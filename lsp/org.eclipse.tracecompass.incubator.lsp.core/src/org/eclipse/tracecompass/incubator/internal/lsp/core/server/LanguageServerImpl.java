@@ -58,17 +58,18 @@ public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
     }
 
     @JsonRequest
-    CompletableFuture<String> fetchMessage() {
-        return CompletableFuture.completedFuture("Hello");
+    public CompletableFuture<String> complete(String str) {
+        if(str.equals("Hello")) {
+            return CompletableFuture.completedFuture("Hello world!");
+        }
+        return CompletableFuture.completedFuture(str);
     }
 
-    @JsonNotification
+    /*@JsonNotification
     public void sayHello(String s) {
         System.out.println(s);
         for(LanguageClientImpl client : clients) {
             client.didSayHello("hello");
         }
-    }
-
-
+    }*/
 }

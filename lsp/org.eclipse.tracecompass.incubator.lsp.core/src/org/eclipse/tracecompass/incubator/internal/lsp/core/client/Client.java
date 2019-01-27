@@ -1,69 +1,95 @@
 package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
 
-import java.net.Socket;
-import java.util.concurrent.CompletableFuture;
-
-import org.eclipse.lsp4j.MessageActionItem;
-import org.eclipse.lsp4j.MessageParams;
-import org.eclipse.lsp4j.PublishDiagnosticsParams;
-import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
-import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
+import java.net.Socket;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-public class Client implements LanguageClient {
+public class Client {
 
-    LanguageServer serverProxy;
+    private class SocketClient {
 
-    @Override
-    public void telemetryEvent(Object object) {
-        // TODO Auto-generated method stub
+        private Socket socket;
+        public String host;
+        public int port;
 
-    }
-
-    @Override
-    public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void showMessage(MessageParams messageParams) {
-        // TODO Auto-generated method stub
-        System.out.println(messageParams.getMessage());
-    }
-
-    @Override
-    public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void logMessage(MessageParams message) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void setServer(LanguageServer proxy) {
-        this.serverProxy = proxy;
-    }
-
-    public void requestWorld() {
-        this.serverProxy.getTextDocumentService();
-    }
-
-    static void launchClient(String host, Integer port) {
-        try (Socket socket = new Socket(host ,port)) {
-            Client client = new Client();
-            Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(client, socket.getInputStream(), socket.getOutputStream());
-            client.setServer(launcher.getRemoteProxy());
-            launcher.startListening();
-            client.requestWorld();
-        } catch (Exception e) {
-            e.printStackTrace();
+        public SocketClient(String host, int port) {
+            this.host = host;
+            this.port = port;
         }
+
+        public void start() {
+            try {
+                socket = new Socket(host, port);
+                System.out.println("Connected to server");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        public InputStream getInputStream() {
+            InputStream inputStream = null;
+            try {
+                inputStream = socket.getInputStream();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            return inputStream;
+        }
+
+        public OutputStream getOutputStream() {
+            OutputStream outputStream = null;
+            try {
+                outputStream = socket.getOutputStream();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            return outputStream;
+        }
+
+    }
+
+    public Client(String host, int port) {
+
+        SocketClient socketClient = new SocketClient(host, port);
+        socketClient.start();
+
+        InputStream in = socketClient.getInputStream();
+        OutputStream out = socketClient.getOutputStream();
+
+        LanguageClientImpl client = new LanguageClientImpl();
+        Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(client, in, out);
+        client.setServer(launcher.getRemoteProxy());
+        launcher.startListening();
+
+        try {
+            String h1 = "World";
+            String h2 = "Hell";
+            String h3 = "Hello";
+            String h4 = "Hello-o";
+
+            System.out.println("Client testing " + h1);
+            String hello1 = launcher.getRemoteEndpoint().request("complete", h1).get().toString();
+            System.out.println(hello1);
+
+            System.out.println("Client testing " + h2);
+            String hello2 = launcher.getRemoteEndpoint().request("complete", h2).get().toString();
+            System.out.println(hello2);
+
+            System.out.println("Client testing " + h3);
+            String hello3 = launcher.getRemoteEndpoint().request("complete", h3).get().toString();
+            System.out.println(hello3);
+
+            System.out.println("Client testing " + h4);
+            String hello4 = launcher.getRemoteEndpoint().request("complete", h4).get().toString();
+            System.out.println(hello4);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
 }
