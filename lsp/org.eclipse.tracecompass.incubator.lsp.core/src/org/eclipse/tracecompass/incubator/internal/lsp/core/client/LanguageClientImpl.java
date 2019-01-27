@@ -8,14 +8,14 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.services.LanguageClient;
-//import org.eclipse.lsp4j.services.LanguageServer;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.server.LanguageServerImpl;
+import org.eclipse.lsp4j.services.LanguageServer;
+//import org.eclipse.tracecompass.incubator.internal.lsp.core.server.LanguageServerImpl;
 //import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 
 public class LanguageClientImpl implements LanguageClient {
 
-    LanguageServerImpl server;
+    LanguageServer server;
 
     @Override
     public void telemetryEvent(Object object) {
@@ -50,6 +50,10 @@ public class LanguageClientImpl implements LanguageClient {
     @JsonNotification
     public void didSayHello(String str) {
         System.out.println(str);
+    }
+
+    public void setServer(LanguageServer server) {
+        this.server = server;
     }
 
 }
