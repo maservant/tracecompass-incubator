@@ -1,5 +1,6 @@
 package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
 
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.concurrent.CompletableFuture;
 
@@ -54,15 +55,20 @@ public class Client implements LanguageClient {
         this.serverProxy.getTextDocumentService();
     }
 
-    static void launchClient(String host, Integer port) {
+    public static void launchClient(InetAddress host, Integer port) {
         try (Socket socket = new Socket(host ,port)) {
             Client client = new Client();
             Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(client, socket.getInputStream(), socket.getOutputStream());
             client.setServer(launcher.getRemoteProxy());
             launcher.startListening();
-            client.requestWorld();
+            String response1 = launcher.getRemoteEndpoint().request("requestWorld", "Hello").get().toString();
+            String response2 = launcher.getRemoteEndpoint().request("requestWorld", "Patate").get().toString();
+            System.out.println(response1);
+            System.out.println(response2);
+            socket.close();
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
