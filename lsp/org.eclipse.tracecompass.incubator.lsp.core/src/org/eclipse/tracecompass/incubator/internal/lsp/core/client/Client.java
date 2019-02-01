@@ -9,10 +9,16 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
 
+import org.eclipse.lsp4j.DidChangeTextDocumentParams;
+import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -74,27 +80,16 @@ public class Client {
         launcher.startListening();
 
         try {
-            String h1 = "World";
-            String h2 = "Hell";
-            String h3 = "Hello";
-            String h4 = "Hello-o";
-
-            System.out.println("Client testing " + h1);
-            String hello1 = launcher.getRemoteEndpoint().request("complete", h1).get().toString();
-            System.out.println(hello1);
-
-            System.out.println("Client testing " + h2);
-            String hello2 = launcher.getRemoteEndpoint().request("complete", h2).get().toString();
-            System.out.println(hello2);
-
-            System.out.println("Client testing " + h3);
-            String hello3 = launcher.getRemoteEndpoint().request("complete", h3).get().toString();
-            System.out.println(hello3);
-
-            System.out.println("Client testing " + h4);
-            String hello4 = launcher.getRemoteEndpoint().request("complete", h4).get().toString();
-            System.out.println(hello4);
-
+            System.out.println("YEEEEHAAA"); //$NON-NLS-1$
+            Range range = new Range(new Position(0, 0), new Position(0, 5));
+            TextDocumentContentChangeEvent change = new TextDocumentContentChangeEvent(range, 5, "Hello");
+            List<TextDocumentContentChangeEvent> changeList = new ArrayList();
+            changeList.add(change);
+            System.out.println("YEEEEHAAA");
+            DidChangeTextDocumentParams params = new DidChangeTextDocumentParams();
+            params.setContentChanges(changeList);
+            System.out.println("YEEEEHAAA");
+            //client.server.getTextDocumentService().didChange(params);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

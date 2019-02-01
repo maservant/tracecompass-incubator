@@ -16,7 +16,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
-import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageClientAware;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -26,10 +25,12 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LanguageClien
 
 public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
 
-    private WorkspaceService workspaceService;
-    private TextDocumentService textDocumentService;
+    private FilterBoxService filterBoxService;
     private final List<LanguageClientImpl> clients = new CopyOnWriteArrayList<>();
 
+    LanguageServerImpl() {
+        this.filterBoxService = new FilterBoxService();
+    }
 
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
@@ -52,13 +53,15 @@ public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
     @Override
     public TextDocumentService getTextDocumentService() {
         // TODO Auto-generated method stub
-        return textDocumentService;
+        System.out.println("In the service of the queen");
+        return this.filterBoxService;
     }
 
     @Override
     public WorkspaceService getWorkspaceService() {
         // TODO Auto-generated method stub
-        return workspaceService;
+        //return workspaceService;
+        return null;
     }
 
     @Override
