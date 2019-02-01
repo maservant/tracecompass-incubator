@@ -25,8 +25,8 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LanguageClien
 
 public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
 
-    private FilterBoxService filterBoxService;
-    private final List<LanguageClientImpl> clients = new CopyOnWriteArrayList<>();
+    private TextDocumentService filterBoxService;
+    private final List<LanguageClient> clients = new CopyOnWriteArrayList<>();
 
     LanguageServerImpl() {
         this.filterBoxService = new FilterBoxService();
@@ -66,7 +66,7 @@ public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
 
     @Override
     public void connect(LanguageClient client) {
-        this.clients.add((LanguageClientImpl)client);
+        this.clients.add(client);
     }
 
     @JsonRequest
