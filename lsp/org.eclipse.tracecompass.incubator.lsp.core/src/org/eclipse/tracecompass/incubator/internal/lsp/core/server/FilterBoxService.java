@@ -141,12 +141,12 @@ public class FilterBoxService implements TextDocumentService {
     @Override
     public void didChange(DidChangeTextDocumentParams params) {
         System.out.println("ALLO");
-        String input = params.getContentChanges().get(0).getText();
+        /*String input = params.getContentChanges().get(0).getText();
         if (input.equals("Hello")) {
             System.out.println("HELLO THERE");
         } else {
             System.out.println("GENERAL KENOBI");
-        }
+        }*/
     }
 
     @Override

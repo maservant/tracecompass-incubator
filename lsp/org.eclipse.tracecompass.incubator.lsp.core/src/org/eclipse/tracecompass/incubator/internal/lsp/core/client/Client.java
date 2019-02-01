@@ -79,7 +79,9 @@ public class Client {
         client.setServer(launcher.getRemoteProxy());
         launcher.startListening();
 
-        try {
+        client.server.getTextDocumentService().didChange(null);
+
+        /*try {
             System.out.println("YEEEEHAAA"); //$NON-NLS-1$
             Range range = new Range(new Position(0, 0), new Position(0, 5));
             TextDocumentContentChangeEvent change = new TextDocumentContentChangeEvent(range, 5, "Hello");
@@ -92,7 +94,7 @@ public class Client {
             //client.server.getTextDocumentService().didChange(params);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-        }
+        }*/
 
     }
 
