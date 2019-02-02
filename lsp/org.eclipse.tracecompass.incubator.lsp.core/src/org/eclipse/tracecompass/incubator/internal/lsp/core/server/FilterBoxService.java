@@ -19,6 +19,7 @@ import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
@@ -30,6 +31,8 @@ import org.eclipse.lsp4j.DocumentRangeFormattingParams;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ReferenceParams;
 import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.SignatureHelp;
@@ -38,9 +41,18 @@ import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 public class FilterBoxService implements TextDocumentService {
+
+    private String input;
+    private final List<LanguageClient> clients;
+
+    FilterBoxService(List<LanguageClient> clients) {
+        this.input = new String();
+        this.clients = clients;
+    }
 
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
@@ -140,13 +152,19 @@ public class FilterBoxService implements TextDocumentService {
 
     @Override
     public void didChange(DidChangeTextDocumentParams params) {
-        System.out.println("ALLO");
-        /*String input = params.getContentChanges().get(0).getText();
-        if (input.equals("Hello")) {
-            System.out.println("HELLO THERE");
+        String inputs = params.getContentChanges().get(0).getText();
+        PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
+        List<Diagnostic> diagnostics = pd.getDiagnostics();
+        String diagMsg = new String();
+        Range range = params.getContentChanges().get(0).getRange();
+        if (inputs.equals("Hello")) {
+            diagMsg = "VALID";
         } else {
-            System.out.println("GENERAL KENOBI");
-        }*/
+            diagMsg = "INVALID";
+        }
+        diagnostics.add(new Diagnostic(range, diagMsg));
+        pd.setDiagnostics(diagnostics);
+        this.clients.get(0).publishDiagnostics(pd);
     }
 
     @Override
@@ -159,6 +177,18 @@ public class FilterBoxService implements TextDocumentService {
     public void didSave(DidSaveTextDocumentParams params) {
         // TODO Auto-generated method stub
 
+    }
+
+    public List<LanguageClient> getClients() {
+        return clients;
+    }
+
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(String input) {
+        this.input = input;
     }
 
 }

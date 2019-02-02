@@ -21,15 +21,16 @@ import org.eclipse.lsp4j.services.LanguageClientAware;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LanguageClientImpl;
 
 public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
 
     private TextDocumentService filterBoxService;
+    private WorkspaceService filterWorkspaceService;
     private final List<LanguageClient> clients = new CopyOnWriteArrayList<>();
 
     LanguageServerImpl() {
-        this.filterBoxService = new FilterBoxService();
+        this.filterBoxService = new FilterBoxService(this.clients);
+        this.filterWorkspaceService = new FilterWorkspaceService();
     }
 
     @Override
@@ -60,8 +61,7 @@ public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
     @Override
     public WorkspaceService getWorkspaceService() {
         // TODO Auto-generated method stub
-        //return workspaceService;
-        return null;
+        return this.filterWorkspaceService;
     }
 
     @Override
@@ -76,12 +76,4 @@ public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
         }
         return CompletableFuture.completedFuture(str);
     }
-
-    /*@JsonNotification
-    public void sayHello(String s) {
-        System.out.println(s);
-        for(LanguageClientImpl client : clients) {
-            client.didSayHello("hello");
-        }
-    }*/
 }
