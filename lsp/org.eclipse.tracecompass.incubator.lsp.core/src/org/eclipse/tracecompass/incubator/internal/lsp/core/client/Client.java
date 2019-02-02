@@ -79,8 +79,6 @@ public class Client {
         client.setServer(launcher.getRemoteProxy());
         launcher.startListening();
 
-        //client.server.getTextDocumentService().didChange(null);
-
         try {
             Range range = new Range(new Position(0, 0), new Position(0, 5));
             TextDocumentContentChangeEvent change1 = new TextDocumentContentChangeEvent(range, 5, "Hello");
@@ -89,10 +87,10 @@ public class Client {
             changeList.add(change1);
             DidChangeTextDocumentParams params = new DidChangeTextDocumentParams();
             params.setContentChanges(changeList);
-            client.server.getTextDocumentService().didChange(params);
+            client.serverProxy.getTextDocumentService().didChange(params);
             changeList.remove(change1);
             changeList.add(change2);
-            client.server.getTextDocumentService().didChange(params);
+            client.serverProxy.getTextDocumentService().didChange(params);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
