@@ -9,7 +9,7 @@ public class exec {
         String host = "127.0.0.1";
         int port = 9090;
 
-        new Server(host, port);
+        new Server(port);
         new Client(host, port);
 
     }
