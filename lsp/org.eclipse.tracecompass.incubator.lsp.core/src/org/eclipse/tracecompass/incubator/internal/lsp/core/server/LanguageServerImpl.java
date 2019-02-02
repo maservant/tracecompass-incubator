@@ -15,7 +15,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
-import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageClientAware;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -54,7 +53,6 @@ public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
     @Override
     public TextDocumentService getTextDocumentService() {
         // TODO Auto-generated method stub
-        System.out.println("In the service of the queen");
         return this.filterBoxService;
     }
 
@@ -67,13 +65,5 @@ public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
     @Override
     public void connect(LanguageClient client) {
         this.clients.add(client);
-    }
-
-    @JsonRequest
-    public CompletableFuture<String> complete(String str) {
-        if(str.equals("Hello")) {
-            return CompletableFuture.completedFuture("Hello world!");
-        }
-        return CompletableFuture.completedFuture(str);
     }
 }
