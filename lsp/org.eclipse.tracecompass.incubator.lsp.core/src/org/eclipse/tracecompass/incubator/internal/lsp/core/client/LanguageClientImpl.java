@@ -34,8 +34,7 @@ public class LanguageClientImpl implements LanguageClient {
 
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        // TODO Auto-generated method stub
-
+        System.out.println(diagnostics.getDiagnostics().get(0).getMessage());
     }
 
     @Override

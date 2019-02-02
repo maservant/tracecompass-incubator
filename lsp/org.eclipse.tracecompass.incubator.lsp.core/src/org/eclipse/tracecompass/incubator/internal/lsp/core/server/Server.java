@@ -57,7 +57,7 @@ public class Server {
 
                             LanguageServerImpl server = new LanguageServerImpl();
                             Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(server, in, out);
-                            //server.connect(launcher.getRemoteProxy());
+                            server.connect(launcher.getRemoteProxy());
                             launcher.startListening();
 
 
