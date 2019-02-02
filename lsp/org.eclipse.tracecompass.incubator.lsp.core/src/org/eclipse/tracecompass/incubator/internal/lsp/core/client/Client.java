@@ -79,7 +79,8 @@ public class Client {
         client.setServer(launcher.getRemoteProxy());
         launcher.startListening();
 
-        client.server.getTextDocumentService().didChange(null);
+        client.tellDidChange("hello");
+        client.tellDidChange("Hello");
 
     }
 
