@@ -81,8 +81,8 @@ public class LanguageClientImpl implements LanguageClient {
         Integer min = 0;
         Integer max = str.length() - 1;
 
-        Position p1 = new Position(min, Integer.parseInt(str.substring(min,  min)));
-        Position p2 = new Position(max, Integer.parseInt(str.substring(max,  max)));
+        Position p1 = new Position(min, Character.getNumericValue(str.charAt(min)) );
+        Position p2 = new Position(max, Character.getNumericValue(str.charAt(min)) );
         Range r = new Range(p1,p2);
         TextDocumentContentChangeEvent change = new TextDocumentContentChangeEvent(r, max, str);
         List<TextDocumentContentChangeEvent> changelist = new ArrayList();
@@ -90,7 +90,7 @@ public class LanguageClientImpl implements LanguageClient {
         DidChangeTextDocumentParams params = new DidChangeTextDocumentParams();
         params.setContentChanges(changelist);
 
-        server.getTextDocumentService().didChange(params);
+        serverProxy.getTextDocumentService().didChange(params);
     }
 
     public void askCompletion() {
