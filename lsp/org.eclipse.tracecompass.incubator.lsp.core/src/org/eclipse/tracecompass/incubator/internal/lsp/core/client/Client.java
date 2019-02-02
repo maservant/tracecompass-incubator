@@ -73,31 +73,7 @@ public class Client {
         client.setServer(launcher.getRemoteProxy());
         launcher.startListening();
 
-        try {
-            String h1 = "World";
-            String h2 = "Hell";
-            String h3 = "Hello";
-            String h4 = "Hello-o";
-
-            System.out.println("Client testing " + h1);
-            String hello1 = launcher.getRemoteEndpoint().request("complete", h1).get().toString();
-            System.out.println(hello1);
-
-            System.out.println("Client testing " + h2);
-            String hello2 = launcher.getRemoteEndpoint().request("complete", h2).get().toString();
-            System.out.println(hello2);
-
-            System.out.println("Client testing " + h3);
-            String hello3 = launcher.getRemoteEndpoint().request("complete", h3).get().toString();
-            System.out.println(hello3);
-
-            System.out.println("Client testing " + h4);
-            String hello4 = launcher.getRemoteEndpoint().request("complete", h4).get().toString();
-            System.out.println(hello4);
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        client.server.getTextDocumentService().didChange(null);
 
     }
 
