@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.incubator.internal.global.filters.ui.views;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -34,6 +35,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.client.IObservable;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.client.IObserver;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
@@ -49,7 +52,7 @@ import com.google.gson.Gson;
  * @author Genevieve Bastien
  */
 @SuppressWarnings("restriction")
-public class GlobalFilterViewer extends Composite {
+public class GlobalFilterViewer extends Composite implements IObservable {
 
     private static final Gson GSON = new Gson();
 
@@ -62,6 +65,7 @@ public class GlobalFilterViewer extends Composite {
     private final ExpandItem fActive;
     private final org.eclipse.swt.widgets.List fSavedArea;
     private final ExpandItem fSaved;
+    private final ArrayList<IObserver> observers;
 
     /**
      * Deleted all selected items
@@ -146,6 +150,7 @@ public class GlobalFilterViewer extends Composite {
                     fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
                     filtersUpdated();
                 }
+                observers.forEach((o) -> o.notify(fFilterText.getText()));
             }
 
         });
@@ -315,6 +320,7 @@ public class GlobalFilterViewer extends Composite {
             }
         });
         layout(true);
+        observers = new ArrayList<>();
     }
 
     @Override
@@ -351,4 +357,8 @@ public class GlobalFilterViewer extends Composite {
         redraw();
     }
 
+    @Override
+    public void register(IObserver observer) {
+        this.observers.add(observer);
+    }
 }
