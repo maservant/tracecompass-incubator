@@ -30,8 +30,11 @@ import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Text;
@@ -65,7 +68,8 @@ public class GlobalFilterViewer extends Composite implements IObservable {
     private final ExpandItem fActive;
     private final org.eclipse.swt.widgets.List fSavedArea;
     private final ExpandItem fSaved;
-    private final ArrayList<IObserver> observers;
+    private final ArrayList<IObserver> fobservers;
+    private final Color defaultFilterTextColor;
 
     /**
      * Deleted all selected items
@@ -150,7 +154,7 @@ public class GlobalFilterViewer extends Composite implements IObservable {
                     fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
                     filtersUpdated();
                 }
-                observers.forEach((o) -> o.notify(fFilterText.getText()));
+                fobservers.forEach((o) -> o.notify(fFilterText.getText()));
             }
 
         });
@@ -320,7 +324,8 @@ public class GlobalFilterViewer extends Composite implements IObservable {
             }
         });
         layout(true);
-        observers = new ArrayList<>();
+        fobservers = new ArrayList<>();
+        defaultFilterTextColor = fFilterText.getBackground();
     }
 
     @Override
@@ -357,8 +362,26 @@ public class GlobalFilterViewer extends Composite implements IObservable {
         redraw();
     }
 
+    /**
+     * Method available to the LSP dispatcher so this view can notify for a change
+     */
     @Override
     public void register(IObserver observer) {
-        this.observers.add(observer);
+        fobservers.add(observer);
+    }
+
+    /**
+     * method available to the LSP dispatcher to update the view according to a response
+     * @param status the status (VALID or INVALID for now)
+     * @param suggestions A list of suggestions to show underneath
+     */
+    public void updateView(String status, ArrayList<String> suggestions) {
+        if (status == "INVALID") {
+            Device device = Display.getCurrent ();
+            fFilterText.setBackground(new Color (device, 255, 117, 117));
+        }
+        else {
+            fFilterText.setBackground(defaultFilterTextColor);
+        }
     }
 }
