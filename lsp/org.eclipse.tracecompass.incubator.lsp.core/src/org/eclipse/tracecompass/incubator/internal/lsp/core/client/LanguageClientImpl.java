@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
@@ -27,11 +28,14 @@ import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObservable;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-public class LanguageClientImpl implements LanguageClient {
+public class LanguageClientImpl implements LanguageClient, IObservable {
 
     LanguageServer serverProxy;
+    IObserver observer;
 
     @Override
     public void telemetryEvent(Object object) {
@@ -43,6 +47,8 @@ public class LanguageClientImpl implements LanguageClient {
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
         // TODO Auto-generated method stub
         String v = diagnostics.getDiagnostics().get(0).getMessage();
+        this.observer.notify(v);
+
         if(v.equals("VALID")) {
             //Ask for completion
             //this.askCompletion();
@@ -52,7 +58,6 @@ public class LanguageClientImpl implements LanguageClient {
             //Error
             System.out.println("String is INVALID");
         }
-
     }
 
     @Override
@@ -77,6 +82,11 @@ public class LanguageClientImpl implements LanguageClient {
         this.serverProxy = server;
     }
 
+    @Override
+    public void register(@NonNull IObserver obs) {
+        this.observer = obs;
+    }
+
     public void tellDidChange(String str) {
         Integer min = 0;
         Integer max = str.length() - 1;
@@ -91,19 +101,6 @@ public class LanguageClientImpl implements LanguageClient {
         params.setContentChanges(changelist);
 
         serverProxy.getTextDocumentService().didChange(params);
-    }
-
-    public void askCompletion() {
-        //Waiting for response
-        CompletionParams completion = new CompletionParams();
-        try {
-             Either<List<CompletionItem>, CompletionList> either = server.getTextDocumentService().completion(completion).get();
-             CompletionItem item = either.getLeft().get(0);
-             String c = item.getLabel();
-             System.out.println(c);
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
     }
 
 }
