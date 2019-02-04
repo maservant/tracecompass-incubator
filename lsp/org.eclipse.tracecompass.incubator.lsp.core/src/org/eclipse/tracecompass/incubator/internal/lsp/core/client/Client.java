@@ -64,7 +64,7 @@ public class Client {
 
     }
 
-    private Client(@NonNull IObserver observer) {
+    public Client(@NonNull IObserver observer) {
 
         SocketClient socketClient = new SocketClient(Configuration.HOSTNAME, Configuration.PORT);
         socketClient.start();
