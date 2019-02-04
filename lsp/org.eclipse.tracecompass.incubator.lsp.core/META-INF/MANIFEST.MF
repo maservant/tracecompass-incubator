@@ -16,5 +16,6 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.gson;bundle-version="2.7.0"
 Export-Package: org.eclipse.tracecompass.incubator.internal.lsp.core;x-friends:="org.eclipse.tracecompass.incubator.lsp.core.tests",
  org.eclipse.tracecompass.incubator.internal.lsp.core.client,
- org.eclipse.tracecompass.incubator.internal.lsp.core.server
+ org.eclipse.tracecompass.incubator.internal.lsp.core.server,
+ org.eclipse.tracecompass.incubator.internal.lsp.core.shared
 Automatic-Module-Name: org.eclipse.tracecompass.incubator.lsp.core

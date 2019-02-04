@@ -88,6 +88,9 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
     }
 
     public void tellDidChange(String str) {
+        if (str.equals("")) {
+            return;
+        }
         Integer min = 0;
         Integer max = str.length() - 1;
 
