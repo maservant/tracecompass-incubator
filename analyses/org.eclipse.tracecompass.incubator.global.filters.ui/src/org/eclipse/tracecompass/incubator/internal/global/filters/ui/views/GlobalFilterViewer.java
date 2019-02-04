@@ -38,7 +38,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObservable;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.client.Client;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Server;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
@@ -55,7 +56,7 @@ import com.google.gson.Gson;
  * @author Genevieve Bastien
  */
 @SuppressWarnings("restriction")
-public class GlobalFilterViewer extends Composite {
+public class GlobalFilterViewer extends Composite implements IObserver {
 
     private static final Gson GSON = new Gson();
 
@@ -69,7 +70,7 @@ public class GlobalFilterViewer extends Composite {
     private final org.eclipse.swt.widgets.List fSavedArea;
     private final ExpandItem fSaved;
     private final Color defaultFilterTextColor;
-//    private final Client lspClient;
+    private final Client lspClient;
 
     /**
      * Deleted all selected items
@@ -137,6 +138,8 @@ public class GlobalFilterViewer extends Composite {
             @Override
             public void keyReleased(@Nullable KeyEvent e) {
                 // Do nothing
+                String text = Objects.requireNonNull(fFilterText.getText());
+                notifyLspClient(text);
             }
 
             @Override
@@ -154,7 +157,7 @@ public class GlobalFilterViewer extends Composite {
                     fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
                     filtersUpdated();
                 }
-                notifyLspClient(text);
+//                notifyLspClient(text);
             }
 
         });
@@ -325,13 +328,11 @@ public class GlobalFilterViewer extends Composite {
         });
         layout(true);
         defaultFilterTextColor = fFilterText.getBackground();
-        String host = "127.0.0.1";
-        int port = 9090;
 
         // Initialize the LSP server
-//        new Server(port);
+        new Server();
         // and the LSP Client
-//        lspClient = new Client(host, port);
+        lspClient = new Client(this);
     }
 
     @Override
@@ -373,6 +374,29 @@ public class GlobalFilterViewer extends Composite {
      * @param msg string enterred in the filter box
      */
     private void notifyLspClient(String msg) {
+        if (msg.equals("")) {
+            fFilterText.setBackground(defaultFilterTextColor);
+        }
+        else {
+            lspClient.notify(msg);
+        }
+    }
+
+    @Override()
+    public void notify(@Nullable Object v) {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override()
+            public void run() {
+                String s = Objects.requireNonNull(v).toString();
+                if (s.equals("INVALID")) {
+                    Device device = Display.getCurrent();
+                    fFilterText.setBackground(new Color (device, 255, 117, 117));
+                }
+                else {
+                    fFilterText.setBackground(defaultFilterTextColor);
+                }
+            }
+        });
     }
 
     /**
