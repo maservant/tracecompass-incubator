@@ -9,14 +9,13 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.eclipse.lsp4j.jsonrpc.Launcher;
-import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -68,8 +67,8 @@ public class Server {
         }
     }
 
-    public Server(int port) {
-        mSocket socket = new mSocket(port);
+    public Server() {
+        mSocket socket = new mSocket(Configuration.PORT);
         socket.start();
     }
 
