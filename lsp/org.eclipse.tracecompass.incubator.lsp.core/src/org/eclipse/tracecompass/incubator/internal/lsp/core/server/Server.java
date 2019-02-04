@@ -9,10 +9,12 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.eclipse.lsp4j.jsonrpc.Launcher;
+import org.eclipse.lsp4j.jsonrpc.services.JsonRequest;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 
