@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
+package org.eclipse.tracecompass.incubator.internal.lsp.core.shared;
 
 import org.eclipse.jdt.annotation.NonNull;
 

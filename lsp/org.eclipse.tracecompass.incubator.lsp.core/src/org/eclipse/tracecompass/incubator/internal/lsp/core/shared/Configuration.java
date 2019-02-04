@@ -7,8 +7,9 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
+package org.eclipse.tracecompass.incubator.internal.lsp.core.shared;
 
-public interface IObserver {
-    public void notify(Object value);
+public class Configuration {
+    public static String HOSTNAME = "127.0.0.1";
+    public static Integer PORT = 9090;
 }
