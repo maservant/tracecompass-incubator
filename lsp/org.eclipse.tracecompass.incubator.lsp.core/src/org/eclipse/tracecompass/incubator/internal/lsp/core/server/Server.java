@@ -15,6 +15,7 @@ import java.net.Socket;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -66,8 +67,8 @@ public class Server {
         }
     }
 
-    public Server(int port) {
-        mSocket socket = new mSocket(port);
+    public Server() {
+        mSocket socket = new mSocket(Configuration.PORT);
         socket.start();
     }
 

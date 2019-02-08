@@ -1,16 +1,23 @@
 
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.Client;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Server;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
 public class exec {
 
+
     public static void main(String[] args) throws Exception {
 
-        String host = "127.0.0.1";
-        int port = 9090;
+        new Server();
+        new Client(new IObserver() {
 
-        new Server(port);
-        new Client(host, port);
+            @Override
+            public void notify(Object value) {
+                // TODO Auto-generated method stub
+
+            }
+        });
 
     }
+
 }

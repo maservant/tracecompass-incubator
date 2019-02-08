@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.incubator.internal.global.filters.ui.views;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,11 +30,17 @@ import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.client.Client;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Server;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
@@ -49,7 +56,7 @@ import com.google.gson.Gson;
  * @author Genevieve Bastien
  */
 @SuppressWarnings("restriction")
-public class GlobalFilterViewer extends Composite {
+public class GlobalFilterViewer extends Composite implements IObserver {
 
     private static final Gson GSON = new Gson();
 
@@ -62,6 +69,8 @@ public class GlobalFilterViewer extends Composite {
     private final ExpandItem fActive;
     private final org.eclipse.swt.widgets.List fSavedArea;
     private final ExpandItem fSaved;
+    private final Color defaultFilterTextColor;
+    private final Client lspClient;
 
     /**
      * Deleted all selected items
@@ -129,6 +138,8 @@ public class GlobalFilterViewer extends Composite {
             @Override
             public void keyReleased(@Nullable KeyEvent e) {
                 // Do nothing
+                String text = Objects.requireNonNull(fFilterText.getText());
+                notifyLspClient(text);
             }
 
             @Override
@@ -136,8 +147,8 @@ public class GlobalFilterViewer extends Composite {
                 if (e == null) {
                     return;
                 }
+                String text = Objects.requireNonNull(fFilterText.getText());
                 if (e.character == SWT.CR) {
-                    String text = Objects.requireNonNull(fFilterText.getText());
                     fFilterText.setText(""); //$NON-NLS-1$
                     if (fEnabledFilters.contains(text) || fDisabledFilters.contains(text)) {
                         return;
@@ -146,6 +157,7 @@ public class GlobalFilterViewer extends Composite {
                     fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
                     filtersUpdated();
                 }
+//                notifyLspClient(text);
             }
 
         });
@@ -315,6 +327,12 @@ public class GlobalFilterViewer extends Composite {
             }
         });
         layout(true);
+        defaultFilterTextColor = fFilterText.getBackground();
+
+        // Initialize the LSP server
+        new Server();
+        // and the LSP Client
+        lspClient = new Client(this);
     }
 
     @Override
@@ -351,4 +369,48 @@ public class GlobalFilterViewer extends Composite {
         redraw();
     }
 
+    /**
+     * Method to notify the LSP Client of a change
+     * @param msg string enterred in the filter box
+     */
+    private void notifyLspClient(String msg) {
+        if (msg.equals("")) {
+            fFilterText.setBackground(defaultFilterTextColor);
+        }
+        else {
+            lspClient.notify(msg);
+        }
+    }
+
+    @Override()
+    public void notify(@Nullable Object v) {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override()
+            public void run() {
+                String s = Objects.requireNonNull(v).toString();
+                if (s.equals("INVALID")) {
+                    Device device = Display.getCurrent();
+                    fFilterText.setBackground(new Color (device, 255, 117, 117));
+                }
+                else {
+                    fFilterText.setBackground(defaultFilterTextColor);
+                }
+            }
+        });
+    }
+
+    /**
+     * method available to the LSP dispatcher to update the view according to a response
+     * @param status the status (VALID or INVALID for now)
+     * @param suggestions A list of suggestions to show underneath
+     */
+    public void updateView(String status, ArrayList<String> suggestions) {
+        if (status == "INVALID") {
+            Device device = Display.getCurrent ();
+            fFilterText.setBackground(new Color (device, 255, 117, 117));
+        }
+        else {
+            fFilterText.setBackground(defaultFilterTextColor);
+        }
+    }
 }

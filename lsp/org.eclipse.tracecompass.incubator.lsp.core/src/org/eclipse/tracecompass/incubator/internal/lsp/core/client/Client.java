@@ -9,20 +9,18 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
 
-import org.eclipse.lsp4j.DidChangeTextDocumentParams;
-import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 import java.io.InputStream;
 import java.io.OutputStream;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
 
 public class Client {
+
+    private LanguageClientImpl client;
 
     private class SocketClient {
 
@@ -66,35 +64,22 @@ public class Client {
 
     }
 
-    public Client(String host, int port) {
+    public Client(@NonNull IObserver observer) {
 
-        SocketClient socketClient = new SocketClient(host, port);
+        SocketClient socketClient = new SocketClient(Configuration.HOSTNAME, Configuration.PORT);
         socketClient.start();
 
         InputStream in = socketClient.getInputStream();
         OutputStream out = socketClient.getOutputStream();
 
-        LanguageClientImpl client = new LanguageClientImpl();
+        client = new LanguageClientImpl();
         Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(client, in, out);
         client.setServer(launcher.getRemoteProxy());
+        client.register(observer);
         launcher.startListening();
-
-        try {
-            Range range = new Range(new Position(0, 0), new Position(0, 5));
-            TextDocumentContentChangeEvent change1 = new TextDocumentContentChangeEvent(range, 5, "Hello");
-            TextDocumentContentChangeEvent change2 = new TextDocumentContentChangeEvent(range, 5, "hello");
-            List<TextDocumentContentChangeEvent> changeList = new ArrayList();
-            changeList.add(change1);
-            DidChangeTextDocumentParams params = new DidChangeTextDocumentParams();
-            params.setContentChanges(changeList);
-            client.serverProxy.getTextDocumentService().didChange(params);
-            changeList.remove(change1);
-            changeList.add(change2);
-            client.serverProxy.getTextDocumentService().didChange(params);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
     }
 
+    public void notify(String str) {
+        client.tellDidChange(str);
+    }
 }
