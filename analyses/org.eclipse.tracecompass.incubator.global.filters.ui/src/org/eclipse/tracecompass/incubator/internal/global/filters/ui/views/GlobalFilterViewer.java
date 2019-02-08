@@ -9,7 +9,6 @@
 
 package org.eclipse.tracecompass.incubator.internal.global.filters.ui.views;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,6 +29,8 @@ import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Point;
@@ -39,7 +40,6 @@ import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.Client;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Server;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
@@ -137,7 +137,6 @@ public class GlobalFilterViewer extends Composite implements IObserver {
 
             @Override
             public void keyReleased(@Nullable KeyEvent e) {
-                // Do nothing
                 String text = Objects.requireNonNull(fFilterText.getText());
                 notifyLspClient(text);
             }
@@ -147,8 +146,8 @@ public class GlobalFilterViewer extends Composite implements IObserver {
                 if (e == null) {
                     return;
                 }
-                String text = Objects.requireNonNull(fFilterText.getText());
                 if (e.character == SWT.CR) {
+                    String text = Objects.requireNonNull(fFilterText.getText());
                     fFilterText.setText(""); //$NON-NLS-1$
                     if (fEnabledFilters.contains(text) || fDisabledFilters.contains(text)) {
                         return;
@@ -157,9 +156,24 @@ public class GlobalFilterViewer extends Composite implements IObserver {
                     fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
                     filtersUpdated();
                 }
-//                notifyLspClient(text);
             }
 
+        });
+        fFilterText.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(@Nullable SelectionEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void widgetDefaultSelected(@Nullable SelectionEvent e) {
+                SelectionEvent event = Objects.requireNonNull(e);
+                if (event.detail == SWT.ICON_CANCEL) {
+                    resetFilterBox();
+                }
+            }
         });
         DragSource activeSource = new DragSource(fActiveArea, DND.DROP_MOVE);
         activeSource.setTransfer(TextTransfer.getInstance());
@@ -329,9 +343,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
         layout(true);
         defaultFilterTextColor = fFilterText.getBackground();
 
-        // Initialize the LSP server
-        new Server();
-        // and the LSP Client
+        // Initialize the LSP Client
         lspClient = new Client(this);
     }
 
@@ -371,17 +383,20 @@ public class GlobalFilterViewer extends Composite implements IObserver {
 
     /**
      * Method to notify the LSP Client of a change
-     * @param msg string enterred in the filter box
+     * @param msg string entered in the filter box
      */
     private void notifyLspClient(String msg) {
-        if (msg.equals("")) {
-            fFilterText.setBackground(defaultFilterTextColor);
+        if (msg.isEmpty()) {
+            resetFilterBox();
         }
         else {
             lspClient.notify(msg);
         }
     }
 
+    /**
+     * Method called by the lsp client to notify the view of changes
+     */
     @Override()
     public void notify(@Nullable Object v) {
         Display.getDefault().syncExec(new Runnable() {
@@ -389,28 +404,28 @@ public class GlobalFilterViewer extends Composite implements IObserver {
             public void run() {
                 String s = Objects.requireNonNull(v).toString();
                 if (s.equals("INVALID")) {
-                    Device device = Display.getCurrent();
-                    fFilterText.setBackground(new Color (device, 255, 117, 117));
+                    showErrorFilterBox();
                 }
                 else {
-                    fFilterText.setBackground(defaultFilterTextColor);
+                    resetFilterBox();
                 }
             }
         });
     }
 
     /**
-     * method available to the LSP dispatcher to update the view according to a response
-     * @param status the status (VALID or INVALID for now)
-     * @param suggestions A list of suggestions to show underneath
+     * Method to put the filter box in error state
      */
-    public void updateView(String status, ArrayList<String> suggestions) {
-        if (status == "INVALID") {
-            Device device = Display.getCurrent ();
-            fFilterText.setBackground(new Color (device, 255, 117, 117));
-        }
-        else {
-            fFilterText.setBackground(defaultFilterTextColor);
-        }
+    private void showErrorFilterBox() {
+        Device device = Display.getCurrent();
+        fFilterText.setBackground(new Color (device, 255, 150, 150));
+    }
+
+    /**
+     * Method to reset the filter box view (i.e. put back initial color,
+     * remove error message, remove suggestions)
+     */
+    private void resetFilterBox() {
+        fFilterText.setBackground(defaultFilterTextColor);
     }
 }
