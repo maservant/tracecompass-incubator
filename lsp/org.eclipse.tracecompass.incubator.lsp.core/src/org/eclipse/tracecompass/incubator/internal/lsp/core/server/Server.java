@@ -72,4 +72,10 @@ public class Server {
         socket.start();
     }
 
+    public Server(InputStream in, OutputStream out) {
+        LanguageServerImpl server = new LanguageServerImpl();
+        Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(server, in, out);
+        server.connect(launcher.getRemoteProxy());
+        launcher.startListening();
+    }
 }
