@@ -43,6 +43,7 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 
 public class FilterBoxService implements TextDocumentService {
 
@@ -152,12 +153,13 @@ public class FilterBoxService implements TextDocumentService {
 
     @Override
     public void didChange(DidChangeTextDocumentParams params) {
-        String inputs = params.getContentChanges().get(0).getText();
+        this.input = params.getContentChanges().get(0).getText();
         PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
         List<Diagnostic> diagnostics = pd.getDiagnostics();
         String diagMsg = new String();
         Range range = params.getContentChanges().get(0).getRange();
-        if (inputs.equals("Hello")) {
+        FilterCu inputValidity = FilterCu.compile(this.input);
+        if (inputValidity != null) {
             diagMsg = "VALID";
         } else {
             diagMsg = "INVALID";

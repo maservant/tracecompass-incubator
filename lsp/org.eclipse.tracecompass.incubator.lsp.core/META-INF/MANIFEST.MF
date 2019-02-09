@@ -19,4 +19,5 @@ Export-Package: org.eclipse.tracecompass.incubator.internal.lsp.core;x-friends:=
  org.eclipse.tracecompass.incubator.internal.lsp.core.server,
  org.eclipse.tracecompass.incubator.internal.lsp.core.shared
 Automatic-Module-Name: org.eclipse.tracecompass.incubator.lsp.core
-Import-Package: org.apache.commons.compress.utils
+Import-Package: org.apache.commons.compress.utils,
+ org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser
