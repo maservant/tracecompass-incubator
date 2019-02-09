@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionList;
-import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
@@ -30,12 +27,11 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObservable;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
 public class LanguageClientImpl implements LanguageClient, IObservable {
 
-    LanguageServer serverProxy;
-    IObserver observer;
+    public LanguageServer serverProxy;
+    public IObserver observer;
 
     @Override
     public void telemetryEvent(Object object) {

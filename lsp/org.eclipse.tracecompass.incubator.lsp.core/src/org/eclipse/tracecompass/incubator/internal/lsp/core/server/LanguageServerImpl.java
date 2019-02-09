@@ -23,9 +23,9 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 
 public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
 
-    protected TextDocumentService filterBoxService;
-    protected WorkspaceService filterWorkspaceService;
-    protected final List<LanguageClient> clients = new CopyOnWriteArrayList<>();
+    private TextDocumentService filterBoxService;
+    private WorkspaceService filterWorkspaceService;
+    private final List<LanguageClient> clients = new CopyOnWriteArrayList<>();
 
     public LanguageServerImpl() {
         this.filterBoxService = new FilterBoxService(this.clients);

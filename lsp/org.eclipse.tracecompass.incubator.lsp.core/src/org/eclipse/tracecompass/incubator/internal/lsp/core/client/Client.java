@@ -19,12 +19,25 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
 
 public class Client {
 
-    private LanguageClientImpl client;
+    public LanguageClientImpl lspclient;
 
     /*
      * Create client:
-     *  -Connect to server with socket form hostname and port
-     *  -Register an observer whom use client API and get notified when server responds
+     *  -Connect to server with socket from default hostname and port
+     *  -Register an observer who can use client API and get notified when server responds
+     * @param hostname: address of server to connect to
+     * @param port: port of server
+     * @param observer that uses this API and get notified
+     */
+    public Client(@NonNull IObserver observer) {
+        SocketClient sc = new SocketClient(Configuration.HOSTNAME, Configuration.PORT);
+        initialize(sc.getInputStream(), sc.getOutputStream(), observer);
+    }
+
+    /*
+     * Create client:
+     *  -Connect to server with socket from hostname and port
+     *  -Register an observer who can use client API and get notified when server responds
      * @param hostname: address of server to connect to
      * @param port: port of server
      * @param observer that uses this API and get notified
@@ -37,7 +50,7 @@ public class Client {
     /*
      * Create client:
      *  -Use InputStream and OutputStream instead of socket
-     *  -Register an observer whom use client API and get notified when server responds
+     *  -Register an observer who can use client API and get notified when server responds
      * @param in: input stream
      * @param out: output stream
      * @param observer that uses this API and get notified
@@ -53,10 +66,10 @@ public class Client {
      * @param observer
      */
     private void initialize(InputStream in, OutputStream out, @NonNull IObserver observer) {
-        client = new LanguageClientImpl();
-        Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(client, in, out);
-        client.setServer(launcher.getRemoteProxy());
-        client.register(observer);
+        lspclient = new LanguageClientImpl();
+        Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(lspclient, in, out);
+        lspclient.setServer(launcher.getRemoteProxy());
+        lspclient.register(observer);
         launcher.startListening();
         System.out.println("LSPClient initialized");
     }
@@ -66,6 +79,6 @@ public class Client {
      * @param str: string to send
      */
     public void notify(String str) {
-        client.tellDidChange(str);
+        lspclient.tellDidChange(str);
     }
 }

@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.Client;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
@@ -344,7 +345,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
         defaultFilterTextColor = fFilterText.getBackground();
 
         // Initialize the LSP Client
-        lspClient = new Client(this);
+        lspClient = new Client(Configuration.HOSTNAME, Configuration.PORT, this);
     }
 
     @Override
