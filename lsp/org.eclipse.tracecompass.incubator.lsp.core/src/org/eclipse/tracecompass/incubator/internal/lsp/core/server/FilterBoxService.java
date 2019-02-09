@@ -9,9 +9,9 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.CodeLens;
 import org.eclipse.lsp4j.CodeLensParams;
@@ -31,6 +31,7 @@ import org.eclipse.lsp4j.DocumentRangeFormattingParams;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ReferenceParams;
@@ -44,6 +45,8 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterExpressionCu;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterSimpleExpressionCu;
 
 public class FilterBoxService implements TextDocumentService {
 
@@ -57,8 +60,26 @@ public class FilterBoxService implements TextDocumentService {
 
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
-        // TODO Auto-generated method stub
-        return null;
+        Position startPos = new Position(position.getPosition().getLine(), position.getPosition().getCharacter());
+        Position endPos = new Position(startPos.getLine(), startPos.getCharacter() + 1);
+        List<CompletionItem> items = new ArrayList();
+        FilterCu inputValidity = FilterCu.compile2(this.input);
+        if (inputValidity == null) {
+            return CompletableFuture.completedFuture(null);
+        }
+        FilterExpressionCu expression = inputValidity.getExpressions().get(0);
+        if (expression.getElement().get(0) instanceof FilterSimpleExpressionCu) {
+            FilterSimpleExpressionCu simpleExpression = (FilterSimpleExpressionCu)expression.getElement().get(0);
+            if (simpleExpression.getOperator().equals("matches")) {
+                CompletionItem item1 = new CompletionItem();
+                item1.setTextEdit(new TextEdit(new Range(startPos, endPos), "=="));
+                CompletionItem item2 = new CompletionItem();
+                item2.setTextEdit(new TextEdit(new Range(startPos, endPos), "!="));
+                items.add(item1);
+                items.add(item2);
+            }
+        }
+        return CompletableFuture.completedFuture(Either.forLeft(items));
     }
 
     @Override
