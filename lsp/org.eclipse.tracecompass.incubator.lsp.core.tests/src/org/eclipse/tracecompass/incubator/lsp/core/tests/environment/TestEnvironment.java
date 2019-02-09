@@ -8,18 +8,13 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.client.Client;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Server;
 
 /**
- * This class initialize stubs for Client, Server and FilterBox. Theses stubs has a mockup attributes in wich the stubs
- * needs to write value when they receive signals from others stubs from original classes (Client, Server or FilterBox)
+ * Create a test environment for testing LSP implementations
+ * This class returns a stub for every communication elements. Theses stubs gather data about transaction and delegates transactions
+ * to the real communication elements. So the unit test can simply read from mockup to check if values are OK.
  * @author maxtibs
  *
  */
 public class TestEnvironment {
-
-    public static enum ENVIRONMENT {
-        SERVER,
-        CLIENT,
-        FILTERBOX
-    }
 
     public Server server = null;
     public Client client = null;
@@ -29,96 +24,31 @@ public class TestEnvironment {
     public ServerStub serverStub;
     public FilterBoxStub filterBoxStub;
 
-    /**
-     * Initialize a test environnment based on env selected
-     * @param env: SERVER, CLIENT or FILTERBOX
-     */
-    public TestEnvironment(ENVIRONMENT env) {
-        switch(env) {
-            case SERVER:
-                createServerEnv();
-                break;
-            case CLIENT:
-                createClientEnv();
-                break;
-           /* TODO: case FILTERBOX:
-                break;*/
-            default:
-                break;
-        }
-    }
 
-    /**
-     * Create test environment for Client
-     *  -Create a Client
-     *  -Create a ClientStub
-     *  -Create a ServerStub
-     *  -Create a FilterBoxStub
-     */
-    private void createClientEnv() {
-
-        Stream blackholeStream = new Stream();
-
-        Stream clientStream = new Stream();
-        Stream serverStubStream = new Stream();
-
-        //Create filterBoxStub
-        filterBoxStub = new FilterBoxStub();
-
-        //Create clientStub
-        Stream clientStubStream = new Stream();
-        clientStub = new ClientStub();
-        Launcher<LanguageServer> clientLauncher = LSPLauncher.createClientLauncher(clientStub, serverStubStream.read, clientStubStream.write);
-        clientStub.setServer(clientLauncher.getRemoteProxy());
-        clientStub.register(filterBoxStub);
-        clientLauncher.startListening();
-
-        //Create serverStub
-        serverStub = new ServerStub();
-        Launcher<LanguageClient> serverLauncher = LSPLauncher.createServerLauncher(serverStub, clientStream.read, serverStubStream.write);
-        serverStub.connect(serverLauncher.getRemoteProxy());
-        serverLauncher.startListening();
-
-
-        //Create Client
-        client = new Client(blackholeStream.read, clientStream.write, filterBoxStub);
-
-    }
-
-
-    /**
-     * Create test environment for Server
-     *  -Create a Server
-     *  -Create a ClientStub
-     *  -Create a ServerStub
-     *  -Create a FilterBoxStub
-     */
-    private void createServerEnv() {
-
-        Stream blackholeStream = new Stream();
-
+    public TestEnvironment() {
+      //Server
         Stream serverStream = new Stream();
+        Stream serverStubStream = new Stream();
+        Stream clientStream = new Stream();
         Stream clientStubStream = new Stream();
 
+        //Filterbox
+        // TODO: filterBox = new FilterBox();
+        filterBoxStub = new FilterBoxStub(); //TODO: Bind filterbox to filterBoxStub
 
-        //Create filterBoxStub
-        filterBoxStub = new FilterBoxStub();
+        //Server configuration
+        server = new Server(serverStubStream.read, serverStream.write);
+        //ServerStub
+        serverStub = new ServerStub(server.lspserver);
+        Launcher<LanguageClient> l2 = LSPLauncher.createServerLauncher(serverStub, clientStream.read, serverStubStream.write);
+        l2.startListening();
 
-        //Create clientStub
-        clientStub = new ClientStub();
-        Launcher<LanguageServer> clientLauncher = LSPLauncher.createClientLauncher(clientStub, serverStream.read, clientStubStream.write);
-        clientStub.setServer(clientLauncher.getRemoteProxy());
-        clientLauncher.startListening();
-
-        //Create serverStub
-        serverStub = new ServerStub();
-        Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(serverStub, clientStubStream.read, serverStream.write);
-        serverStub.connect(launcher.getRemoteProxy());
-        launcher.startListening();
-
-        //Create Server
-        server = new Server(blackholeStream.read, serverStream.write);
-
+        //Client
+        client = new Client(clientStubStream.read, clientStream.write, filterBoxStub);
+        //ClientStub
+        clientStub = new ClientStub(client.lspclient);
+        Launcher<LanguageServer> l3 = LSPLauncher.createClientLauncher(clientStub, serverStream.read, clientStream.write);
+        clientStub.setServer(l3.getRemoteProxy());
+        l3.startListening();
     }
-
 }

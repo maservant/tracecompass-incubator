@@ -22,6 +22,8 @@ import java.io.OutputStream;
 
 public class Server {
 
+    public LanguageServerImpl lspserver;
+
     private class mSocket {
 
         public int port;
@@ -49,9 +51,9 @@ public class Server {
                         InputStream in = socket.getInputStream();
                         OutputStream out = socket.getOutputStream();
 
-                        LanguageServerImpl server = new LanguageServerImpl();
-                        Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(server, in, out);
-                        server.connect(launcher.getRemoteProxy());
+                        lspserver = new LanguageServerImpl();
+                        Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(lspserver, in, out);
+                        lspserver.connect(launcher.getRemoteProxy());
                         launcher.startListening();
 
 
@@ -72,10 +74,15 @@ public class Server {
         socket.start();
     }
 
+    /**
+     * Create server from InputStream and OutputStream
+     * @param in: InputStream (data in)
+     * @param out OutputStream (data out)
+     */
     public Server(InputStream in, OutputStream out) {
-        LanguageServerImpl server = new LanguageServerImpl();
-        Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(server, in, out);
-        server.connect(launcher.getRemoteProxy());
+        lspserver = new LanguageServerImpl();
+        Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(lspserver, in, out);
+        lspserver.connect(launcher.getRemoteProxy());
         launcher.startListening();
     }
 }
