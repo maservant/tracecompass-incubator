@@ -49,7 +49,7 @@ public class FilterBoxService implements TextDocumentService {
     private String input;
     private final List<LanguageClient> clients;
 
-    FilterBoxService(List<LanguageClient> clients) {
+    protected FilterBoxService(List<LanguageClient> clients) {
         this.input = new String();
         this.clients = clients;
     }

@@ -13,7 +13,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
-import java.net.Socket;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
@@ -22,63 +21,50 @@ public class Client {
 
     private LanguageClientImpl client;
 
-    private class SocketClient {
-
-        private Socket socket;
-        public String host;
-        public int port;
-
-        public SocketClient(String host, int port) {
-            this.host = host;
-            this.port = port;
-        }
-
-        public void start() {
-            try {
-                socket = new Socket(host, port);
-                System.out.println("Connected to server");
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-        public InputStream getInputStream() {
-            InputStream inputStream = null;
-            try {
-                inputStream = socket.getInputStream();
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            return inputStream;
-        }
-
-        public OutputStream getOutputStream() {
-            OutputStream outputStream = null;
-            try {
-                outputStream = socket.getOutputStream();
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            return outputStream;
-        }
-
+    /*
+     * Create client:
+     *  -Connect to server with socket form hostname and port
+     *  -Register an observer whom use client API and get notified when server responds
+     * @param hostname: address of server to connect to
+     * @param port: port of server
+     * @param observer that uses this API and get notified
+     */
+    public Client(String hostname, Integer port, @NonNull IObserver observer) {
+        SocketClient sc = new SocketClient(hostname, port);
+        initialize(sc.getInputStream(), sc.getOutputStream(), observer);
     }
 
-    public Client(@NonNull IObserver observer) {
+    /*
+     * Create client:
+     *  -Use InputStream and OutputStream instead of socket
+     *  -Register an observer whom use client API and get notified when server responds
+     * @param in: input stream
+     * @param out: output stream
+     * @param observer that uses this API and get notified
+     */
+    public Client(InputStream in, OutputStream out, @NonNull IObserver observer) {
+        initialize(in, out, observer);
+    }
 
-        SocketClient socketClient = new SocketClient(Configuration.HOSTNAME, Configuration.PORT);
-        socketClient.start();
-
-        InputStream in = socketClient.getInputStream();
-        OutputStream out = socketClient.getOutputStream();
-
+    /**
+     * Initialize
+     * @param in
+     * @param out
+     * @param observer
+     */
+    private void initialize(InputStream in, OutputStream out, @NonNull IObserver observer) {
         client = new LanguageClientImpl();
         Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(client, in, out);
         client.setServer(launcher.getRemoteProxy());
         client.register(observer);
         launcher.startListening();
+        System.out.println("LSPClient initialized");
     }
 
+    /**
+     * Send string to server using the LSP client
+     * @param str: string to send
+     */
     public void notify(String str) {
         client.tellDidChange(str);
     }
