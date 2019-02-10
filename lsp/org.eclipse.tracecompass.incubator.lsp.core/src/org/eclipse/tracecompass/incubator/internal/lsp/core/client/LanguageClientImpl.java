@@ -90,10 +90,10 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
         Integer min = 0;
         Integer max = str.length() - 1;
 
-        Position p1 = new Position(min, Character.getNumericValue(str.charAt(min)) );
-        Position p2 = new Position(max, Character.getNumericValue(str.charAt(min)) );
+        Position p1 = new Position(0, min);
+        Position p2 = new Position(0, max);
         Range r = new Range(p1,p2);
-        TextDocumentContentChangeEvent change = new TextDocumentContentChangeEvent(r, max, str);
+        TextDocumentContentChangeEvent change = new TextDocumentContentChangeEvent(r, max + 1, str);
         List<TextDocumentContentChangeEvent> changelist = new ArrayList();
         changelist.add(change);
         DidChangeTextDocumentParams params = new DidChangeTextDocumentParams();
