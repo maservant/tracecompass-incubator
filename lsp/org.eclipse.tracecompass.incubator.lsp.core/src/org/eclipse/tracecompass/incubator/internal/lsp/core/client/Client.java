@@ -13,8 +13,12 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.UnknownHostException;
+
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
 
 /**
@@ -33,7 +37,7 @@ public class Client {
      *  -Register an observer who can use client API and get notified when server responds
      * @param observer that uses this API and get notified
      */
-    public Client(@NonNull IObserver observer) {
+    public Client(@NonNull IObserver observer) throws UnknownHostException, IOException {
         SocketClient sc = new SocketClient(Configuration.HOSTNAME, Configuration.PORT);
         initialize(sc.getInputStream(), sc.getOutputStream(), observer);
     }
@@ -46,7 +50,7 @@ public class Client {
      * @param port: port of server
      * @param observer that uses this API and get notified
      */
-    public Client(String hostname, Integer port, @NonNull IObserver observer) {
+    public Client(String hostname, Integer port, @NonNull IObserver observer) throws UnknownHostException, IOException {
         SocketClient sc = new SocketClient(hostname, port);
         initialize(sc.getInputStream(), sc.getOutputStream(), observer);
     }

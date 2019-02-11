@@ -1,8 +1,10 @@
 package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 /**
  * Simple socket for client-side
@@ -17,13 +19,11 @@ public class SocketClient {
      * Simple socket with methods to get Input and Output stream
      * @param hostname of server to connect to
      * @param port of server
+     * @throws IOException
+     * @throws UnknownHostException
      */
-    public SocketClient(String hostname, Integer port) {
-        try {
-            socket = new Socket(hostname, port);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public SocketClient(String hostname, Integer port) throws UnknownHostException, IOException {
+        socket = new Socket(hostname, port);
     }
 
     /**
