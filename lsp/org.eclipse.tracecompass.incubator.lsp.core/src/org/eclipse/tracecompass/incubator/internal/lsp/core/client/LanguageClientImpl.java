@@ -48,11 +48,9 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
         if(v.equals("VALID")) {
             //Ask for completion
             //this.askCompletion();
-            System.out.println("String is VALID");
 
         } else if (v.equals("INVALID")) {
             //Error
-            System.out.println("String is INVALID");
         }
     }
 

@@ -17,6 +17,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
 
+/**
+ * LSP Client simplification that offers an API to its observer.
+ * The underlying class is the LanguageClient implementation
+ * @author maxtibs
+ *
+ */
 public class Client {
 
     public LanguageClientImpl lspclient;
@@ -25,8 +31,6 @@ public class Client {
      * Create client:
      *  -Connect to server with socket from default hostname and port
      *  -Register an observer who can use client API and get notified when server responds
-     * @param hostname: address of server to connect to
-     * @param port: port of server
      * @param observer that uses this API and get notified
      */
     public Client(@NonNull IObserver observer) {
@@ -51,8 +55,8 @@ public class Client {
      * Create client:
      *  -Use InputStream and OutputStream instead of socket
      *  -Register an observer who can use client API and get notified when server responds
-     * @param in: input stream
-     * @param out: output stream
+     * @param in: input stream of a stream communication
+     * @param out: output stream of a stream communication
      * @param observer that uses this API and get notified
      */
     public Client(InputStream in, OutputStream out, @NonNull IObserver observer) {
@@ -60,7 +64,7 @@ public class Client {
     }
 
     /**
-     * Initialize
+     * Initialize the LanguageServer from LanguageClient impementation
      * @param in
      * @param out
      * @param observer
@@ -71,11 +75,10 @@ public class Client {
         lspclient.setServer(launcher.getRemoteProxy());
         lspclient.register(observer);
         launcher.startListening();
-        System.out.println("LSPClient initialized");
     }
 
     /**
-     * Send string to server using the LSP client
+     * PUBLIC API: Send string to server using the LSP client
      * @param str: string to send
      */
     public void notify(String str) {

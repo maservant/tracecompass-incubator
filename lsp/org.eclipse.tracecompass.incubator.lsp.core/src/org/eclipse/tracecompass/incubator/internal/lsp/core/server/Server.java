@@ -34,7 +34,7 @@ public class Server {
             try {
                 this.serverSocket = new ServerSocket(this.port);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
         }
 
@@ -45,7 +45,6 @@ public class Server {
                     try {
                         Socket socket = serverSocket.accept();
                         String ip = socket.getInetAddress().toString();
-                        System.out.println("Un client s'est connecté à partir de " + ip);
 
                         //Instantiate LSP client
                         InputStream in = socket.getInputStream();
@@ -61,7 +60,7 @@ public class Server {
                         serverSocket.close();
 
                     } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                        e.printStackTrace();
                     }
                 }
             });
