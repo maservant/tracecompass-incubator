@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.Client;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
@@ -71,7 +70,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
     private final org.eclipse.swt.widgets.List fSavedArea;
     private final ExpandItem fSaved;
     private final Color defaultFilterTextColor;
-    private final Client lspClient;
+    private @Nullable Client lspClient;
 
     /**
      * Deleted all selected items
@@ -345,7 +344,12 @@ public class GlobalFilterViewer extends Composite implements IObserver {
         defaultFilterTextColor = fFilterText.getBackground();
 
         // Initialize the LSP Client
-        lspClient = new Client(Configuration.HOSTNAME, Configuration.PORT, this);
+        try {
+            lspClient = new Client(this);
+        } catch (Exception e) {
+            lspClient = null;
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -391,7 +395,9 @@ public class GlobalFilterViewer extends Composite implements IObserver {
             resetFilterBox();
         }
         else {
-            lspClient.notify(msg);
+            if(lspClient != null) {
+                lspClient.notify(msg);
+            }
         }
     }
 
