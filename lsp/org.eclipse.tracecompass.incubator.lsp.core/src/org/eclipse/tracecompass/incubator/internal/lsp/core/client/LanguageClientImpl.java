@@ -54,7 +54,7 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
         String v = diagnostics.getDiagnostics().get(0).getMessage();
         observer.notify(v);
 
-        if (v.equals("VALID")) {
+        /*if (v.equals("VALID")) {
             // Ask for completion
             CompletionParams completionParams = new CompletionParams();
             Position position = new Position();
@@ -71,7 +71,7 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
 
         } else if (v.equals("INVALID")) {
             // Error
-        }
+        }*/
     }
 
     @Override
