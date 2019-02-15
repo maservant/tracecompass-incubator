@@ -17,6 +17,7 @@ import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -50,9 +51,8 @@ public class Server {
                 public void run() {
                     try {
                         Socket socket = serverSocket.accept();
-                        String ip = socket.getInetAddress().toString();
 
-                        //Instantiate LSP client
+                        // Instantiate LSP client
                         InputStream in = socket.getInputStream();
                         OutputStream out = socket.getOutputStream();
 
@@ -61,11 +61,10 @@ public class Server {
                         lspserver.connect(launcher.getRemoteProxy());
                         launcher.startListening();
 
-
-                        //Close thread
+                        // Close thread
                         serverSocket.close();
 
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -81,8 +80,11 @@ public class Server {
 
     /**
      * Create server from InputStream and OutputStream
-     * @param in: InputStream (data in)
-     * @param out OutputStream (data out)
+     *
+     * @param in:
+     *            InputStream (data in)
+     * @param out
+     *            OutputStream (data out)
      */
     public Server(InputStream in, OutputStream out) {
         lspserver = new LanguageServerImpl();
