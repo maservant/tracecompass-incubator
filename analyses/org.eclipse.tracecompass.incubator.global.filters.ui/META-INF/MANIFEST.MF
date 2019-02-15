@@ -21,4 +21,5 @@ Import-Package: com.google.gson,
  org.apache.commons.lang3,
  org.eclipse.tracecompass.incubator.internal.lsp.core.client,
  org.eclipse.tracecompass.incubator.internal.lsp.core.server,
- org.eclipse.tracecompass.incubator.internal.lsp.core.shared
+ org.eclipse.tracecompass.incubator.internal.lsp.core.shared,
+ org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox

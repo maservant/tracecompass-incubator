@@ -56,7 +56,7 @@ import com.google.gson.Gson;
  * @author Genevieve Bastien
  */
 @SuppressWarnings("restriction")
-public class GlobalFilterViewer extends Composite implements IObserver {
+public class GlobalFilterViewer extends Composite implements IFilterBoxView {
 
     private static final Gson GSON = new Gson();
 
@@ -70,7 +70,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
     private final org.eclipse.swt.widgets.List fSavedArea;
     private final ExpandItem fSaved;
     private final Color fDefaultFilterTextColor;
-    private @Nullable Client lspClient;
+    private @Nullable LspFilterTextbox fFilterTextbox;
 
     /**
      * Deleted all selected items
@@ -138,7 +138,9 @@ public class GlobalFilterViewer extends Composite implements IObserver {
             @Override
             public void keyReleased(@Nullable KeyEvent e) {
                 String text = Objects.requireNonNull(fFilterText.getText());
-                notifyLspClient(text);
+                if (fFilterTextbox != null) {
+                    fFilterTextbox.notifyLspClient(text);
+                }
             }
 
             @Override
@@ -170,7 +172,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
             public void widgetDefaultSelected(@Nullable SelectionEvent e) {
                 SelectionEvent event = Objects.requireNonNull(e);
                 if (event.detail == SWT.ICON_CANCEL) {
-                    resetFilterBox();
+                    defaultViewHandler();
                 }
             }
         });
@@ -342,12 +344,12 @@ public class GlobalFilterViewer extends Composite implements IObserver {
         layout(true);
         fDefaultFilterTextColor = fFilterText.getBackground();
 
-        // Initialize the LSP Client
+        // Initialize the FilterTextBox widget
         try {
             lspClient = new LSPClientAPI(this);
         } catch (Exception e) {
-            lspClient = null;
             e.printStackTrace();
+            fFilterTextbox = null;
         }
     }
 
@@ -386,50 +388,20 @@ public class GlobalFilterViewer extends Composite implements IObserver {
     }
 
     /**
-     * Method to notify the LSP Client of a change
-     * @param msg string entered in the filter box
+     * Method to reset the filter box view (i.e. put back initial color,
+     * remove error message, remove suggestions)
      */
-    private void notifyLspClient(String msg) {
-        if (msg.isEmpty()) {
-            resetFilterBox();
-        } else {
-            if(lspClient != null) {
-                lspClient.notify(msg);
-            }
-        }
-    }
-
-    /**
-     * Method called by the lsp client to notify the view of changes
-     */
-    @Override()
-    public void notify(@Nullable Object v) {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override()
-            public void run() {
-                String s = Objects.requireNonNull(v).toString();
-                if (s.equals("INVALID")) {
-                    showErrorFilterBox();
-                } else {
-                    resetFilterBox();
-                }
-            }
-        });
+    @Override
+    public void defaultViewHandler() {
+        fFilterText.setBackground(fDefaultFilterTextColor);
     }
 
     /**
      * Method to put the filter box in error state
      */
-    private void showErrorFilterBox() {
+    @Override
+    public void errorViewHandler() {
         Device device = Display.getCurrent();
         fFilterText.setBackground(new Color (device, 255, 150, 150));
-    }
-
-    /**
-     * Method to reset the filter box view (i.e. put back initial color,
-     * remove error message, remove suggestions)
-     */
-    private void resetFilterBox() {
-        fFilterText.setBackground(fDefaultFilterTextColor);
     }
 }
