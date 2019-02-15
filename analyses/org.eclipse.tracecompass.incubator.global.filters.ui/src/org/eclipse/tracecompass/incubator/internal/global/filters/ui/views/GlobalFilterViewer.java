@@ -69,7 +69,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
     private final ExpandItem fActive;
     private final org.eclipse.swt.widgets.List fSavedArea;
     private final ExpandItem fSaved;
-    private final Color defaultFilterTextColor;
+    private final Color fDefaultFilterTextColor;
     private @Nullable Client lspClient;
 
     /**
@@ -341,7 +341,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
             }
         });
         layout(true);
-        defaultFilterTextColor = fFilterText.getBackground();
+        fDefaultFilterTextColor = fFilterText.getBackground();
 
         // Initialize the LSP Client
         try {
@@ -393,8 +393,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
     private void notifyLspClient(String msg) {
         if (msg.isEmpty()) {
             resetFilterBox();
-        }
-        else {
+        } else {
             if(lspClient != null) {
                 lspClient.notify(msg);
             }
@@ -412,8 +411,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
                 String s = Objects.requireNonNull(v).toString();
                 if (s.equals("INVALID")) {
                     showErrorFilterBox();
-                }
-                else {
+                } else {
                     resetFilterBox();
                 }
             }
@@ -433,6 +431,6 @@ public class GlobalFilterViewer extends Composite implements IObserver {
      * remove error message, remove suggestions)
      */
     private void resetFilterBox() {
-        fFilterText.setBackground(defaultFilterTextColor);
+        fFilterText.setBackground(fDefaultFilterTextColor);
     }
 }

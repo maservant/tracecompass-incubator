@@ -22,7 +22,7 @@ public class Activator extends TraceCompassActivator {
     public static final String PLUGIN_ID = "org.eclipse.tracecompass.incubator.lsp.core"; //$NON-NLS-1$
 
     /** The LSP server instance */
-    private static @Nullable Server server;
+    private static @Nullable Server fServer;
 
     /**
      * The constructor
@@ -42,12 +42,12 @@ public class Activator extends TraceCompassActivator {
 
     @Override
     protected void startActions() {
-        server = new Server();
+        fServer = new Server();
     }
 
     @Override
     protected void stopActions() {
-        server = null;
+        fServer = null;
     }
 
     /**
@@ -56,7 +56,7 @@ public class Activator extends TraceCompassActivator {
      * @return the LSP server instance
      */
     public static @Nullable Server getServer() {
-        return server;
+        return fServer;
     }
 
 }
