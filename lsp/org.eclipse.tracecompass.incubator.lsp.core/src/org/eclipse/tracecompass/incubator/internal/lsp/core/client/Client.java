@@ -31,7 +31,7 @@ public class Client {
 
     public LanguageClientImpl lspclient;
 
-    /*
+    /**
      * Create client:
      *  -Connect to server with socket from default hostname and port
      *  -Register an observer who can use client API and get notified when server responds
@@ -42,12 +42,12 @@ public class Client {
         initialize(sc.getInputStream(), sc.getOutputStream(), observer);
     }
 
-    /*
+    /**
      * Create client:
      *  -Connect to server with socket from hostname and port
      *  -Register an observer who can use client API and get notified when server responds
-     * @param hostname: address of server to connect to
-     * @param port: port of server
+     * @param hostname address of server to connect to
+     * @param port port of server
      * @param observer that uses this API and get notified
      */
     public Client(String hostname, Integer port, @NonNull IObserver observer) throws UnknownHostException, IOException {
@@ -55,12 +55,12 @@ public class Client {
         initialize(sc.getInputStream(), sc.getOutputStream(), observer);
     }
 
-    /*
+    /**
      * Create client:
      *  -Use InputStream and OutputStream instead of socket
      *  -Register an observer who can use client API and get notified when server responds
-     * @param in: input stream of a stream communication
-     * @param out: output stream of a stream communication
+     * @param in input stream of a stream communication
+     * @param out output stream of a stream communication
      * @param observer that uses this API and get notified
      */
     public Client(InputStream in, OutputStream out, @NonNull IObserver observer) {
@@ -83,7 +83,7 @@ public class Client {
 
     /**
      * PUBLIC API: Send string to server using the LSP client
-     * @param str: string to send
+     * @param str string to send
      */
     public void notify(String str) {
         lspclient.tellDidChange(str);
