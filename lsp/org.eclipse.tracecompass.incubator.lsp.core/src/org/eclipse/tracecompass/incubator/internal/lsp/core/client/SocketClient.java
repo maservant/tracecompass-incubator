@@ -7,8 +7,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 /**
- * Simple socket for client-side
- * @author maxtibs
+ * Simplified socket for lsp client-side
+ *
+ * @author Maxime Thibault
  *
  */
 public class SocketClient {
@@ -17,8 +18,11 @@ public class SocketClient {
 
     /**
      * Simple socket with methods to get Input and Output stream
-     * @param hostname of server to connect to
-     * @param port of server
+     *
+     * @param hostname
+     *            of server to connect to
+     * @param port
+     *            of server
      * @throws IOException
      * @throws UnknownHostException
      */
@@ -28,6 +32,7 @@ public class SocketClient {
 
     /**
      * Return the socket InputStream
+     *
      * @return InputStream
      */
     public InputStream getInputStream() {
@@ -42,6 +47,7 @@ public class SocketClient {
 
     /**
      * Return the socket OutputStream
+     *
      * @return OutputStram
      */
     public OutputStream getOutputStream() {

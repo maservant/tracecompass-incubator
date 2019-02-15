@@ -20,6 +20,12 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * LSPServer wrapper
+ *
+ * @author Maxime Thibault
+ *
+ */
 public class Server {
 
     public LanguageServerImpl lspserver;
