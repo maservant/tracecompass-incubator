@@ -28,6 +28,12 @@ public class LspFilterTextbox implements IObserver {
     private @Nullable Client lspClient;
     private final IFilterBoxView fFilterBoxView;
 
+    /**
+     * Constructor
+     * @param view the filter box view
+     * @throws UnknownHostException Exception thrown from LSPClientAPI
+     * @throws IOException Exception thrown from LSPClientAPI
+     */
     public LspFilterTextbox(IFilterBoxView view) throws UnknownHostException, IOException {
         lspClient = new Client(this);
         fFilterBoxView = view;
@@ -36,7 +42,6 @@ public class LspFilterTextbox implements IObserver {
     /**
      * Method to notify the LSP Client of a change
      * @param message string entered in the filter box
-     * @return true the notification is a valid call, false otherwise
      */
     public void notifyLspClient(String message) {
         if (message.isEmpty()) {
