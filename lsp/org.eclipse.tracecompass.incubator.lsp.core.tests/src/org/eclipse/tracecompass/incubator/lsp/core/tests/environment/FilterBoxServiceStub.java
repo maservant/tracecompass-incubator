@@ -1,4 +1,3 @@
-package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
 /*******************************************************************************
  * Copyright (c) 2019 Ecole Polytechnique de Montreal
  *
@@ -7,6 +6,7 @@ package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
+package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -41,9 +41,10 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 /**
  * FilterBoxService stub: Wrap around an actual FilterBoxService implementation.
- * It helps to store data about the real implementation.
- * Mockup actually store information about the requests/reponses values.
- * @author maxtibs
+ * It helps to store data about the real implementation. Mockup actually store
+ * information about the requests/reponses values.
+ *
+ * @author Maxime Thibault
  *
  */
 public class FilterBoxServiceStub implements TextDocumentService {
@@ -57,98 +58,97 @@ public class FilterBoxServiceStub implements TextDocumentService {
 
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<SignatureHelp> signatureHelp(TextDocumentPositionParams position) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<List<? extends Location>> definition(TextDocumentPositionParams position) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(TextDocumentPositionParams position) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<List<? extends SymbolInformation>> documentSymbol(DocumentSymbolParams params) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<List<? extends Command>> codeAction(CodeActionParams params) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<List<? extends CodeLens>> codeLens(CodeLensParams params) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<CodeLens> resolveCodeLens(CodeLens unresolved) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<List<? extends TextEdit>> rangeFormatting(DocumentRangeFormattingParams params) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<List<? extends TextEdit>> onTypeFormatting(DocumentOnTypeFormattingParams params) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public CompletableFuture<WorkspaceEdit> rename(RenameParams params) {
-        // TODO Auto-generated method stub
+        // Not implemented
         return null;
     }
 
     @Override
     public void didOpen(DidOpenTextDocumentParams params) {
-        // TODO Auto-generated method stub
-
+        // Not implemented
     }
 
     @Override
@@ -159,13 +159,11 @@ public class FilterBoxServiceStub implements TextDocumentService {
 
     @Override
     public void didClose(DidCloseTextDocumentParams params) {
-        // TODO Auto-generated method stub
-
+        // Not implemented
     }
 
     @Override
     public void didSave(DidSaveTextDocumentParams params) {
-        // TODO Auto-generated method stub
-
+        // Not implemented
     }
 }

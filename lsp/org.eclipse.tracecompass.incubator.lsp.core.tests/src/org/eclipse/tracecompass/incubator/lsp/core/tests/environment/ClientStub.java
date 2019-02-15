@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2019 École Polytechnique de Montréal
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
 
 import java.util.concurrent.CompletableFuture;
@@ -14,10 +22,11 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObservable;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
 /**
- * LanguageClient stub: Wrap around an actual LanguageClientImplementation
- * It helps to store data about the real implementation.
- * Mockup actually store information about the requests/reponses values.
- * @author maxtibs
+ * LanguageClient stub: Wrap around an actual LanguageClientImplementation It
+ * helps to store data about the real implementation. Mockup actually store
+ * information about the requests/reponses values.
+ *
+ * @author Maxime Thibault
  *
  */
 public class ClientStub implements LanguageClient, IObservable {
@@ -33,7 +42,7 @@ public class ClientStub implements LanguageClient, IObservable {
 
     @Override
     public void telemetryEvent(Object object) {
-        // TODO Auto-generated method stub
+        // Not implemented
     }
 
     @Override
@@ -44,34 +53,31 @@ public class ClientStub implements LanguageClient, IObservable {
 
     @Override
     public void showMessage(MessageParams messageParams) {
-        // TODO Auto-generated method stub
-
+        // Not implemented
     }
 
     @Override
     public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void logMessage(MessageParams message) {
-        // TODO Auto-generated method stub
-
+        // Not implemented
     }
 
     public void setServer(LanguageServer server) {
-        this.serverProxy = server;
+        serverProxy = server;
     }
 
     @Override
     public void register(@NonNull IObserver obs) {
-        this.observer = obs;
+        observer = obs;
     }
 
     public void tellDidChange(String str) {
-       mockup.received = str;
-       client.tellDidChange(str);
+        mockup.received = str;
+        client.tellDidChange(str);
     }
 
 }

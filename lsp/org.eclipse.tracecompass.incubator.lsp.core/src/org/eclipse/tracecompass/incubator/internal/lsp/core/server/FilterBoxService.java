@@ -69,7 +69,7 @@ public class FilterBoxService implements TextDocumentService {
         }
         FilterExpressionCu expression = inputValidity.getExpressions().get(0);
         if (expression.getElement().get(0) instanceof FilterSimpleExpressionCu) {
-            FilterSimpleExpressionCu simpleExpression = (FilterSimpleExpressionCu)expression.getElement().get(0);
+            FilterSimpleExpressionCu simpleExpression = (FilterSimpleExpressionCu) expression.getElement().get(0);
             if (simpleExpression.getOperator().equals("matches")) {
                 CompletionItem item1 = new CompletionItem();
                 item1.setTextEdit(new TextEdit(new Range(startPos, endPos), "=="));

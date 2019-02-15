@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (c) 2019 Ecole Polytechnique de Montreal
+ *
+ * All rights reserved. This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
 
 import java.util.concurrent.CompletableFuture;
@@ -9,23 +17,24 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.FilterWorkspaceService;
 
 /**
- * LanguageServer stub: Wrap around an actual LanguageServerImplementation
- * It helps delegates calls from mockup to real implementation
- * Mockup actually store information about the requests/reponses values.
- * @author maxtibs
+ * LanguageServer stub: Wrap around an actual LanguageServerImplementation It
+ * helps delegates calls from mockup to real implementation Mockup actually
+ * store information about the requests/reponses values.
+ *
+ * @author Maxime Thibault
  *
  */
-public class ServerStub implements LanguageServer  {
+public class ServerStub implements LanguageServer {
 
-    ServerMockup mockup = new ServerMockup();
-    LanguageServer server;
+    public ServerMockup mockup = new ServerMockup();
+    public LanguageServer server;
     protected FilterBoxServiceStub filterBoxService;
     private WorkspaceService filterWorkspaceService;
 
     public ServerStub(LanguageServer s) {
         server = s;
-        this.filterBoxService = new FilterBoxServiceStub(server.getTextDocumentService());
-        this.filterWorkspaceService = new FilterWorkspaceService();
+        filterBoxService = new FilterBoxServiceStub(server.getTextDocumentService());
+        filterWorkspaceService = new FilterWorkspaceService();
     }
 
     @Override
@@ -45,12 +54,12 @@ public class ServerStub implements LanguageServer  {
 
     @Override
     public FilterBoxServiceStub getTextDocumentService() {
-        return this.filterBoxService;
+        return filterBoxService;
     }
 
     @Override
     public WorkspaceService getWorkspaceService() {
-        return this.filterWorkspaceService;
+        return filterWorkspaceService;
     }
 
 }

@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.client.Client;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPClientAPI;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
@@ -344,7 +344,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
 
         // Initialize the LSP Client
         try {
-            lspClient = new Client(this);
+            lspClient = new LSPClientAPI(this);
         } catch (Exception e) {
             lspClient = null;
             e.printStackTrace();
