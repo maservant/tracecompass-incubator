@@ -163,8 +163,7 @@ public class GlobalFilterViewer extends Composite implements IObserver {
 
             @Override
             public void widgetSelected(@Nullable SelectionEvent e) {
-                // TODO Auto-generated method stub
-
+                // Nothing to do here
             }
 
             @Override
