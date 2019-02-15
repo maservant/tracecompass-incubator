@@ -38,6 +38,7 @@ import org.eclipse.lsp4j.ReferenceParams;
 import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.SignatureHelp;
 import org.eclipse.lsp4j.SymbolInformation;
+import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.TextDocumentPositionParams;
 import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.WorkspaceEdit;
@@ -48,6 +49,14 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parse
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterExpressionCu;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterSimpleExpressionCu;
 
+/**
+ * FilterBoxService offers the interface to the client in order to notify the
+ * server of the changes and to ask for completions, validations and syntax tips
+ * for the filter string.
+ *
+ * @author David-Alexandre Beaupre and Remi Croteau
+ *
+ */
 public class FilterBoxService implements TextDocumentService {
 
     private String input;
@@ -58,6 +67,12 @@ public class FilterBoxService implements TextDocumentService {
         this.clients = clients;
     }
 
+    /**
+     * Offers completion suggestions based on the user input
+     *
+     * @param position
+     *            is the current cursor position
+     */
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
         Position startPos = new Position(position.getPosition().getLine(), position.getPosition().getCharacter());
@@ -172,21 +187,30 @@ public class FilterBoxService implements TextDocumentService {
 
     }
 
+    /**
+     * Check the string validity and sends a diagnostic to the client
+     *
+     * @param params
+     *            contains the changes to the string input
+     */
     @Override
-    public void didChange(DidChangeTextDocumentParams params) {
+    public void didChange(DidChangeTextDocumentParams params) throws NullPointerException {
+        TextDocumentContentChangeEvent contentChange = params.getContentChanges().get(0);
+        if (contentChange == null) {
+            throw new NullPointerException("Event change param cannot be null");
+        }
         this.input = params.getContentChanges().get(0).getText();
         PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
         List<Diagnostic> diagnostics = pd.getDiagnostics();
-        String diagMsg = new String();
         Range range = params.getContentChanges().get(0).getRange();
         FilterCu inputValidity = FilterCu.compile(this.input);
-        if (inputValidity != null) {
-            diagMsg = "VALID";
-        } else {
-            diagMsg = "INVALID";
-        }
+        String diagMsg = (inputValidity != null ? "VALID" : "INVALID");
         diagnostics.add(new Diagnostic(range, diagMsg));
         pd.setDiagnostics(diagnostics);
+        LanguageClient client = this.clients.get(0);
+        if (client == null) {
+            throw new NullPointerException("Client cannot be null");
+        }
         this.clients.get(0).publishDiagnostics(pd);
     }
 
