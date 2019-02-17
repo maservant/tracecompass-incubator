@@ -78,7 +78,6 @@ public class FilterBoxService implements TextDocumentService {
         Position startPos = new Position(position.getPosition().getLine(), position.getPosition().getCharacter());
         Position endPos = new Position(startPos.getLine(), startPos.getCharacter() + 1);
         List<CompletionItem> items = new ArrayList();
-        FilterCu inputValidity = FilterCu.compile2(this.input);
         if (inputValidity == null) {
             return CompletableFuture.completedFuture(null);
         }
@@ -204,6 +203,7 @@ public class FilterBoxService implements TextDocumentService {
         List<Diagnostic> diagnostics = pd.getDiagnostics();
         Range range = params.getContentChanges().get(0).getRange();
         FilterCu inputValidity = FilterCu.compile(this.input);
+        LspFilterParser.runAllChecks(this.input);
         String diagMsg = (inputValidity != null ? "VALID" : "INVALID");
         diagnostics.add(new Diagnostic(range, diagMsg));
         pd.setDiagnostics(diagnostics);
