@@ -9,12 +9,17 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Stack;
 
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Position;
+import org.eclipse.lsp4j.Range;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.DiagnosticCodes;
 
 /**
  * Proposes completions to the input string in the globalFilter box, and locates
@@ -24,6 +29,46 @@ import org.eclipse.lsp4j.Position;
  *
  */
 public class LspFilterParser {
+
+    public static class FilterToken {
+        public enum TokenType {
+            SYNTACTIC, FIELD, VALUE
+        }
+
+        private String fInput;
+        private Range fRange;
+        private TokenType fType;
+
+        public FilterToken(String input, Range range, TokenType type) {
+            fInput = input;
+            fRange = range;
+            fType = type;
+        }
+
+        public String getInput() {
+            return fInput;
+        }
+
+        public Range getRange() {
+            return fRange;
+        }
+
+        public TokenType getType() {
+            return fType;
+        }
+
+        public void setInput(String input) {
+            fInput = input;
+        }
+
+        public void setRange(Range range) {
+            fRange = range;
+        }
+
+        public void setTokenType(TokenType type) {
+            fType = type;
+        }
+    }
 
     private static final int STATE_START_TEXT_1 = 0;
     private static final int STATE_START_TEXT_2 = 1;
@@ -45,157 +90,210 @@ public class LspFilterParser {
     private static final List<Character> SPECIAL_TEXT = Arrays.asList('-', '_', '[', ']', '.', '*', '$', '^', '|', '\\', '{', '}', '?', '+');
     private static final List<Character> OPERATOR_CUES = Arrays.asList('!', '=', '<', '>');
     private static final List<Character> SEPARATOR_CUES = Arrays.asList('&');
+    private static final String source = "LSP Filter Parser";
+    private Stack<Position> parenthesesPositions;
+    List<Diagnostic> diagnostics;
+    private int index;
 
-    public static void runAllChecks(String input) {
-        parseFilter(input);
+    public LspFilterParser() {
+        parenthesesPositions = new Stack();
+        diagnostics = new ArrayList();
+        index = 0;
+    }
+
+    public List<Diagnostic> getDiagnostics() {
+        return diagnostics;
     }
 
     private static boolean isValidTextChar(char character) {
         return SPECIAL_TEXT.contains(character) || Character.isLetterOrDigit(character);
     }
 
-    private static void parseFilter(String input) {
+    private void logDiagnostic(int start, int end, String errorCode) {
+        Range range = new Range(new Position(0, start), new Position(0, end));
+        String message = DiagnosticCodes.getMessage(errorCode);
+        DiagnosticSeverity severity = DiagnosticCodes.getSeverity(errorCode);
+        diagnostics.add(new Diagnostic(range, message, severity, source, errorCode));
+    }
+
+    private void updateParenthesisState(char parenthesis) {
+        if (parenthesis == LEFT_PARENTHESIS) {
+            parenthesesPositions.push(new Position(0, index));
+        } else if (parenthesis == RIGHT_PARENTHESIS) {
+            try {
+                parenthesesPositions.pop();
+            } catch (EmptyStackException e) {
+                logDiagnostic(index, index + 1, DiagnosticCodes.RIGHT_PARENTHESIS_UNBALANCED);
+            }
+        }
+    }
+
+    public void parseFilter(String input) {
+        parenthesesPositions.clear();
+        diagnostics.clear();
+        index = 0;
         int state = STATE_START_TEXT_1;
-        Stack<Position> parenthesesPositions = new Stack();
-        int i = 0;
-        System.out.println();
-        System.out.println("Input = " + input);
-        while (i < input.length()) {
-            char character = input.charAt(i);
-            System.out.println("State = " + state + ", index = " + i + ", character = " + character);
+        while (index < input.length()) {
+            char character = input.charAt(index);
             switch (state) {
             case STATE_START_TEXT_1:
                 if (isValidTextChar(character)) {
                     state = STATE_TEXT_1;
                 } else if (WHITESPACES.contains(character)) {
-                    i++;
+                    index++;
                 } else if (character == LEFT_PARENTHESIS) {
-                    parenthesesPositions.push(new Position(0, i));
-                    i++;
+                    updateParenthesisState(character);
+                    index++;
                 } else {
-                    // log-error + parentheses right
-                    System.out.println("ERROR");
+                    if (character == RIGHT_PARENTHESIS) {
+                        updateParenthesisState(character);
+                        logDiagnostic(index, index + 1, DiagnosticCodes.RIGHT_PARENTHESIS_UNEXPECTED);
+                    } else if (OPERATOR_CUES.contains(character) || SEPARATOR_CUES.contains(character)) {
+                        logDiagnostic(index, index + 1, DiagnosticCodes.CHARACTER_UNEXPECTED);
+                    } else {
+                        logDiagnostic(index, index + 1, DiagnosticCodes.ILLEGAL_CHARACTER);
+                    }
+                    index++;
                 }
                 break;
             case STATE_TEXT_1:
                 if (WHITESPACES.contains(character)) {
                     state = STATE_START_OP_SEP;
-                    i++;
+                    index++;
                 } else if (OPERATOR_CUES.contains(character)) {
                     state = STATE_OPERATOR;
                 } else if (SEPARATOR_CUES.contains(character)) {
                     state = STATE_SEPARATOR;
                 } else if (isValidTextChar(character)) {
-                    i++;
+                    index++;
                 } else if (character == RIGHT_PARENTHESIS) {
-                    try {
-                        parenthesesPositions.pop();
-                    } catch (EmptyStackException e) {
-                        // log-error
-                        System.out.println("ERROR RIGHT PARENTHESIS");
-                    }
-                    i++;
+                    updateParenthesisState(character);
+                    index++;
                     state = STATE_START_SEPARATOR;
                 } else {
-                    // log-error + parentheses
-                    System.out.println("ERROR");
+                    if (character == LEFT_PARENTHESIS) {
+                        updateParenthesisState(character);
+                        logDiagnostic(index, index + 1, DiagnosticCodes.LEFT_PARENTHESIS_UNEXPECTED);
+                    } else {
+                        logDiagnostic(index, index + 1, DiagnosticCodes.ILLEGAL_CHARACTER);
+                    }
+                    index++;
                 }
                 break;
             case STATE_START_TEXT_2:
                 if (isValidTextChar(character)) {
                     state = STATE_TEXT_2;
                 } else if (WHITESPACES.contains(character)) {
-                    i++;
+                    index++;
                 } else {
-                    // log-error + parentheses
-                    System.out.println("ERROR");
+                    if (character == RIGHT_PARENTHESIS) {
+                        updateParenthesisState(character);
+                        logDiagnostic(index, index + 1, DiagnosticCodes.RIGHT_PARENTHESIS_UNEXPECTED);
+                    } else if (character == LEFT_PARENTHESIS) {
+                        updateParenthesisState(character);
+                        logDiagnostic(index, index + 1, DiagnosticCodes.LEFT_PARENTHESIS_UNEXPECTED);
+                    } else {
+                        logDiagnostic(index, index + 1, DiagnosticCodes.ILLEGAL_CHARACTER);
+                    }
+                    index++;
                 }
                 break;
             case STATE_TEXT_2:
                 if (WHITESPACES.contains(character)) {
                     state = STATE_START_SEPARATOR;
-                    i++;
+                    index++;
                 } else if (SEPARATOR_CUES.contains(character)) {
                     state = STATE_SEPARATOR;
                 } else if (isValidTextChar(character)) {
-                    i++;
+                    index++;
                 } else if (character == RIGHT_PARENTHESIS) {
-                    try {
-                        parenthesesPositions.pop();
-                    } catch (EmptyStackException e) {
-                        // log-error
-                        System.out.println("ERROR RIGHT PARENTHESIS");
-                    }
-                    i++;
+                    updateParenthesisState(character);
+                    index++;
                     state = STATE_START_SEPARATOR;
                 } else {
-                    // log-error
-                    System.out.println("ERROR");
+                    if (character == LEFT_PARENTHESIS) {
+                        updateParenthesisState(character);
+                        logDiagnostic(index, index + 1, DiagnosticCodes.LEFT_PARENTHESIS_UNEXPECTED);
+                    } else if (OPERATOR_CUES.contains(character) || SEPARATOR_CUES.contains(character)) {
+                        logDiagnostic(index, index + 1, DiagnosticCodes.CHARACTER_UNEXPECTED);
+                    } else {
+                        logDiagnostic(index, index + 1, DiagnosticCodes.ILLEGAL_CHARACTER);
+                    }
+                    index++;
                 }
                 break;
             case STATE_START_OP_SEP:
                 if (WHITESPACES.contains(character)) {
-                    i++;
+                    index++;
                 } else if (OPERATOR_CUES.contains(character) || character == MATCHES_OP.charAt(0) || character == CONTAINS_OP.charAt(0)) {
                     state = STATE_OPERATOR;
                 } else if (SEPARATOR_CUES.contains(character) || character == OR_OP.charAt(0)) {
                     state = STATE_SEPARATOR;
                 } else if (character == RIGHT_PARENTHESIS) {
+                    updateParenthesisState(character);
+                    index++;
                     state = STATE_START_SEPARATOR;
                 } else {
-                    // log-error + parentheses
-                    System.out.println("ERROR");
+                    if (character == LEFT_PARENTHESIS) {
+                        updateParenthesisState(character);
+                        logDiagnostic(index, index + 1, DiagnosticCodes.OPERATOR_SEPARATOR_EXPECTED);
+                    } else if (isValidTextChar(character)) {
+                        logDiagnostic(index, index + 1, DiagnosticCodes.OPERATOR_SEPARATOR_EXPECTED);
+                    } else {
+                        logDiagnostic(index, index + 1, DiagnosticCodes.ILLEGAL_CHARACTER);
+                    }
+                    index++;
                 }
                 break;
             case STATE_OPERATOR: {
                 boolean matches = false;
                 for (int j = 0; j < OPERATORS.size(); j++) {
                     String op = OPERATORS.get(j);
-                    matches = input.regionMatches(i, op, 0, op.length());
+                    matches = input.regionMatches(index, op, 0, op.length());
                     if (matches) {
-                        i += op.length();
+                        index += op.length();
                         state = STATE_START_TEXT_2;
                         break;
                     }
                 }
                 if (!matches) {
-                    // log-error
-                    System.out.println("ERROR");
+                    logDiagnostic(index, index + 1, DiagnosticCodes.INVALID_OPERATOR);
+                    index++;
                 }
-            break;
+                break;
             }
             case STATE_START_SEPARATOR:
                 if (WHITESPACES.contains(character)) {
-                    i++;
+                    index++;
                 } else if (SEPARATOR_CUES.contains(character) || character == OR_OP.charAt(0)) {
                     state = STATE_SEPARATOR;
                 } else if (character == RIGHT_PARENTHESIS) {
-                    try {
-                        parenthesesPositions.pop();
-                    } catch (EmptyStackException e) {
-                        // log-error
-                        System.out.println("ERROR RIGHT PARENTHESIS");
-                    }
-                    i++;
+                    updateParenthesisState(character);
+                    index++;
                 } else {
-                    // log-error + parentheses
-                    System.out.println("ERROR");
+                    if (character == LEFT_PARENTHESIS) {
+                        updateParenthesisState(character);
+                        logDiagnostic(index, index + 1, DiagnosticCodes.LEFT_PARENTHESIS_UNEXPECTED);
+                    } else {
+                        logDiagnostic(index, index + 1, DiagnosticCodes.SEPARATOR_EXPECTED);
+                    }
+                    index++;
                 }
                 break;
             case STATE_SEPARATOR: {
                 boolean matches = false;
                 for (int j = 0; j < SEPARATORS.size(); j++) {
                     String sep = SEPARATORS.get(j);
-                    matches = input.regionMatches(i, sep, 0, sep.length());
+                    matches = input.regionMatches(index, sep, 0, sep.length());
                     if (matches) {
-                        i += sep.length();
+                        index += sep.length();
                         state = STATE_START_TEXT_1;
                         break;
                     }
                 }
                 if (!matches) {
-                    // log-error
-                    System.out.println("ERROR");
+                    logDiagnostic(index, index + 1, DiagnosticCodes.INVALID_SEPARATOR);
+                    index++;
                 }
                 break;
             }
@@ -204,10 +302,9 @@ public class LspFilterParser {
             }
 
         }
-        if (!((state == STATE_START_TEXT_1 /*&& token.empty()*/) || state == STATE_TEXT_1 || state == STATE_TEXT_2 ||
-                state == STATE_START_SEPARATOR || state == STATE_START_OP_SEP)) {
-            // log-error
-            System.out.println("ERROR INVALID END STATE");
+        if (!(state == STATE_TEXT_1 || state == STATE_TEXT_2 || state == STATE_START_SEPARATOR ||
+                state == STATE_START_OP_SEP) || !parenthesesPositions.empty()) {
+            logDiagnostic(index, index + 1, DiagnosticCodes.INVALID_ENDSTATE);
         }
     }
 }

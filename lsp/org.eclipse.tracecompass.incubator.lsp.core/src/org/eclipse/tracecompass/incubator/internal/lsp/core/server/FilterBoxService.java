@@ -59,12 +59,14 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parse
  */
 public class FilterBoxService implements TextDocumentService {
 
-    private String input;
-    private final List<LanguageClient> clients;
+    private String fInput;
+    private final List<LanguageClient> fClients;
+    private LspFilterParser fFilterParser; // List for multiple clients!
 
     protected FilterBoxService(List<LanguageClient> clients) {
-        this.input = new String();
-        this.clients = clients;
+        fInput = new String();
+        fClients = clients;
+        fFilterParser = new LspFilterParser();
     }
 
     /**
@@ -198,20 +200,24 @@ public class FilterBoxService implements TextDocumentService {
         if (contentChange == null) {
             throw new NullPointerException("Event change param cannot be null");
         }
-        this.input = params.getContentChanges().get(0).getText();
+        fInput = params.getContentChanges().get(0).getText();
         PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
-        List<Diagnostic> diagnostics = pd.getDiagnostics();
+        fFilterParser.parseFilter(fInput);
+        List<Diagnostic> diagnostics = fFilterParser.getDiagnostics();
+        // WILL DISAPPEAR, AS WITH ALL HUMANS
         Range range = params.getContentChanges().get(0).getRange();
-        FilterCu inputValidity = FilterCu.compile(this.input);
-        LspFilterParser.runAllChecks(this.input);
+        FilterCu inputValidity = FilterCu.compile(fInput);
         String diagMsg = (inputValidity != null ? "VALID" : "INVALID");
-        diagnostics.add(new Diagnostic(range, diagMsg));
+        diagnostics.add(0, new Diagnostic(range, diagMsg));
+        // WILL DISAPPEAR, AS WITH ALL HUMANS (END)
         pd.setDiagnostics(diagnostics);
-        LanguageClient client = this.clients.get(0);
+        System.out.println("Input: " + fInput);
+        System.out.println("Length = " + fFilterParser.getDiagnostics().size());
+        LanguageClient client = fClients.get(0);
         if (client == null) {
             throw new NullPointerException("Client cannot be null");
         }
-        this.clients.get(0).publishDiagnostics(pd);
+        fClients.get(0).publishDiagnostics(pd);
     }
 
     @Override
@@ -227,15 +233,15 @@ public class FilterBoxService implements TextDocumentService {
     }
 
     public List<LanguageClient> getClients() {
-        return clients;
+        return fClients;
     }
 
     public String getInput() {
-        return input;
+        return fInput;
     }
 
     public void setInput(String input) {
-        this.input = input;
+        fInput = input;
     }
 
 }
