@@ -46,8 +46,6 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterExpressionCu;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterSimpleExpressionCu;
 
 /**
  * FilterBoxService offers the interface to the client in order to notify the
@@ -80,20 +78,15 @@ public class FilterBoxService implements TextDocumentService {
         Position startPos = new Position(position.getPosition().getLine(), position.getPosition().getCharacter());
         Position endPos = new Position(startPos.getLine(), startPos.getCharacter() + 1);
         List<CompletionItem> items = new ArrayList();
-        if (inputValidity == null) {
-            return CompletableFuture.completedFuture(null);
-        }
-        FilterExpressionCu expression = inputValidity.getExpressions().get(0);
-        if (expression.getElement().get(0) instanceof FilterSimpleExpressionCu) {
-            FilterSimpleExpressionCu simpleExpression = (FilterSimpleExpressionCu) expression.getElement().get(0);
-            if (simpleExpression.getOperator().equals("matches")) {
-                CompletionItem item1 = new CompletionItem();
-                item1.setTextEdit(new TextEdit(new Range(startPos, endPos), "=="));
-                CompletionItem item2 = new CompletionItem();
-                item2.setTextEdit(new TextEdit(new Range(startPos, endPos), "!="));
-                items.add(item1);
-                items.add(item2);
-            }
+        LspFilterParser currentPositionFilterParser = new LspFilterParser();
+        currentPositionFilterParser.parseFilter(fInput, startPos);
+        int currentState = currentPositionFilterParser.getCurrentState();
+        List<String> suggestions = currentPositionFilterParser.getSuggestions(currentState);
+        for (int i = 0; i < suggestions.size(); i++) {
+            System.out.println("Suggestion " + i + ": " + suggestions.get(i));
+            CompletionItem item = new CompletionItem();
+            item.setTextEdit(new TextEdit(new Range(startPos, endPos), suggestions.get(i)));
+            items.add(item);
         }
         return CompletableFuture.completedFuture(Either.forLeft(items));
     }
@@ -202,7 +195,7 @@ public class FilterBoxService implements TextDocumentService {
         }
         fInput = params.getContentChanges().get(0).getText();
         PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
-        fFilterParser.parseFilter(fInput);
+        fFilterParser.parseFilter(fInput, new Position(0, -1));
         List<Diagnostic> diagnostics = fFilterParser.getDiagnostics();
         // WILL DISAPPEAR, AS WITH ALL HUMANS
         Range range = params.getContentChanges().get(0).getRange();
