@@ -94,15 +94,21 @@ public class LspFilterParser {
     private Stack<Position> parenthesesPositions;
     List<Diagnostic> diagnostics;
     private int index;
+    private int state;
 
     public LspFilterParser() {
         parenthesesPositions = new Stack();
         diagnostics = new ArrayList();
         index = 0;
+        state = STATE_START_TEXT_1;
     }
 
     public List<Diagnostic> getDiagnostics() {
         return diagnostics;
+    }
+
+    public int getCurrentState() {
+        return state;
     }
 
     private static boolean isValidTextChar(char character) {
@@ -128,13 +134,33 @@ public class LspFilterParser {
         }
     }
 
-    public void parseFilter(String input) {
+    public List<String> getSuggestions(int currentState) {
+        List<String> suggestions = new ArrayList();
+        if (currentState == STATE_START_OP_SEP) {
+            suggestions.addAll(OPERATORS);
+            suggestions.addAll(SEPARATORS);
+        } else if (currentState == STATE_START_SEPARATOR || currentState == STATE_SEPARATOR) {
+            suggestions.addAll(SEPARATORS);
+        } else if (currentState == STATE_OPERATOR) {
+            suggestions.addAll(OPERATORS);
+        }
+        return suggestions;
+    }
+
+    public void parseFilter(String input, Position position) {
         parenthesesPositions.clear();
         diagnostics.clear();
         index = 0;
-        int state = STATE_START_TEXT_1;
-        while (index < input.length()) {
-            char character = input.charAt(index);
+        state = STATE_START_TEXT_1;
+        int length = input.length();
+        String inputToParse = input;
+        if (position.getCharacter() < length && position.getCharacter() > 0) {
+            length = position.getCharacter();
+            inputToParse = input.substring(0, length);
+            System.out.println("Parser input: " + inputToParse);
+        }
+        while (index < length) {
+            char character = inputToParse.charAt(index);
             switch (state) {
             case STATE_START_TEXT_1:
                 if (isValidTextChar(character)) {
@@ -249,7 +275,7 @@ public class LspFilterParser {
                 boolean matches = false;
                 for (int j = 0; j < OPERATORS.size(); j++) {
                     String op = OPERATORS.get(j);
-                    matches = input.regionMatches(index, op, 0, op.length());
+                    matches = inputToParse.regionMatches(index, op, 0, op.length());
                     if (matches) {
                         index += op.length();
                         state = STATE_START_TEXT_2;
@@ -284,7 +310,7 @@ public class LspFilterParser {
                 boolean matches = false;
                 for (int j = 0; j < SEPARATORS.size(); j++) {
                     String sep = SEPARATORS.get(j);
-                    matches = input.regionMatches(index, sep, 0, sep.length());
+                    matches = inputToParse.regionMatches(index, sep, 0, sep.length());
                     if (matches) {
                         index += sep.length();
                         state = STATE_START_TEXT_1;
