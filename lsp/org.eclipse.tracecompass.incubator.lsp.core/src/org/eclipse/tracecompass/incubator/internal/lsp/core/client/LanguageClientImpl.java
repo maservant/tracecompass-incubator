@@ -28,7 +28,8 @@ import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
-import org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox.LspFilterTextbox;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObservable;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
 /**
  * LSPClient custom implementation
@@ -36,10 +37,10 @@ import org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox.LspFilterTextb
  * @author Maxime Thibault
  *
  */
-public class LanguageClientImpl implements LanguageClient {
+public class LanguageClientImpl implements LanguageClient, IObservable {
 
     public LanguageServer serverProxy;
-    public LspFilterTextbox fLspFilterTextbox;
+    public IObserver observer;
     private Integer cursor = 0;
 
     @Override
@@ -51,7 +52,7 @@ public class LanguageClientImpl implements LanguageClient {
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
         String v = diagnostics.getDiagnostics().get(0).getMessage();
-        fLspFilterTextbox.notify(v);
+        observer.notify(v);
 
         /*if (v.equals("VALID")) {
             // Ask for completion
@@ -94,8 +95,9 @@ public class LanguageClientImpl implements LanguageClient {
         serverProxy = server;
     }
 
-    public void register(@NonNull LspFilterTextbox lspFilterTextbox) {
-        fLspFilterTextbox = lspFilterTextbox;
+    @Override
+    public void register(@NonNull IObserver obs) {
+        observer = obs;
     }
 
     public void tellDidChange(String str) {

@@ -20,7 +20,6 @@ import java.io.OutputStream;
 import java.net.UnknownHostException;
 
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
-import org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox.LspFilterTextbox;
 
 /**
  * LSP Client simplification that offers an API to its observer. The underlying
@@ -41,9 +40,9 @@ public class LSPClientAPI {
      * @param observer
      *            that uses this API and get notified
      */
-    public LSPClientAPI(@NonNull LspFilterTextbox lspFilterTextbox) throws UnknownHostException, IOException {
+    public LSPClientAPI(@NonNull IObserver observer) throws UnknownHostException, IOException {
         SocketClient sc = new SocketClient(Configuration.HOSTNAME, Configuration.PORT);
-        initialize(sc.getInputStream(), sc.getOutputStream(), lspFilterTextbox);
+        initialize(sc.getInputStream(), sc.getOutputStream(), observer);
     }
 
     /**
@@ -58,9 +57,9 @@ public class LSPClientAPI {
      * @param observer
      *            that uses this API and get notified
      */
-    public LSPClientAPI(String hostname, Integer port, @NonNull LspFilterTextbox lspFilterTextbox) throws UnknownHostException, IOException {
+    public LSPClientAPI(String hostname, Integer port, @NonNull IObserver observer) throws UnknownHostException, IOException {
         SocketClient sc = new SocketClient(hostname, port);
-        initialize(sc.getInputStream(), sc.getOutputStream(), lspFilterTextbox);
+        initialize(sc.getInputStream(), sc.getOutputStream(), observer);
     }
 
     /**
@@ -75,8 +74,8 @@ public class LSPClientAPI {
      * @param observer
      *            that uses this API and get notified
      */
-    public LSPClientAPI(InputStream in, OutputStream out, @NonNull LspFilterTextbox lspFilterTextbox) {
-        initialize(in, out, lspFilterTextbox);
+    public LSPClientAPI(InputStream in, OutputStream out, @NonNull IObserver observer) {
+        initialize(in, out, observer);
     }
 
     /**
@@ -86,11 +85,11 @@ public class LSPClientAPI {
      * @param out
      * @param observer
      */
-    private void initialize(InputStream in, OutputStream out, @NonNull LspFilterTextbox lspFilterTextbox) {
+    private void initialize(InputStream in, OutputStream out, @NonNull IObserver observer) {
         lspclient = new LanguageClientImpl();
         Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(lspclient, in, out);
         lspclient.setServer(launcher.getRemoteProxy());
-        lspclient.register(lspFilterTextbox);
+        lspclient.register(observer);
         launcher.startListening();
     }
 
