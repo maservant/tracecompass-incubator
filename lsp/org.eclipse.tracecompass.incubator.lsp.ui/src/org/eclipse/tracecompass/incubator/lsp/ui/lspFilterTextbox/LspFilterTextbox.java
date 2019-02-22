@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPClientAPI;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
 /**
  * Widget to wrap a FilterText widget with additional logic of a filter lsp
@@ -34,10 +35,11 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPClientAPI;
  *
  * @author Jeremy Dube
  */
-public class LspFilterTextbox {
+public class LspFilterTextbox implements IObserver {
 
     private @Nullable LSPClientAPI lspClient;
     private final Color fDefaultFilterTextColor;
+//    private final StyledText fFilterStyledText;
     private final Text fFilterText;
 
     /**
@@ -70,7 +72,7 @@ public class LspFilterTextbox {
      *            of the listener to override, without "set"
      */
     public LspFilterTextbox(Composite parent, Map<String, Boolean> overridenParameters) {
-        fFilterText = new Text(parent, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
+        fFilterText = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
         fFilterText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
         if (!overridenParameters.containsKey("SelectionListener") //$NON-NLS-1$
@@ -120,6 +122,7 @@ public class LspFilterTextbox {
     /**
      * Method called by the lsp client to notify the view of changes
      */
+    @Override
     public void notify(@Nullable Object v) {
         Display.getDefault().syncExec(new Runnable() {
             @Override()
