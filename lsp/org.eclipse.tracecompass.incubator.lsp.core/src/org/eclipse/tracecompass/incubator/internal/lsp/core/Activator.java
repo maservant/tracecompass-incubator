@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core;
 
+import java.io.IOException;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.TraceCompassActivator;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.LSPServer;
@@ -42,12 +44,22 @@ public class Activator extends TraceCompassActivator {
 
     @Override
     protected void startActions() {
-        fServer = new LSPServer();
+        try {
+            fServer = new LSPServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void stopActions() {
-        fServer = null;
+        if(fServer != null) {
+            try {
+                fServer.dispose();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
