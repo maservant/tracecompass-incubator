@@ -10,8 +10,10 @@
 package org.eclipse.tracecompass.incubator.internal.global.filters.ui.views;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -28,19 +30,11 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPClientAPI;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
+import org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox.LspFilterTextbox;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
@@ -56,11 +50,10 @@ import com.google.gson.Gson;
  * @author Genevieve Bastien
  */
 @SuppressWarnings("restriction")
-public class GlobalFilterViewer extends Composite implements IFilterBoxView {
+public class GlobalFilterViewer extends Composite {
 
     private static final Gson GSON = new Gson();
 
-    private final Text fFilterText;
     private final ExpandBar fExpandBar;
     private final LinkedHashSet<String> fEnabledFilters = new LinkedHashSet<>();
     private final LinkedHashSet<String> fDisabledFilters = new LinkedHashSet<>();
@@ -69,8 +62,7 @@ public class GlobalFilterViewer extends Composite implements IFilterBoxView {
     private final ExpandItem fActive;
     private final org.eclipse.swt.widgets.List fSavedArea;
     private final ExpandItem fSaved;
-    private final Color fDefaultFilterTextColor;
-    private @Nullable LspFilterTextbox fFilterTextbox;
+    private final LspFilterTextbox fLspFilterTextbox;
 
     /**
      * Deleted all selected items
@@ -113,8 +105,12 @@ public class GlobalFilterViewer extends Composite implements IFilterBoxView {
     public GlobalFilterViewer(ITmfComponent component, Composite parent, int style) {
         super(parent, style);
         fComponent = component;
-        fFilterText = new Text(parent, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
-        fFilterText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+        Map<String, Boolean> overrideParametersMap = new HashMap();
+        overrideParametersMap.put("KeyListener", true); //$NON-NLS-1$
+        fLspFilterTextbox = new LspFilterTextbox(parent, overrideParametersMap);
+        fLspFilterTextbox.setKeyListener(this::keyPressed);
+
         fExpandBar = new ExpandBar(parent, SWT.V_SCROLL);
         parent.setLayout(GridLayoutFactory.fillDefaults().create());
         fExpandBar.setLayout(GridLayoutFactory.fillDefaults().create());
@@ -133,49 +129,7 @@ public class GlobalFilterViewer extends Composite implements IFilterBoxView {
         fSaved.setControl(fSavedArea);
         fActive.setExpanded(true);
         fSaved.setExpanded(true);
-        fFilterText.addKeyListener(new KeyListener() {
 
-            @Override
-            public void keyReleased(@Nullable KeyEvent e) {
-                String text = Objects.requireNonNull(fFilterText.getText());
-                if (fFilterTextbox != null) {
-                    fFilterTextbox.notifyLspClient(text);
-                }
-            }
-
-            @Override
-            public void keyPressed(@Nullable KeyEvent e) {
-                if (e == null) {
-                    return;
-                }
-                if (e.character == SWT.CR) {
-                    String text = Objects.requireNonNull(fFilterText.getText());
-                    fFilterText.setText(""); //$NON-NLS-1$
-                    if (fEnabledFilters.contains(text) || fDisabledFilters.contains(text)) {
-                        return;
-                    }
-                    fEnabledFilters.add(text);
-                    fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
-                    filtersUpdated();
-                }
-            }
-
-        });
-        fFilterText.addSelectionListener(new SelectionListener() {
-
-            @Override
-            public void widgetSelected(@Nullable SelectionEvent e) {
-                // Nothing to do here
-            }
-
-            @Override
-            public void widgetDefaultSelected(@Nullable SelectionEvent e) {
-                SelectionEvent event = Objects.requireNonNull(e);
-                if (event.detail == SWT.ICON_CANCEL) {
-                    defaultViewHandler();
-                }
-            }
-        });
         DragSource activeSource = new DragSource(fActiveArea, DND.DROP_MOVE);
         activeSource.setTransfer(TextTransfer.getInstance());
         activeSource.addDragListener(new DragSourceListener() {
@@ -342,20 +296,29 @@ public class GlobalFilterViewer extends Composite implements IFilterBoxView {
             }
         });
         layout(true);
-        fDefaultFilterTextColor = fFilterText.getBackground();
 
         // Initialize the FilterTextBox widget
-        try {
-            lspClient = new LSPClientAPI(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fFilterTextbox = null;
-        }
     }
 
     @Override
     public boolean setFocus() {
-        return fFilterText.setFocus();
+        return fLspFilterTextbox.setFocus();
+    }
+
+    private void keyPressed(@Nullable KeyEvent e) {
+        if (e == null) {
+            return;
+        }
+        if (e.character == SWT.CR) {
+            String text = Objects.requireNonNull(fLspFilterTextbox.getText());
+            fLspFilterTextbox.setText(""); //$NON-NLS-1$
+            if (fEnabledFilters.contains(text) || fDisabledFilters.contains(text)) {
+                return;
+            }
+            fEnabledFilters.add(text);
+            fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
+            filtersUpdated();
+        }
     }
 
     private void filtersUpdated() {
@@ -385,23 +348,5 @@ public class GlobalFilterViewer extends Composite implements IFilterBoxView {
         fDisabledFilters.removeAll(regexes);
         // redraw
         redraw();
-    }
-
-    /**
-     * Method to reset the filter box view (i.e. put back initial color,
-     * remove error message, remove suggestions)
-     */
-    @Override
-    public void defaultViewHandler() {
-        fFilterText.setBackground(fDefaultFilterTextColor);
-    }
-
-    /**
-     * Method to put the filter box in error state
-     */
-    @Override
-    public void errorViewHandler() {
-        Device device = Display.getCurrent();
-        fFilterText.setBackground(new Color (device, 255, 150, 150));
     }
 }
