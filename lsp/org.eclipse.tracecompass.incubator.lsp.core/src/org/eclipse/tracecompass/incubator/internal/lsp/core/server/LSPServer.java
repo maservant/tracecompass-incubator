@@ -41,16 +41,25 @@ public class LSPServer {
      */
     public LSPServer() throws IOException {
         serverSocket = new ServerSocket(Configuration.PORT);
-        clientSocket = serverSocket.accept();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    clientSocket = serverSocket.accept();
 
-        // Instantiate LSP client
-        InputStream in = clientSocket.getInputStream();
-        OutputStream out = clientSocket.getOutputStream();
+                    // Instantiate LSP client
+                    InputStream in = clientSocket.getInputStream();
+                    OutputStream out = clientSocket.getOutputStream();
 
-        lspserver = new LanguageServerImpl();
-        Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(lspserver, in, out);
-        lspserver.connect(launcher.getRemoteProxy());
-        launcher.startListening();
+                    lspserver = new LanguageServerImpl();
+                    Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(lspserver, in, out);
+                    lspserver.connect(launcher.getRemoteProxy());
+                    launcher.startListening();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     /**

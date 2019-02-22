@@ -31,13 +31,15 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
  */
 public class LSPClientAPI {
 
+    //Avoid using the lspclient directly
     public LanguageClientImpl lspclient;
     private Socket socket;
 
     /**
-     * Create client: -Connect to server with socket from default hostname and
-     * port -Register an observer who can use client API and get notified when
-     * server responds
+     * Create client:
+     * -Connect to server with socket from default hostname and port
+     * -Register an observer who can use client API and get notified when
+     *  server responds
      *
      * @param observer
      *            that uses this API and get notified
@@ -48,9 +50,9 @@ public class LSPClientAPI {
     }
 
     /**
-     * Create client: -Connect to server with socket from hostname and port
-     * -Register an observer who can use client API and get notified when server
-     * responds
+     * Create client:
+     * -Connect to server with socket from hostname and port
+     * -Register an observer who can use client API and get notified when server responds
      *
      * @param hostname
      *            address of server to connect to
@@ -65,9 +67,10 @@ public class LSPClientAPI {
     }
 
     /**
-     * Create client: -Use InputStream and OutputStream instead of socket
+     * Create client:
+     * -Use InputStream and OutputStream instead of socket
      * -Register an observer who can use client API and get notified when server
-     * responds
+     *  responds
      *
      * @param in
      *            input stream of a stream communication
