@@ -13,7 +13,7 @@ import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPClientAPI;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Server;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.LSPServer;
 
 /**
  * Create a test environment for testing LSP implementations This class returns
@@ -26,7 +26,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Server;
  */
 public class TestEnvironment {
 
-    public Server server = null;
+    public LSPServer server = null;
     public LSPClientAPI client = null;
     // public FilterBox fb = null;
 
@@ -47,7 +47,7 @@ public class TestEnvironment {
                                              // filterBoxStub
 
         // Server configuration
-        server = new Server(serverStubStream.read, serverStream.write);
+        server = new LSPServer(serverStubStream.read, serverStream.write);
         // ServerStub
         serverStub = new ServerStub(server.lspserver);
         Launcher<LanguageClient> l2 = LSPLauncher.createServerLauncher(serverStub, clientStream.read, serverStubStream.write);

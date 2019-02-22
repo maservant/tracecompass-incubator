@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.incubator.internal.lsp.core;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.TraceCompassActivator;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Server;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.LSPServer;
 
 /**
  * Activator
@@ -22,7 +22,7 @@ public class Activator extends TraceCompassActivator {
     public static final String PLUGIN_ID = "org.eclipse.tracecompass.incubator.lsp.core"; //$NON-NLS-1$
 
     /** The LSP server instance */
-    private static @Nullable Server fServer;
+    private static @Nullable LSPServer fServer;
 
     /**
      * The constructor
@@ -42,7 +42,7 @@ public class Activator extends TraceCompassActivator {
 
     @Override
     protected void startActions() {
-        fServer = new Server();
+        fServer = new LSPServer();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class Activator extends TraceCompassActivator {
      *
      * @return the LSP server instance
      */
-    public static @Nullable Server getServer() {
+    public static @Nullable LSPServer getServer() {
         return fServer;
     }
 

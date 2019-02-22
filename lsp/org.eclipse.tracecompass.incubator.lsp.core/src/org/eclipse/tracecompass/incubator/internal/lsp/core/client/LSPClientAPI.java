@@ -17,6 +17,7 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
@@ -31,6 +32,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
 public class LSPClientAPI {
 
     public LanguageClientImpl lspclient;
+    private Socket socket;
 
     /**
      * Create client: -Connect to server with socket from default hostname and
@@ -41,8 +43,8 @@ public class LSPClientAPI {
      *            that uses this API and get notified
      */
     public LSPClientAPI(@NonNull IObserver observer) throws UnknownHostException, IOException {
-        SocketClient sc = new SocketClient(Configuration.HOSTNAME, Configuration.PORT);
-        initialize(sc.getInputStream(), sc.getOutputStream(), observer);
+        socket = new Socket(Configuration.HOSTNAME, Configuration.PORT);
+        initialize(socket.getInputStream(), socket.getOutputStream(), observer);
     }
 
     /**
@@ -58,8 +60,8 @@ public class LSPClientAPI {
      *            that uses this API and get notified
      */
     public LSPClientAPI(String hostname, Integer port, @NonNull IObserver observer) throws UnknownHostException, IOException {
-        SocketClient sc = new SocketClient(hostname, port);
-        initialize(sc.getInputStream(), sc.getOutputStream(), observer);
+        socket = new Socket(hostname, port);
+        initialize(socket.getInputStream(), socket.getOutputStream(), observer);
     }
 
     /**
@@ -101,5 +103,14 @@ public class LSPClientAPI {
      */
     public void notify(String str) {
         lspclient.tellDidChange(str);
+    }
+
+    /**
+     * Close client-side socket connection
+     *
+     * @throws IOException
+     */
+    public void dispose() throws IOException {
+        socket.close();
     }
 }
