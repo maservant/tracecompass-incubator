@@ -10,12 +10,15 @@
 package org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -123,11 +126,12 @@ public class LspFilterTextbox implements IObserver {
      * Method called by the lsp client to notify the view of changes
      */
     @Override
-    public void notify(@Nullable Object v) {
+    public void notify(@Nullable Object obj) {
+        final List<Diagnostic> diagnostics = (List<Diagnostic>)Objects.requireNonNull(obj);
         Display.getDefault().syncExec(new Runnable() {
             @Override()
             public void run() {
-                String s = Objects.requireNonNull(v).toString();
+                String s = diagnostics.get(0).getMessage();
                 if (s.equals("INVALID")) {
                     showErrorView();
                 } else {
