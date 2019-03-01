@@ -9,11 +9,20 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.shared;
 
+import java.util.List;
+
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionList;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
+
 /**
  *
  * @author Jeremy Dube
  *
  */
 public interface IObserver {
-    public void notify(Object value);
+    public void diagnostic(List<Diagnostic> diagnostics);
+    public void completion(Either<List<CompletionItem>, CompletionList> completion);
+    public void syntaxHighlighting();
 }

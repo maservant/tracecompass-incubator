@@ -70,9 +70,10 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
 
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        observer.notify(diagnostics.getDiagnostics());
+        observer.diagnostic(diagnostics.getDiagnostics());
 
-        Runnable task = () -> {
+        //Make request for completion
+        Runnable completionTask = () -> {
             CompletionParams completionParams = new CompletionParams();
             Position position = new Position();
             position.setLine(0);
@@ -80,14 +81,21 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
             completionParams.setPosition(position);
 
             try {
-                Either<List<CompletionItem>, CompletionList> c = serverProxy.getTextDocumentService().completion(completionParams).get();
-                List<CompletionItem> ft = c.getLeft();
-                System.out.println("CLIENT:" + ft);
+                Either<List<CompletionItem>, CompletionList> completion = serverProxy.getTextDocumentService().completion(completionParams).get();
+                observer.completion(completion);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         };
-       threadPoolExecutor.execute(task);
+        ///Make request for syntax highlighting
+        Runnable syntaxHighlightingTask = () -> {
+            observer.syntaxHighlighting();
+            //TODO: Needs to be implemented
+        };
+
+       threadPoolExecutor.execute(completionTask);
+       threadPoolExecutor.execute(syntaxHighlightingTask);
+
     }
 
     @Override
