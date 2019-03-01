@@ -12,8 +12,14 @@ package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionList;
+import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
@@ -22,6 +28,7 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObservable;
@@ -38,6 +45,21 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
     public LanguageServer serverProxy;
     public IObserver observer;
     private Integer cursor = 0;
+    private ThreadPoolExecutor threadPoolExecutor;
+
+    public LanguageClientImpl() {
+        final int corePoolSize = 1;
+        final int maxPoolSize = 3;
+        final long keepAliveTime = 5000;
+        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+        threadPoolExecutor = new ThreadPoolExecutor(
+                corePoolSize,
+                maxPoolSize,
+                keepAliveTime,
+                TimeUnit.MILLISECONDS,
+                queue
+                );
+    }
 
     @Override
     public void telemetryEvent(Object object) {
@@ -50,24 +72,28 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
         String v = diagnostics.getDiagnostics().get(0).getMessage();
         observer.notify(v);
 
-        /*if (v.equals("VALID")) {
+        if (v.equals("VALID")) {
             // Ask for completion
-            CompletionParams completionParams = new CompletionParams();
-            Position position = new Position();
-            position.setLine(0);
-            position.setCharacter(cursor);
-            completionParams.setPosition(position);
 
-            try {
-                Either<List<CompletionItem>, CompletionList> c = serverProxy.getTextDocumentService().completion(completionParams).get();
-                c.get();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Runnable task = () -> {
+                CompletionParams completionParams = new CompletionParams();
+                Position position = new Position();
+                position.setLine(0);
+                position.setCharacter(cursor);
+                completionParams.setPosition(position);
 
+                try {
+                    Either<List<CompletionItem>, CompletionList> c = serverProxy.getTextDocumentService().completion(completionParams).get();
+                    List<CompletionItem> ft = c.getLeft();
+                    System.out.println("CLIENT:" + ft);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            };
+           threadPoolExecutor.execute(task);
         } else if (v.equals("INVALID")) {
-            // Error
-        }*/
+           // Error
+       }
     }
 
     @Override
