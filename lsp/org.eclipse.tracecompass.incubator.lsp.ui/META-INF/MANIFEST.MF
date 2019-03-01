@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.incubator.lsp.core,
- org.eclipse.lsp4j
+ org.eclipse.lsp4j,
+ org.eclipse.lsp4j.jsonrpc
 Export-Package: org.eclipse.tracecompass.incubator.internal.lsp.ui;x-internal:=true,
  org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox
 Automatic-Module-Name: org.eclipse.tracecompass.incubator.lsp.ui

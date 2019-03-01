@@ -18,7 +18,10 @@ import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -126,8 +129,7 @@ public class LspFilterTextbox implements IObserver {
      * Method called by the lsp client to notify the view of changes
      */
     @Override
-    public void notify(@Nullable Object obj) {
-        final List<Diagnostic> diagnostics = (List<Diagnostic>)Objects.requireNonNull(obj);
+    public void diagnostic(final List<Diagnostic> diagnostics) {
         Display.getDefault().syncExec(new Runnable() {
             @Override()
             public void run() {
@@ -137,6 +139,26 @@ public class LspFilterTextbox implements IObserver {
                 } else {
                     resetView();
                 }
+            }
+        });
+    }
+
+    @Override
+    public void completion(final Either<List<CompletionItem>, CompletionList> completion) {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override()
+            public void run() {
+                //TODO: Needs to be implemented
+            }
+        });
+    }
+
+    @Override
+    public void syntaxHighlighting() {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override()
+            public void run() {
+                //TODO: Needs to be implemented
             }
         });
     }
