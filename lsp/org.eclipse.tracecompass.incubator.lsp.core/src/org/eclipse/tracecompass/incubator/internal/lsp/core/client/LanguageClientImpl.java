@@ -16,10 +16,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
@@ -69,31 +71,24 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
 
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        String v = diagnostics.getDiagnostics().get(0).getMessage();
-        observer.notify(v);
+        observer.notify(diagnostics.getDiagnostics());
 
-        if (v.equals("VALID")) {
-            // Ask for completion
+        Runnable task = () -> {
+            CompletionParams completionParams = new CompletionParams();
+            Position position = new Position();
+            position.setLine(0);
+            position.setCharacter(cursor);
+            completionParams.setPosition(position);
 
-            Runnable task = () -> {
-                CompletionParams completionParams = new CompletionParams();
-                Position position = new Position();
-                position.setLine(0);
-                position.setCharacter(cursor);
-                completionParams.setPosition(position);
-
-                try {
-                    Either<List<CompletionItem>, CompletionList> c = serverProxy.getTextDocumentService().completion(completionParams).get();
-                    List<CompletionItem> ft = c.getLeft();
-                    System.out.println("CLIENT:" + ft);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            };
-           threadPoolExecutor.execute(task);
-        } else if (v.equals("INVALID")) {
-           // Error
-       }
+            try {
+                Either<List<CompletionItem>, CompletionList> c = serverProxy.getTextDocumentService().completion(completionParams).get();
+                List<CompletionItem> ft = c.getLeft();
+                System.out.println("CLIENT:" + ft);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+       threadPoolExecutor.execute(task);
     }
 
     @Override
