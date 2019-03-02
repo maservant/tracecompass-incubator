@@ -8,6 +8,12 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
 
+import java.util.List;
+
+import org.eclipse.lsp4j.CompletionItem;
+import org.eclipse.lsp4j.CompletionList;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
 /**
@@ -24,8 +30,20 @@ public class FilterBoxStub implements IObserver {
     public FilterBoxMockup mockup = new FilterBoxMockup();
 
     @Override
-    public void notify(Object value) {
-        mockup.received = (String) value;
+    public void diagnostic(List<Diagnostic> diagnostics) {
+        // TODO Auto-generated method stub
+
     }
 
+    @Override
+    public void completion(Either<List<CompletionItem>, CompletionList> completion) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void syntaxHighlighting() {
+        // TODO Auto-generated method stub
+
+    }
 }
