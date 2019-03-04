@@ -14,9 +14,12 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.List;
 
+import org.antlr.runtime.RecognitionException;
 import org.eclipse.lsp4j.Color;
 import org.eclipse.lsp4j.ColorInformation;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.AutoCompletion;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlighting;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Validation;
 import org.junit.Test;
 
 public class ANTLRTest {
@@ -44,5 +47,10 @@ public class ANTLRTest {
         assertEquals(7, ci3.getRange().getStart().getCharacter());
         assertEquals(8, ci3.getRange().getEnd().getCharacter());
 
+    }
+
+    @Test
+    public void validationTest() throws IOException, RecognitionException {
+        Validation.validate("TID == && 1 != 2");
     }
 }
