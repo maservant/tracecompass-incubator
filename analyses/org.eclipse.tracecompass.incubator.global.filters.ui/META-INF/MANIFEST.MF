@@ -18,4 +18,8 @@ Export-Package: org.eclipse.tracecompass.incubator.internal.global.filters.ui;x-
  org.eclipse.tracecompass.incubator.internal.global.filters.ui.views;x-internal:=true
 Automatic-Module-Name: org.eclipse.tracecompass.incubator.global.filters.ui
 Import-Package: com.google.gson,
- org.apache.commons.lang3
+ org.apache.commons.lang3,
+ org.eclipse.tracecompass.incubator.internal.lsp.core.client,
+ org.eclipse.tracecompass.incubator.internal.lsp.core.server,
+ org.eclipse.tracecompass.incubator.internal.lsp.core.shared,
+ org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox
