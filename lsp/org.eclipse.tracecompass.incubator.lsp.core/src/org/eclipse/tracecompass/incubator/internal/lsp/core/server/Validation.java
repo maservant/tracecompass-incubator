@@ -19,7 +19,6 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
-import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
@@ -58,7 +57,6 @@ public class Validation {
 
         parser.parse();
 
-        PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
         List<Diagnostic> diagnostics = new ArrayList<>();
 
         lexerExceptions.forEach(e -> {
