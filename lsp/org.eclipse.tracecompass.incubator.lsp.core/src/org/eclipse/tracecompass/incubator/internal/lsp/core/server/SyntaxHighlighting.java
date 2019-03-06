@@ -8,6 +8,7 @@
  *******************************************************************************/
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -37,16 +38,19 @@ public class SyntaxHighlighting {
     @SuppressWarnings("restriction")
     static public List<ColorInformation> getColorInformationList(String str) throws IOException {
 
-        //Initialise the lexerParser, parse str and return list of CommonToken
+        // Initialise the lexerParser, parse str and return list of CommonToken
         ByteArrayInputStream input = new ByteArrayInputStream(str.getBytes());
         ANTLRInputStream antlrStream = new ANTLRInputStream(input);
         FilterParserLexer lexer = new FilterParserLexer(antlrStream);
+        lexer.setErrorListener(e -> {
+            // do nothing
+        });
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         List<CommonToken> commonTokenList = tokenStream.getTokens();
 
-        //From commonTokens
+        // From commonTokens
         List<ColorInformation> colorInformations = new LinkedList<>();
-        commonTokenList.forEach(commonToken->{
+        commonTokenList.forEach(commonToken -> {
             Position start = new Position(commonToken.getLine(), commonToken.getStartIndex());
             Position end = new Position(commonToken.getLine(), commonToken.getStopIndex());
             Range range = new Range(start, end);
