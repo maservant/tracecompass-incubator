@@ -29,18 +29,20 @@ public class FilterWorkspaceService implements WorkspaceService {
 
     @Override
     public CompletableFuture<List<? extends SymbolInformation>> symbol(WorkspaceSymbolParams params) {
-        // Nothing to do
-        return null;
+        // Does not apply to filter box
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void didChangeConfiguration(DidChangeConfigurationParams params) {
-        // Nothing to do
+        // Not used
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void didChangeWatchedFiles(DidChangeWatchedFilesParams params) {
-        // Nothing to do
+        // Not used
+        throw new UnsupportedOperationException();
     }
 
 }

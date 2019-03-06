@@ -100,38 +100,38 @@ public class FilterBoxService implements TextDocumentService {
 
     @Override
     public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
-        // TODO Auto-generated method stub
-        return null;
+        // May eventually be used
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<Hover> hover(TextDocumentPositionParams position) {
-        // TODO Auto-generated method stub
-        return null;
+        // Not used.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<SignatureHelp> signatureHelp(TextDocumentPositionParams position) {
-        // TODO Auto-generated method stub
-        return null;
+        // Does not apply to filter box
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<List<? extends Location>> definition(TextDocumentPositionParams position) {
-        // TODO Auto-generated method stub
-        return null;
+        // Does not apply to filter box
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<List<? extends Location>> references(ReferenceParams params) {
-        // TODO Auto-generated method stub
-        return null;
+        // Does not apply to filter box
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<List<? extends DocumentHighlight>> documentHighlight(TextDocumentPositionParams position) {
-        // TODO Auto-generated method stub
-        return null;
+        // May be implemented eventually
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -147,56 +147,56 @@ public class FilterBoxService implements TextDocumentService {
 
     @Override
     public CompletableFuture<List<? extends SymbolInformation>> documentSymbol(DocumentSymbolParams params) {
-        // TODO Auto-generated method stub
-        return null;
+        // May be implemented eventually
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<List<? extends Command>> codeAction(CodeActionParams params) {
-        // TODO Auto-generated method stub
-        return null;
+        // Does not apply to filter box
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<List<? extends CodeLens>> codeLens(CodeLensParams params) {
-        // TODO Auto-generated method stub
-        return null;
+        // May be implemented eventually
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<CodeLens> resolveCodeLens(CodeLens unresolved) {
-        // TODO Auto-generated method stub
-        return null;
+        // May be implemented eventually
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
-        // TODO Auto-generated method stub
-        return null;
+        // Should be implemented eventually
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<List<? extends TextEdit>> rangeFormatting(DocumentRangeFormattingParams params) {
-        // TODO Auto-generated method stub
-        return null;
+        // Should be implemented eventually
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<List<? extends TextEdit>> onTypeFormatting(DocumentOnTypeFormattingParams params) {
-        // TODO Auto-generated method stub
-        return null;
+        // Should be implemented eventually
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<WorkspaceEdit> rename(RenameParams params) {
-        // TODO Auto-generated method stub
-        return null;
+        // Does not apply to filter box
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void didOpen(DidOpenTextDocumentParams params) {
-        // TODO Auto-generated method stub
-
+        // Does not apply to filter box. There is no file to be opened.
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -236,14 +236,14 @@ public class FilterBoxService implements TextDocumentService {
 
     @Override
     public void didClose(DidCloseTextDocumentParams params) {
-        // TODO Auto-generated method stub
-
+        // Does not apply to filter box
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void didSave(DidSaveTextDocumentParams params) {
-        // TODO Auto-generated method stub
-
+        // Does not apply to filter box
+        throw new UnsupportedOperationException();
     }
 
     public List<LanguageClient> getClients() {
