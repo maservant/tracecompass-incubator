@@ -18,20 +18,16 @@ import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.text.TextViewer;
+import org.eclipse.swt.*;
+import org.eclipse.swt.custom.*;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.events.*;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPClientAPI;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
@@ -45,8 +41,8 @@ public class LspFilterTextbox implements IObserver {
 
     private @Nullable LSPClientAPI lspClient;
     private final Color fDefaultFilterTextColor;
-//    private final StyledText fFilterStyledText;
-    private final Text fFilterText;
+    private final StyledText fFilterStyledText;
+    private final TextViewer fTextViewer;
 
     /**
      * Constructor
@@ -55,12 +51,12 @@ public class LspFilterTextbox implements IObserver {
      *            the parent view
      */
     public LspFilterTextbox(Composite parent) {
-        fFilterText = new Text(parent, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
-        fFilterText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+        fTextViewer = new TextViewer(parent, SWT.SINGLE | SWT.BORDER);
+        fFilterStyledText = fTextViewer.getTextWidget();
+        fFilterStyledText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
-        setSelectionListener();
         setKeyListener();
-        fDefaultFilterTextColor = fFilterText.getBackground();
+        fDefaultFilterTextColor = fFilterStyledText.getBackground();
         try {
             lspClient = new LSPClientAPI(this);
         } catch (IOException e) {
@@ -78,18 +74,15 @@ public class LspFilterTextbox implements IObserver {
      *            of the listener to override, without "set"
      */
     public LspFilterTextbox(Composite parent, Map<String, Boolean> overridenParameters) {
-        fFilterText = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
-        fFilterText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+        fTextViewer = new TextViewer(parent, SWT.SINGLE | SWT.BORDER);
+        fFilterStyledText = fTextViewer.getTextWidget();
+        fFilterStyledText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
-        if (!overridenParameters.containsKey("SelectionListener") //$NON-NLS-1$
-            || !Objects.requireNonNull(overridenParameters.get("SelectionListener"))) { //$NON-NLS-1$
-            setSelectionListener();
-        }
         if (!overridenParameters.containsKey("KeyListener") //$NON-NLS-1$
             || !Objects.requireNonNull(overridenParameters.get("KeyListener"))) { //$NON-NLS-1$
             setKeyListener();
         }
-        fDefaultFilterTextColor = fFilterText.getBackground();
+        fDefaultFilterTextColor = fFilterStyledText.getBackground();
         try {
             lspClient = new LSPClientAPI(this);
         } catch (IOException e) {
@@ -103,7 +96,7 @@ public class LspFilterTextbox implements IObserver {
      * @return true if the FilterText gets the focus
      */
     public boolean setFocus() {
-        return fFilterText.setFocus();
+        return fFilterStyledText.setFocus();
     }
 
     /**
@@ -112,7 +105,7 @@ public class LspFilterTextbox implements IObserver {
      * @return the text
      */
     public String getText() {
-        return fFilterText.getText();
+        return fFilterStyledText.getText();
     }
 
     /**
@@ -122,7 +115,7 @@ public class LspFilterTextbox implements IObserver {
      *            the value to set to
      */
     public void setText(String text) {
-        fFilterText.setText(text);
+        fFilterStyledText.setText(text);
     }
 
     /**
@@ -164,60 +157,14 @@ public class LspFilterTextbox implements IObserver {
     }
 
     /**
-     * Method to add a selection Listener to the FilterText Widget
-     */
-    private void setSelectionListener() {
-        fFilterText.addSelectionListener(new SelectionListener() {
-
-            @Override
-            public void widgetSelected(@Nullable SelectionEvent e) {
-                // Nothing to do here
-            }
-
-            @Override
-            public void widgetDefaultSelected(@Nullable SelectionEvent e) {
-                SelectionEvent event = Objects.requireNonNull(e);
-                if (event.detail == SWT.ICON_CANCEL) {
-                    resetView();
-                }
-            }
-        });
-    }
-
-    /**
-     * Method to add a selection Listener to the FilterText Widget
-     *
-     * @param consumer
-     *            the function to be called
-     */
-    public void setSelectionListener(Consumer<SelectionEvent> consumer) {
-        fFilterText.addSelectionListener(new SelectionListener() {
-
-            @Override
-            public void widgetSelected(@Nullable SelectionEvent e) {
-                // Nothing to do here
-            }
-
-            @Override
-            public void widgetDefaultSelected(@Nullable SelectionEvent e) {
-                SelectionEvent event = Objects.requireNonNull(e);
-                if (event.detail == SWT.ICON_CANCEL) {
-                    resetView();
-                }
-                consumer.accept(e);
-            }
-        });
-    }
-
-    /**
      * Method to add a key Listener to the FilterText Widget
      */
     private void setKeyListener() {
-        fFilterText.addKeyListener(new KeyListener() {
+        fFilterStyledText.addKeyListener(new KeyListener() {
 
             @Override
             public void keyReleased(@Nullable KeyEvent e) {
-                String text = Objects.requireNonNull(fFilterText.getText());
+                String text = Objects.requireNonNull(fFilterStyledText.getText());
                 notifyLspClient(text);
             }
 
@@ -235,11 +182,11 @@ public class LspFilterTextbox implements IObserver {
      *            the function to be called
      */
     public void setKeyListener(Consumer<KeyEvent> consumer) {
-        fFilterText.addKeyListener(new KeyListener() {
+        fFilterStyledText.addKeyListener(new KeyListener() {
 
             @Override
             public void keyReleased(@Nullable KeyEvent e) {
-                String text = Objects.requireNonNull(fFilterText.getText());
+                String text = Objects.requireNonNull(fFilterStyledText.getText());
                 notifyLspClient(text);
             }
 
@@ -271,7 +218,7 @@ public class LspFilterTextbox implements IObserver {
      * error message, remove suggestions)
      */
     private void resetView() {
-        fFilterText.setBackground(fDefaultFilterTextColor);
+        fFilterStyledText.setBackground(fDefaultFilterTextColor);
     }
 
     /**
@@ -279,6 +226,6 @@ public class LspFilterTextbox implements IObserver {
      */
     private void showErrorView() {
         Device device = Display.getCurrent();
-        fFilterText.setBackground(new Color(device, 255, 150, 150));
+        fFilterStyledText.setBackground(new Color(device, 255, 150, 150));
     }
 }

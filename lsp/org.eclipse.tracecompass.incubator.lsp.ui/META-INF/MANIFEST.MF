@@ -17,3 +17,4 @@ Require-Bundle: org.eclipse.ui,
 Export-Package: org.eclipse.tracecompass.incubator.internal.lsp.ui;x-internal:=true,
  org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox
 Automatic-Module-Name: org.eclipse.tracecompass.incubator.lsp.ui
+Import-Package: org.eclipse.jface.text
