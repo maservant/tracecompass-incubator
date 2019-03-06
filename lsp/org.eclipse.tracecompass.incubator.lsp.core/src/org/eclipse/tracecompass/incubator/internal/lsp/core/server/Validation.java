@@ -69,7 +69,7 @@ public class Validation {
            Range range = new Range(start, end);
            Diagnostic diagnostic = new Diagnostic(range, message);
 
-           diagnostics.add(diagnostic);
+           diagnostics.add(diagnostic); // (TID == ) && (TID == 12)
 
         });
 
