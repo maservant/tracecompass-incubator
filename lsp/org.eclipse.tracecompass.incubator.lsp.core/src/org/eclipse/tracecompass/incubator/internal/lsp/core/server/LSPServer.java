@@ -83,7 +83,6 @@ public class LSPServer {
      * @throws IOException
      */
     public void dispose() throws IOException {
-        clientSocket.close();
         serverSocket.close();
     }
 }
