@@ -126,8 +126,7 @@ public class LspFilterTextbox implements IObserver {
         Display.getDefault().syncExec(new Runnable() {
             @Override()
             public void run() {
-                String s = diagnostics.get(0).getMessage();
-                if (s.equals("INVALID")) {
+                if (!diagnostics.isEmpty()) {
                     showErrorView();
                 } else {
                     resetView();

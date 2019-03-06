@@ -16,12 +16,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.lsp4j.ColorInformation;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
+import org.eclipse.lsp4j.DocumentColorParams;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.Position;
@@ -58,8 +59,7 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
                 maxPoolSize,
                 keepAliveTime,
                 TimeUnit.MILLISECONDS,
-                queue
-                );
+                queue);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
         observer.diagnostic(diagnostics.getDiagnostics());
 
-        //Make request for completion
+        // Make request for completion
         Runnable completionTask = () -> {
             CompletionParams completionParams = new CompletionParams();
             Position position = new Position();
@@ -87,14 +87,21 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
                 e.printStackTrace();
             }
         };
-        ///Make request for syntax highlighting
+        /// Make request for syntax highlighting
         Runnable syntaxHighlightingTask = () -> {
-            observer.syntaxHighlighting();
-            //TODO: Needs to be implemented
+            DocumentColorParams colorParams = new DocumentColorParams();
+            try {
+                List<ColorInformation> colors = serverProxy.getTextDocumentService().documentColor(colorParams).get();
+                // uncomment when box is ready
+                // observer.syntaxHighlighting(colors);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // TODO: Needs to be implemented
         };
 
-       threadPoolExecutor.execute(completionTask);
-       threadPoolExecutor.execute(syntaxHighlightingTask);
+        threadPoolExecutor.execute(completionTask);
+        threadPoolExecutor.execute(syntaxHighlightingTask);
 
     }
 

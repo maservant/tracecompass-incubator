@@ -52,7 +52,6 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlighting;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Validation;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 
 /**
  * FilterBoxService offers the interface to the client in order to notify the
@@ -66,12 +65,10 @@ public class FilterBoxService implements TextDocumentService {
 
     private String fInput;
     private final List<LanguageClient> fClients;
-    private LspFilterParser fFilterParser; // List for multiple clients!
 
     protected FilterBoxService(List<LanguageClient> clients) {
         fInput = new String();
         fClients = clients;
-        fFilterParser = new LspFilterParser();
     }
 
     /**
@@ -215,12 +212,6 @@ public class FilterBoxService implements TextDocumentService {
         try {
             List<Diagnostic> diagnostics = Validation.validate(fInput);
             PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
-            // WILL DISAPPEAR
-            Range range = params.getContentChanges().get(0).getRange();
-            FilterCu inputValidity = FilterCu.compile(fInput);
-            String diagMsg = (inputValidity != null ? "VALID" : "INVALID");
-            diagnostics.add(0, new Diagnostic(range, diagMsg));
-            // WILL DISAPPEAR
             pd.setDiagnostics(diagnostics);
             LanguageClient client = fClients.get(0);
             if (client == null) {
