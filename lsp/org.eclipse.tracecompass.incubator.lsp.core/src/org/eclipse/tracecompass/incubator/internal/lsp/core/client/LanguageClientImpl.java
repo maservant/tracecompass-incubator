@@ -100,7 +100,7 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
             // TODO: Needs to be implemented
         };
 
-        threadPoolExecutor.execute(completionTask);
+        // threadPoolExecutor.execute(completionTask);
         threadPoolExecutor.execute(syntaxHighlightingTask);
 
     }
