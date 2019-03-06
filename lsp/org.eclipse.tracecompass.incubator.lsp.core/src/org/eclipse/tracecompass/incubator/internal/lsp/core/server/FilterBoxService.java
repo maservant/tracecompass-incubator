@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import org.antlr.runtime.RecognitionException;
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.CodeLens;
 import org.eclipse.lsp4j.CodeLensParams;
@@ -49,6 +51,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlighting;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Validation;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 
 /**
@@ -209,23 +212,26 @@ public class FilterBoxService implements TextDocumentService {
             throw new NullPointerException("Event change param cannot be null");
         }
         fInput = params.getContentChanges().get(0).getText();
-        PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
-        fFilterParser.parseFilter(fInput, new Position(0, -1));
-        List<Diagnostic> diagnostics = fFilterParser.getDiagnostics();
-        // WILL DISAPPEAR, AS WITH ALL HUMANS
-        Range range = params.getContentChanges().get(0).getRange();
-        FilterCu inputValidity = FilterCu.compile(fInput);
-        String diagMsg = (inputValidity != null ? "VALID" : "INVALID");
-        diagnostics.add(0, new Diagnostic(range, diagMsg));
-        // WILL DISAPPEAR, AS WITH ALL HUMANS (END)
-        pd.setDiagnostics(diagnostics);
-        System.out.println("Input: " + fInput);
-        System.out.println("Length = " + fFilterParser.getDiagnostics().size());
-        LanguageClient client = fClients.get(0);
-        if (client == null) {
-            throw new NullPointerException("Client cannot be null");
+        try {
+            List<Diagnostic> diagnostics = Validation.validate(fInput);
+            PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
+            // WILL DISAPPEAR
+            Range range = params.getContentChanges().get(0).getRange();
+            FilterCu inputValidity = FilterCu.compile(fInput);
+            String diagMsg = (inputValidity != null ? "VALID" : "INVALID");
+            diagnostics.add(0, new Diagnostic(range, diagMsg));
+            // WILL DISAPPEAR
+            pd.setDiagnostics(diagnostics);
+            LanguageClient client = fClients.get(0);
+            if (client == null) {
+                throw new NullPointerException("Client cannot be null");
+            }
+            fClients.get(0).publishDiagnostics(pd);
+        } catch (RecognitionException error) {
+            error.printStackTrace();
+        } catch (IOException error) {
+            error.printStackTrace();
         }
-        fClients.get(0).publishDiagnostics(pd);
     }
 
     @Override
