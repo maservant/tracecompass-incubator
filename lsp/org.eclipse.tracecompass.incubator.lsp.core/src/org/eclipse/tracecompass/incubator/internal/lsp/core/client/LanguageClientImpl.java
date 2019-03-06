@@ -92,15 +92,13 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
             DocumentColorParams colorParams = new DocumentColorParams();
             try {
                 List<ColorInformation> colors = serverProxy.getTextDocumentService().documentColor(colorParams).get();
-                // uncomment when box is ready
-                // observer.syntaxHighlighting(colors);
+                observer.syntaxHighlighting(colors);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            // TODO: Needs to be implemented
         };
 
-        // threadPoolExecutor.execute(completionTask);
+        threadPoolExecutor.execute(completionTask);
         threadPoolExecutor.execute(syntaxHighlightingTask);
 
     }

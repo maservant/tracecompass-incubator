@@ -10,6 +10,7 @@ package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
 
 import java.util.List;
 
+import org.eclipse.lsp4j.ColorInformation;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
@@ -42,7 +43,7 @@ public class FilterBoxStub implements IObserver {
     }
 
     @Override
-    public void syntaxHighlighting() {
+    public void syntaxHighlighting(List<ColorInformation> colors) {
         // TODO Auto-generated method stub
 
     }

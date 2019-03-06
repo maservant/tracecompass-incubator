@@ -25,6 +25,7 @@ import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
+import org.eclipse.lsp4j.ColorInformation;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
@@ -163,43 +164,6 @@ public class LspFilterTextbox implements IObserver {
     }
 
     /**
-     * Method called by the lsp client to notify the view of changes
-     */
-    @Override
-    public void diagnostic(final List<Diagnostic> diagnostics) {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override()
-            public void run() {
-                if (!diagnostics.isEmpty()) {
-                    showErrorView();
-                } else {
-                    resetView();
-                }
-            }
-        });
-    }
-
-    @Override
-    public void completion(final Either<List<CompletionItem>, CompletionList> completion) {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override()
-            public void run() {
-                //TODO: Needs to be implemented
-            }
-        });
-    }
-
-    @Override
-    public void syntaxHighlighting() {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override()
-            public void run() {
-                //TODO: Needs to be implemented
-            }
-        });
-    }
-
-    /**
      * Method to add a key Listener to the FilterText Widget
      */
     private void setKeyListener() {
@@ -325,6 +289,44 @@ public class LspFilterTextbox implements IObserver {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
                 // Nothing to do here
+            }
+        });
+    }
+
+    /**
+     * Method called by the lsp client to notify the view of changes
+     */
+    @Override
+    public void diagnostic(final List<Diagnostic> diagnostics) {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override()
+            public void run() {
+                if (diagnostics.size() > 0) {
+                    showErrorView();
+                }
+                else {
+                    resetView();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void completion(final Either<List<CompletionItem>, CompletionList> completion) {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override()
+            public void run() {
+                //TODO: Needs to be implemented
+            }
+        });
+    }
+
+    @Override
+    public void syntaxHighlighting(List<ColorInformation> colors) {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override()
+            public void run() {
+                //TODO: Needs to be implemented
             }
         });
     }
