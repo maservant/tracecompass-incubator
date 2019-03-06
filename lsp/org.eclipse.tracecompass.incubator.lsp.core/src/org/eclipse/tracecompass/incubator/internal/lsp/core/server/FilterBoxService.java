@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -47,6 +48,7 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlighting;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 
 /**
@@ -131,8 +133,13 @@ public class FilterBoxService implements TextDocumentService {
 
     @Override
     public CompletableFuture<List<ColorInformation>> documentColor(DocumentColorParams params) {
-        //TODO: Needs to be implemented
-        return null;
+        try {
+            List<ColorInformation> colorInformation = SyntaxHighlighting.getColorInformationList(fInput);
+            return CompletableFuture.completedFuture(colorInformation);
+        } catch (IOException error) {
+            error.printStackTrace();
+            return CompletableFuture.completedFuture(null);
+        }
     }
 
     @Override

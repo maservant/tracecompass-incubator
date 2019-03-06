@@ -66,9 +66,9 @@ public class SyntaxHighlighting {
     private static Color getColor(int type) {
         switch (type) {
         case FilterParserLexer.OP:
-            return new Color(1, 0, 0, 1);
+            return new Color(0, 1, 0, 1);
         case FilterParserLexer.TEXT:
-            return new Color(1, 1, 1, 1);
+            return new Color(0, 0, 0, 1);
         case FilterParserLexer.SEPARATOR:
             return new Color(0, 0, 1, 1);
         default:
