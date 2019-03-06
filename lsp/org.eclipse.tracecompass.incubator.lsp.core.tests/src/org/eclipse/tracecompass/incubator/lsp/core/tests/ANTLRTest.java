@@ -17,6 +17,7 @@ import java.util.List;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.lsp4j.Color;
 import org.eclipse.lsp4j.ColorInformation;
+import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.AutoCompletion;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlighting;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Validation;
@@ -51,6 +52,26 @@ public class ANTLRTest {
 
     @Test
     public void validationTest() throws IOException, RecognitionException {
-        Validation.validate("TID == && 1 != 2");
+
+        System.out.println("TESING: TID =");
+        List<Diagnostic> diagnostics = Validation.validate("TID =");
+        assertEquals(diagnostics.size(), 1);
+
+        System.out.println("TESING: TID = && ");
+        diagnostics = Validation.validate("TID = && ");
+        assertEquals(diagnostics.size(), 1);
+
+        System.out.println("TESING: = 2");
+        diagnostics = Validation.validate("= 2");
+        assertEquals(diagnostics.size(), 1);
+
+        System.out.println("TESING: TI = 100 & TID != 12");
+        diagnostics = Validation.validate("TI = 100 & TID != 12");
+        assertEquals(diagnostics.size(), 2);
+
+
+        System.out.println("\"asdasd = a\"");
+        diagnostics = Validation.validate("TI = 100 & TID != 12");
+        assertEquals(diagnostics.size(), 2);
     }
 }
