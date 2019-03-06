@@ -22,6 +22,7 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.swt.*;
 import org.eclipse.swt.custom.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.lsp4j.CompletionItem;
@@ -43,6 +44,8 @@ public class LspFilterTextbox implements IObserver {
     private final Color fDefaultFilterTextColor;
     private final StyledText fFilterStyledText;
     private final TextViewer fTextViewer;
+    private final CLabel fSearchButton;
+    private final CLabel fCancelButton;
 
     /**
      * Constructor
@@ -51,10 +54,29 @@ public class LspFilterTextbox implements IObserver {
      *            the parent view
      */
     public LspFilterTextbox(Composite parent) {
-        fTextViewer = new TextViewer(parent, SWT.SINGLE | SWT.BORDER);
-        fFilterStyledText = fTextViewer.getTextWidget();
-        fFilterStyledText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+        final Composite baseComposite = new Composite(parent, SWT.BORDER);
+        baseComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+        final GridLayout baseCompositeGridLayout = new GridLayout(3, false);
+        baseCompositeGridLayout.marginHeight = 0;
+        baseCompositeGridLayout.marginWidth = 0;
+        baseComposite.setLayout(baseCompositeGridLayout);
 
+        // Search icon
+        fSearchButton = new CLabel(baseComposite, SWT.CENTER);
+        fSearchButton.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create()); // new GridData(SWT.FILL, SWT.FILL, false, true));
+        fSearchButton.setText("search");    // Will be changed for an image
+
+        // Text box
+        fTextViewer = new TextViewer(baseComposite, SWT.SINGLE | SWT.BORDER);
+        fFilterStyledText = fTextViewer.getTextWidget();
+        fFilterStyledText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+
+        // Cancel icon
+        fCancelButton = new CLabel(baseComposite, SWT.CENTER);
+        fCancelButton.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create()); // new GridData(SWT.FILL, SWT.FILL, false, true));
+        fCancelButton.setText("clear"); // Will be changed for an image
+
+        setIconsListener();
         setKeyListener();
         fDefaultFilterTextColor = fFilterStyledText.getBackground();
         try {
@@ -74,13 +96,35 @@ public class LspFilterTextbox implements IObserver {
      *            of the listener to override, without "set"
      */
     public LspFilterTextbox(Composite parent, Map<String, Boolean> overridenParameters) {
-        fTextViewer = new TextViewer(parent, SWT.SINGLE | SWT.BORDER);
+        final Composite baseComposite = new Composite(parent, SWT.BORDER);
+        baseComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+        final GridLayout baseCompositeGridLayout = new GridLayout(3, false);
+        baseCompositeGridLayout.marginHeight = 0;
+        baseCompositeGridLayout.marginWidth = 0;
+        baseComposite.setLayout(baseCompositeGridLayout);
+
+        // Search icon
+        fSearchButton = new CLabel(baseComposite, SWT.CENTER);
+        fSearchButton.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create()); // new GridData(SWT.FILL, SWT.FILL, false, true));
+        fSearchButton.setText("search");    // Will be changed for an image
+
+        // Text box
+        fTextViewer = new TextViewer(baseComposite, SWT.SINGLE | SWT.BORDER);
         fFilterStyledText = fTextViewer.getTextWidget();
-        fFilterStyledText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+        fFilterStyledText.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+
+        // Cancel icon
+        fCancelButton = new CLabel(baseComposite, SWT.CENTER);
+        fCancelButton.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create()); // new GridData(SWT.FILL, SWT.FILL, false, true));
+        fCancelButton.setText("clear"); // Will be changed for an image
 
         if (!overridenParameters.containsKey("KeyListener") //$NON-NLS-1$
             || !Objects.requireNonNull(overridenParameters.get("KeyListener"))) { //$NON-NLS-1$
             setKeyListener();
+        }
+        if (!overridenParameters.containsKey("IconListener") //$NON-NLS-1$
+            || !Objects.requireNonNull(overridenParameters.get("IconListener"))) { //$NON-NLS-1$
+            setIconsListener();
         }
         fDefaultFilterTextColor = fFilterStyledText.getBackground();
         try {
@@ -192,6 +236,95 @@ public class LspFilterTextbox implements IObserver {
             @Override
             public void keyPressed(@Nullable KeyEvent e) {
                 consumer.accept(e);
+            }
+        });
+    }
+
+    /**
+     * Method to add a mouse Listener to the icons
+     */
+    private void setIconsListener() {
+        fSearchButton.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseUp(MouseEvent e) {
+                String text = Objects.requireNonNull(fFilterStyledText.getText());
+                notifyLspClient(text);
+            }
+
+            @Override
+            public void mouseDown(MouseEvent e) {
+                // Nothing to do here
+            }
+
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                // Nothing to do here
+            }
+        });
+        fCancelButton.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseUp(MouseEvent e) {
+                fFilterStyledText.setText("");
+                resetView();
+            }
+
+            @Override
+            public void mouseDown(MouseEvent e) {
+                // Nothing to do here
+            }
+
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                // Nothing to do here
+            }
+        });
+    }
+
+    /**
+     * Method to add a mouse Listener to the icons
+     *
+     * @param consumer
+     *            the function to be called
+     */
+    public void setIconsListener(Consumer<MouseEvent> consumer) {
+        fSearchButton.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseUp(MouseEvent e) {
+                String text = Objects.requireNonNull(fFilterStyledText.getText());
+                notifyLspClient(text);
+                consumer.accept(e);
+            }
+
+            @Override
+            public void mouseDown(MouseEvent e) {
+                // Nothing to do here
+            }
+
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                // Nothing to do here
+            }
+        });
+        fCancelButton.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseUp(MouseEvent e) {
+                fFilterStyledText.setText("");
+                resetView();
+                consumer.accept(e);
+            }
+
+            @Override
+            public void mouseDown(MouseEvent e) {
+                // Nothing to do here
+            }
+
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                // Nothing to do here
             }
         });
     }
