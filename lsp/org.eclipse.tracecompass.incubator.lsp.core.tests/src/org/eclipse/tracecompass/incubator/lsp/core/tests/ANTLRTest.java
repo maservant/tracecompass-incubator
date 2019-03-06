@@ -18,7 +18,6 @@ import org.antlr.runtime.RecognitionException;
 import org.eclipse.lsp4j.Color;
 import org.eclipse.lsp4j.ColorInformation;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.server.AutoCompletion;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlighting;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Validation;
 import org.junit.Test;
