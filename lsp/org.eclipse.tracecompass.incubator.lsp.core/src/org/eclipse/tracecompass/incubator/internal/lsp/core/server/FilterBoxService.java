@@ -79,20 +79,7 @@ public class FilterBoxService implements TextDocumentService {
      */
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
-        Position startPos = new Position(position.getPosition().getLine(), position.getPosition().getCharacter());
-        Position endPos = new Position(startPos.getLine(), startPos.getCharacter() + 1);
-        List<CompletionItem> items = new ArrayList();
-        LspFilterParser currentPositionFilterParser = new LspFilterParser();
-        currentPositionFilterParser.parseFilter(fInput, startPos);
-        int currentState = currentPositionFilterParser.getCurrentState();
-        List<String> suggestions = currentPositionFilterParser.getSuggestions(currentState);
-        for (int i = 0; i < suggestions.size(); i++) {
-            System.out.println("Suggestion " + i + ": " + suggestions.get(i));
-            CompletionItem item = new CompletionItem();
-            item.setTextEdit(new TextEdit(new Range(startPos, endPos), suggestions.get(i)));
-            items.add(item);
-        }
-        return CompletableFuture.completedFuture(Either.forLeft(items));
+        return null;
     }
 
     @Override
