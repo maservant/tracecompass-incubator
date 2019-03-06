@@ -24,7 +24,19 @@ import org.eclipse.lsp4j.Range;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
+/**
+ *
+ * @author Maxime Thibault
+ *
+ */
 public class Validation {
+    /**
+     *
+     * @param str
+     * @return List of Diagnostic
+     * @throws IOException
+     * @throws RecognitionException
+     */
     @SuppressWarnings("restriction")
     public static List<Diagnostic> validate(String str) throws IOException, RecognitionException {
         //Initialize the lexerParser, parse str and return list of CommonToken
