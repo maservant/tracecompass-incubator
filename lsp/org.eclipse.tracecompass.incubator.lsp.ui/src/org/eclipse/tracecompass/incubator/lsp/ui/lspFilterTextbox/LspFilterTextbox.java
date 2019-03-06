@@ -302,7 +302,15 @@ public class LspFilterTextbox implements IObserver {
             @Override()
             public void run() {
                 if (diagnostics.size() > 0) {
-                    showErrorView();
+                    diagnostics.forEach((diagnostic) -> {
+                        int start = diagnostic.getRange().getStart().getCharacter();
+                        int end = diagnostic.getRange().getEnd().getCharacter();
+                        if (end - start > 0) {
+                            showErrorView(diagnostic);
+                        } else {
+                            showBackgroundRed();
+                        }
+                    });
                 }
                 else {
                     resetView();
@@ -326,7 +334,9 @@ public class LspFilterTextbox implements IObserver {
         Display.getDefault().syncExec(new Runnable() {
             @Override()
             public void run() {
-                //TODO: Needs to be implemented
+                colors.forEach((color) -> {
+                    addColor(color);
+                });
             }
         });
     }
@@ -348,6 +358,21 @@ public class LspFilterTextbox implements IObserver {
     }
 
     /**
+     * Method to add a color according to a range
+     * @param colorInformation
+     */
+    private void addColor(ColorInformation colorInformation) {
+        int start = colorInformation.getRange().getStart().getCharacter();
+        int end = colorInformation.getRange().getEnd().getCharacter();
+        Device device = Display.getCurrent();
+        Color color = new Color(device, (int) (colorInformation.getColor().getRed() * 255),
+                                        (int) (colorInformation.getColor().getGreen() * 255),
+                                        (int) (colorInformation.getColor().getBlue() * 255));
+
+        fTextViewer.setTextColor(color, start, end - start + 1, false);
+    }
+
+    /**
      * Method to reset the filter box view (i.e. put back initial color, remove
      * error message, remove suggestions)
      */
@@ -358,7 +383,21 @@ public class LspFilterTextbox implements IObserver {
     /**
      * Method to put the filter box in error state
      */
-    private void showErrorView() {
+    private void showErrorView(Diagnostic diagnostic) {
+        int start = diagnostic.getRange().getStart().getCharacter();
+        int end = diagnostic.getRange().getEnd().getCharacter();
+        Device device = Display.getCurrent();
+        Color color = new Color(device, 255, 0, 0);
+
+        StyleRange style = new StyleRange();
+        style.start = start;
+        style.length = end - start + 1;
+        style.underline = true;
+        style.underlineColor = color;
+        fFilterStyledText.setStyleRange(style);
+    }
+
+    private void showBackgroundRed() {
         Device device = Display.getCurrent();
         fFilterStyledText.setBackground(new Color(device, 255, 150, 150));
     }
