@@ -65,7 +65,7 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
     @Override
     public void telemetryEvent(Object object) {
         // Not implemented
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -101,18 +101,19 @@ public class LanguageClientImpl implements LanguageClient, IObservable {
     @Override
     public void showMessage(MessageParams messageParams) {
         // Not implemented
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
         // Not implemented
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void logMessage(MessageParams message) {
         // Not implemented
+        throw new UnsupportedOperationException();
     }
 
     public void setServer(LanguageServer server) {

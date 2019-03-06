@@ -34,20 +34,19 @@ public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
 
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
-        // TODO Auto-generated method stub
+        // TODO : send initialize result with actual capabilities
         return CompletableFuture.completedFuture(new InitializeResult());
     }
 
     @Override
     public CompletableFuture<Object> shutdown() {
-        // TODO Auto-generated method stub
+        // Nothing to do
         return null;
     }
 
     @Override
     public void exit() {
-        // TODO Auto-generated method stub
-
+        // Nothing to do
     }
 
     @Override
