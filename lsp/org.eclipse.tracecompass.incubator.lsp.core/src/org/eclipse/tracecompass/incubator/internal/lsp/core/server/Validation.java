@@ -77,7 +77,6 @@ public class Validation {
            String message = parser.getErrorMessage(e, parser.getTokenNames());
 
            int idx = e.token.getCharPositionInLine();
-           System.out.println("Idx: " + idx);
            // EOF error
            if (idx == -1) {
                idx = str.length();
@@ -88,8 +87,6 @@ public class Validation {
            Diagnostic diagnostic = new Diagnostic(range, message);
 
            diagnostics.add(diagnostic);
-           System.out.println("String length: " + str.length());
-           System.out.println("Error at char: " + idx);
         });
 
         return diagnostics;
