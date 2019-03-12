@@ -69,14 +69,28 @@ public class Validation {
            Range range = new Range(start, end);
            Diagnostic diagnostic = new Diagnostic(range, message);
 
-           diagnostics.add(diagnostic); // (TID == ) && (TID == 12)
+           diagnostics.add(diagnostic);
 
         });
 
-        /*parserExceptions.forEach(e -> {
-           String mString = parser.getErrorMessage(e, parser.getTokenNames());
-           System.out.println(mString);
-        });*/
+        parserExceptions.forEach(e -> {
+           String message = parser.getErrorMessage(e, parser.getTokenNames());
+
+           int idx = e.token.getCharPositionInLine();
+           System.out.println("Idx: " + idx);
+           // EOF error
+           if (idx == -1) {
+               idx = str.length();
+           }
+           Position start = new Position(e.line, idx);
+           Position end = new Position(e.line, idx);
+           Range range = new Range(start, end);
+           Diagnostic diagnostic = new Diagnostic(range, message);
+
+           diagnostics.add(diagnostic);
+           System.out.println("String length: " + str.length());
+           System.out.println("Error at char: " + idx);
+        });
 
         return diagnostics;
 

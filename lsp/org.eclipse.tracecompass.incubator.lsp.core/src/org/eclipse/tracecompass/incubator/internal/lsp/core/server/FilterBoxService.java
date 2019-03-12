@@ -193,7 +193,8 @@ public class FilterBoxService implements TextDocumentService {
         if (contentChange == null) {
             throw new NullPointerException("Event change param cannot be null");
         }
-        fInput = params.getContentChanges().get(0).getText() + "\n";
+        // fInput = params.getContentChanges().get(0).getText() + "\n";
+        fInput = params.getContentChanges().get(0).getText();
         try {
             List<Diagnostic> diagnostics = Validation.validate(fInput);
             PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
