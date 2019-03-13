@@ -6,7 +6,7 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
+package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -17,24 +17,24 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.FilterWorkspaceService;
 
 /**
- * LanguageServer stub: Wrap around an actual LanguageServerImplementation It
- * helps delegates calls from mockup to real implementation Mockup actually
- * store information about the requests/reponses values.
+ * LanguageServer stub: Wrap around an actual LanguageServerImpl
+ * Helps to store data about the real implementation.
+ * Use the LSPServerMockup to store data from calls
  *
  * @author Maxime Thibault
  *
  */
-public class ServerStub implements LanguageServer {
+public class LSPServerStub implements LanguageServer {
 
-    public ServerMockup mockup = new ServerMockup();
-    public LanguageServer server;
-    protected FilterBoxServiceStub filterBoxService;
-    private WorkspaceService filterWorkspaceService;
+    public LSPServerMockup fMockup = new LSPServerMockup();
+    public LanguageServer fServer;
+    protected FilterBoxServiceStub fFilterBoxService;
+    private WorkspaceService fFilterWorkspaceService;
 
-    public ServerStub(LanguageServer s) {
-        server = s;
-        filterBoxService = new FilterBoxServiceStub(server.getTextDocumentService());
-        filterWorkspaceService = new FilterWorkspaceService();
+    public LSPServerStub(LanguageServer s) {
+        fServer = s;
+        fFilterBoxService = new FilterBoxServiceStub(fServer.getTextDocumentService());
+        fFilterWorkspaceService = new FilterWorkspaceService();
     }
 
     @Override
@@ -54,12 +54,12 @@ public class ServerStub implements LanguageServer {
 
     @Override
     public FilterBoxServiceStub getTextDocumentService() {
-        return filterBoxService;
+        return fFilterBoxService;
     }
 
     @Override
     public WorkspaceService getWorkspaceService() {
-        return filterWorkspaceService;
+        return fFilterWorkspaceService;
     }
 
 }

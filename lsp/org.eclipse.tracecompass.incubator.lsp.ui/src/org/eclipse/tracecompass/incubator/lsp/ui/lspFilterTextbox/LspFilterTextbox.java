@@ -30,7 +30,7 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPClientAPI;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPFilterClient;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
 /**
@@ -41,7 +41,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
  */
 public class LspFilterTextbox implements IObserver {
 
-    private @Nullable LSPClientAPI lspClient;
+    private @Nullable LSPFilterClient lspClient;
     private final Color fDefaultFilterTextColor;
     private final StyledText fFilterStyledText;
     private final TextViewer fTextViewer;
@@ -81,7 +81,7 @@ public class LspFilterTextbox implements IObserver {
         setKeyListener();
         fDefaultFilterTextColor = fFilterStyledText.getBackground();
         try {
-            lspClient = new LSPClientAPI(this);
+            lspClient = new LSPFilterClient(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -129,7 +129,7 @@ public class LspFilterTextbox implements IObserver {
         }
         fDefaultFilterTextColor = fFilterStyledText.getBackground();
         try {
-            lspClient = new LSPClientAPI(this);
+            lspClient = new LSPFilterClient(this);
         } catch (IOException e) {
             e.printStackTrace();
         }

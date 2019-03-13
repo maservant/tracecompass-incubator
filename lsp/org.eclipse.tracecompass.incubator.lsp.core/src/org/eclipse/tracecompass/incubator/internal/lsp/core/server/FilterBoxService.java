@@ -48,8 +48,6 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlighting;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Validation;
 
 /**
  * FilterBoxService offers the interface to the client in order to notify the

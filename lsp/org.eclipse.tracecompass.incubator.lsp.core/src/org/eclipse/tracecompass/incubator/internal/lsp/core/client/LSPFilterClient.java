@@ -9,31 +9,31 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.lsp4j.jsonrpc.Launcher;
-import org.eclipse.lsp4j.launch.LSPLauncher;
-import org.eclipse.lsp4j.services.LanguageServer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.*;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.lsp4j.jsonrpc.Launcher;
+import org.eclipse.lsp4j.launch.LSPLauncher;
+import org.eclipse.lsp4j.services.LanguageServer;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
 /**
  * LSP Client simplification that offers an API to its observer. The underlying
- * class is the LanguageClient implementation.
+ * class is the LanguageClient implementation for the tracecompass FilterBox.
  *
  * @author Maxime Thibault
  *
  */
-public class LSPClientAPI {
+public class LSPFilterClient {
 
     //Avoid using the lspclient directly
-    public LanguageClientImpl lspclient;
-    private Socket socket;
+    public LanguageFilterClient fLanguageClient;
+    private Socket fSocket;
 
     /**
      * Create client:
@@ -44,9 +44,9 @@ public class LSPClientAPI {
      * @param observer
      *            that uses this API and get notified
      */
-    public LSPClientAPI(@NonNull IObserver observer) throws UnknownHostException, IOException {
-        socket = new Socket(Configuration.HOSTNAME, Configuration.PORT);
-        initialize(socket.getInputStream(), socket.getOutputStream(), observer);
+    public LSPFilterClient(@NonNull IObserver observer) throws UnknownHostException, IOException {
+        fSocket = new Socket(Configuration.HOSTNAME, Configuration.PORT);
+        initialize(fSocket.getInputStream(), fSocket.getOutputStream(), observer);
     }
 
     /**
@@ -61,9 +61,9 @@ public class LSPClientAPI {
      * @param observer
      *            that uses this API and get notified
      */
-    public LSPClientAPI(String hostname, Integer port, @NonNull IObserver observer) throws UnknownHostException, IOException {
-        socket = new Socket(hostname, port);
-        initialize(socket.getInputStream(), socket.getOutputStream(), observer);
+    public LSPFilterClient(String hostname, Integer port, @NonNull IObserver observer) throws UnknownHostException, IOException {
+        fSocket = new Socket(hostname, port);
+        initialize(fSocket.getInputStream(), fSocket.getOutputStream(), observer);
     }
 
     /**
@@ -79,7 +79,7 @@ public class LSPClientAPI {
      * @param observer
      *            that uses this API and get notified
      */
-    public LSPClientAPI(InputStream in, OutputStream out, @NonNull IObserver observer) {
+    public LSPFilterClient(InputStream in, OutputStream out, @NonNull IObserver observer) {
         initialize(in, out, observer);
     }
 
@@ -91,11 +91,20 @@ public class LSPClientAPI {
      * @param observer
      */
     private void initialize(InputStream in, OutputStream out, @NonNull IObserver observer) {
-        lspclient = new LanguageClientImpl();
-        Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(lspclient, in, out);
-        lspclient.setServer(launcher.getRemoteProxy());
-        lspclient.register(observer);
+        fLanguageClient = new LanguageFilterClient();
+        Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(fLanguageClient, in, out);
+        fLanguageClient.setServer(launcher.getRemoteProxy());
+        fLanguageClient.register(observer);
         launcher.startListening();
+    }
+
+    /**
+     * Return language client used by this LSPClient
+     *
+     * @return Language client
+     */
+    public LanguageFilterClient getLanguageClient() {
+        return fLanguageClient;
     }
 
     /**
@@ -105,7 +114,7 @@ public class LSPClientAPI {
      *            string to send
      */
     public void notify(String str) {
-        lspclient.tellDidChange(str);
+        fLanguageClient.tellDidChange(str);
     }
 
     /**
@@ -114,6 +123,6 @@ public class LSPClientAPI {
      * @throws IOException
      */
     public void dispose() throws IOException {
-        socket.close();
+        fSocket.close();
     }
 }

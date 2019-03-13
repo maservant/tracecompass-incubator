@@ -6,7 +6,7 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
+package org.eclipse.tracecompass.incubator.lsp.core.environment;
 
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
