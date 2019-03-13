@@ -21,13 +21,18 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
-public class LanguageServerImpl implements LanguageServer, LanguageClientAware {
+/**
+ * LanguageServer implementation for the tracecompass FilterBox
+ *
+ *
+ */
+public class LanguageFilterServer implements LanguageServer, LanguageClientAware {
 
     private TextDocumentService filterBoxService;
     private WorkspaceService filterWorkspaceService;
     private final List<LanguageClient> clients = new CopyOnWriteArrayList<>();
 
-    public LanguageServerImpl() {
+    public LanguageFilterServer() {
         this.filterBoxService = new FilterBoxService(this.clients);
         this.filterWorkspaceService = new FilterWorkspaceService();
     }

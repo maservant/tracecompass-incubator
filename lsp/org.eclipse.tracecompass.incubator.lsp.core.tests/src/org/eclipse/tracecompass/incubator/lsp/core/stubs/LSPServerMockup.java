@@ -6,14 +6,15 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
+package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 /**
- * Requests/Responses state storage for the LAnguageServer
+ * Use this class to save data from LSPServerStub
+ * Add attributes/functions if necessary
  *
  * @author Maxime Thibault
  *
  */
-public class ServerMockup {
-    public String received = null;
+public class LSPServerMockup {
+    public String fReceived = null;
 }

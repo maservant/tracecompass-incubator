@@ -47,7 +47,7 @@ public class Activator extends TraceCompassActivator {
         try {
             fServer = new LSPServer();
         } catch (IOException e) {
-            e.printStackTrace();
+            getInstance().logError(e.getMessage());
         }
     }
 
@@ -57,7 +57,7 @@ public class Activator extends TraceCompassActivator {
             try {
                 fServer.dispose();
             } catch (IOException e) {
-                e.printStackTrace();
+                getInstance().logError(e.getMessage());
             }
         }
     }

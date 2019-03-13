@@ -19,13 +19,14 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
 /**
+ * Class that offer autocompletion parameters based on antlr
  *
  * @author Maxime Thibault
  *
  */
 public class AutoCompletion {
 
-    @SuppressWarnings("restriction")
+    @SuppressWarnings("restriction") // Suppress restriction on ANTLR FilterParser*
     static public void autoCompletion(String str) throws IOException, RecognitionException {
 
         // Initialize the lexerParser, parse str and return list of CommonToken

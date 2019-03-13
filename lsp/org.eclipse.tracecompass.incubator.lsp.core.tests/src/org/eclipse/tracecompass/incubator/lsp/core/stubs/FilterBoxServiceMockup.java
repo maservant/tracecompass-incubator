@@ -6,14 +6,15 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
+package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 /**
- * Requests/Responses state storage for the FilterBoxService
+ * Use this class to store data from FilterBoxServiceStub
+ * Add attributes/functions if necessary
  *
  * @author Maxime Thibault
  *
  */
 public class FilterBoxServiceMockup {
-    public String received = null;
+    public String fReceived = null;
 }

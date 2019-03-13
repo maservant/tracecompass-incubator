@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.incubator.lsp.core.tests;
+package org.eclipse.tracecompass.incubator.lsp.core.tests.server;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,6 +22,12 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlig
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Validation;
 import org.junit.Test;
 
+/**
+ *
+ * @author Maxime Thibault
+ *
+ * This class tests server-side class using antlr for syntax color, validation and autocompletion
+ */
 public class ANTLRTest {
 
     @Test

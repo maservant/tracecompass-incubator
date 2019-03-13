@@ -6,7 +6,7 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
+package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 import java.util.List;
 
@@ -18,17 +18,16 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
 /**
- * FilterBox stub: Wrap around an actual FilterBox implementation. It helps to
- * store data about the real implementation. Mockup actually store information
- * about the requests/reponses values.
+ * This fake client stub is used to handle function call from the LSPClient bound in the TestEnvironment
+ * Use this class to store the data into the FakeClientMockup
  *
  * @author Maxime Thibault
  *
- *         TODO: NEEDS TO BE BOUND TO A REAL FILTERBOX EVENTUALLY
+ *
  */
-public class FilterBoxStub implements IObserver {
+public class FakeClientStub implements IObserver {
 
-    public FilterBoxMockup mockup = new FilterBoxMockup();
+    public FakeClientMockup fMockup = new FakeClientMockup();
 
     @Override
     public void diagnostic(List<Diagnostic> diagnostics) {

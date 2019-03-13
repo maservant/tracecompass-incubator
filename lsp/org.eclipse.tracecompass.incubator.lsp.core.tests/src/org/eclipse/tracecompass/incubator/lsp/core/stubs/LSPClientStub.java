@@ -6,7 +6,7 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
+package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -17,27 +17,27 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LanguageClientImpl;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LanguageFilterClient;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObservable;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
 
 /**
- * LanguageClient stub: Wrap around an actual LanguageClientImplementation It
- * helps to store data about the real implementation. Mockup actually store
- * information about the requests/reponses values.
+ * LanguageClient stub: Wrap around LanguageClientImpl
+ * Helps to store data about the real implementation.
+ * Use the LSPClientMockup to store data from calls
  *
  * @author Maxime Thibault
  *
  */
-public class ClientStub implements LanguageClient, IObservable {
+public class LSPClientStub implements LanguageClient, IObservable {
 
-    public LanguageClientImpl client;
-    public ClientMockup mockup = new ClientMockup();
-    public LanguageServer serverProxy;
-    public IObserver observer;
+    public LanguageFilterClient fClient;
+    public LSPClientMockup fMockup = new LSPClientMockup();
+    public LanguageServer fServerProxy;
+    public IObserver fObserver;
 
-    public ClientStub(LanguageClientImpl c) {
-        client = c;
+    public LSPClientStub(LanguageFilterClient languageClient) {
+        fClient = languageClient;
     }
 
     @Override
@@ -47,8 +47,8 @@ public class ClientStub implements LanguageClient, IObservable {
 
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        mockup.received = diagnostics.getDiagnostics().get(0).getMessage();
-        client.publishDiagnostics(diagnostics);
+        fMockup.fReceived = diagnostics.getDiagnostics().get(0).getMessage();
+        fClient.publishDiagnostics(diagnostics);
     }
 
     @Override
@@ -67,17 +67,17 @@ public class ClientStub implements LanguageClient, IObservable {
     }
 
     public void setServer(LanguageServer server) {
-        serverProxy = server;
+        fServerProxy = server;
     }
 
     @Override
     public void register(@NonNull IObserver obs) {
-        observer = obs;
+        fObserver = obs;
     }
 
     public void tellDidChange(String str) {
-        mockup.received = str;
-        client.tellDidChange(str);
+        fMockup.fReceived = str;
+        fClient.tellDidChange(str);
     }
 
 }

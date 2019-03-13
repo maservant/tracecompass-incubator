@@ -7,14 +7,15 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
+package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 /**
- * Requests/Responses state storage for the LanguageClient
+ * Use this class to save data from LSPClientStub
+ * Add attributes/functions if necessary
  *
  * @author Maxime Thibault
  *
  */
-public class ClientMockup {
-    public String received = null;
+public class LSPClientMockup {
+    public String fReceived = null;
 }

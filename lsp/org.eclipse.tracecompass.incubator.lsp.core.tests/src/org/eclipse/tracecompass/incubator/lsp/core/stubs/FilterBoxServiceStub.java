@@ -6,7 +6,7 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.incubator.lsp.core.tests.environment;
+package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -40,20 +40,20 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 /**
- * FilterBoxService stub: Wrap around an actual FilterBoxService implementation.
- * It helps to store data about the real implementation. Mockup actually store
- * information about the requests/reponses values.
+ * FilterBoxService stub: Wrap around the actual textDocumentService implementation.
+ * Use this class to store data coming from the LSPCLient bound in the TestEnvironment.
+ * Store the data into the FilterBoxServiceMocukup
  *
  * @author Maxime Thibault
  *
  */
 public class FilterBoxServiceStub implements TextDocumentService {
 
-    public FilterBoxServiceMockup mockup = new FilterBoxServiceMockup();
-    public TextDocumentService textDocumentService;
+    public FilterBoxServiceMockup fMockup = new FilterBoxServiceMockup();
+    public TextDocumentService fTextDocumentService;
 
     public FilterBoxServiceStub(TextDocumentService ts) {
-        textDocumentService = ts;
+        fTextDocumentService = ts;
     }
 
     @Override
@@ -153,8 +153,8 @@ public class FilterBoxServiceStub implements TextDocumentService {
 
     @Override
     public void didChange(DidChangeTextDocumentParams params) {
-        mockup.received = params.getContentChanges().get(0).getText();
-        textDocumentService.didChange(params);
+        fMockup.fReceived = params.getContentChanges().get(0).getText();
+        fTextDocumentService.didChange(params);
     }
 
     @Override

@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -16,10 +19,6 @@ import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * LSPServer wrapper
@@ -29,9 +28,9 @@ import java.io.OutputStream;
  */
 public class LSPServer {
 
-    public LanguageServerImpl lspserver;
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
+    public LanguageFilterServer fLSPServer;
+    private ServerSocket fServerSocket;
+    private Socket fClientSocket;
 
     /**
      * Create serverSocket then wait for a client socket to connect
@@ -40,20 +39,20 @@ public class LSPServer {
      * @throws IOException
      */
     public LSPServer() throws IOException {
-        serverSocket = new ServerSocket(Configuration.PORT);
+        fServerSocket = new ServerSocket(Configuration.PORT);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    clientSocket = serverSocket.accept();
+                    fClientSocket = fServerSocket.accept();
 
                     // Instantiate LSP client
-                    InputStream in = clientSocket.getInputStream();
-                    OutputStream out = clientSocket.getOutputStream();
+                    InputStream in = fClientSocket.getInputStream();
+                    OutputStream out = fClientSocket.getOutputStream();
 
-                    lspserver = new LanguageServerImpl();
-                    Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(lspserver, in, out);
-                    lspserver.connect(launcher.getRemoteProxy());
+                    fLSPServer = new LanguageFilterServer();
+                    Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(fLSPServer, in, out);
+                    fLSPServer.connect(launcher.getRemoteProxy());
                     launcher.startListening();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -71,9 +70,9 @@ public class LSPServer {
      *            OutputStream (data out)
      */
     public LSPServer(InputStream in, OutputStream out) {
-        lspserver = new LanguageServerImpl();
-        Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(lspserver, in, out);
-        lspserver.connect(launcher.getRemoteProxy());
+        fLSPServer = new LanguageFilterServer();
+        Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(fLSPServer, in, out);
+        fLSPServer.connect(launcher.getRemoteProxy());
         launcher.startListening();
     }
 
@@ -83,6 +82,6 @@ public class LSPServer {
      * @throws IOException
      */
     public void dispose() throws IOException {
-        serverSocket.close();
+        fServerSocket.close();
     }
 }

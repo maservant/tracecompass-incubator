@@ -7,13 +7,13 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.incubator.lsp.core.tests;
+package org.eclipse.tracecompass.incubator.lsp.core.tests.server;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.tracecompass.incubator.lsp.core.tests.environment.TestEnvironment;
+import org.eclipse.tracecompass.incubator.lsp.core.environment.TestEnvironment;
 import org.junit.Test;
 
 public class ServerTest {
@@ -23,16 +23,22 @@ public class ServerTest {
         String[] strArray = {"TID", "TID==", "TID==28"};
         String[] validity = {"VALID", "INVALID", "VALID"};
 
+        //TODO: TestEnvironment needs to be reset every time we call a new function!!
         TestEnvironment te = new TestEnvironment();
 
         for (int i = 0; i < strArray.length; i++) {
-            te.clientStub.tellDidChange(strArray[i]);
+            te.fLSPClientStub.tellDidChange(strArray[i]);
 
+            // TODO: Change synchronization mechanism
             //Wait for transactions to be done
             TimeUnit.SECONDS.sleep(1);
 
             //Check mockup for stored values
-            assertEquals(validity[i], te.clientStub.mockup.received);
+            assertEquals(validity[i], te.fLSPClientStub.fMockup.fReceived);
         }
     }
+
+    /**
+     * TODO: ADD MORE TESTS!
+     */
 }
