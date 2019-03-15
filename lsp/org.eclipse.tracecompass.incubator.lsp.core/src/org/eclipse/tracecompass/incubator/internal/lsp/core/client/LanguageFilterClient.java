@@ -34,8 +34,8 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.Activator;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObservable;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observable;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
 
 /**
  * LanguageClient to be used by 1 LSPFilterClient.
@@ -44,10 +44,10 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
  * @author Maxime Thibault
  *
  */
-public class LanguageFilterClient implements LanguageClient, IObservable {
+public class LanguageFilterClient implements LanguageClient, Observable {
 
     public LanguageServer fServerProxy;
-    public IObserver fObserver;
+    public Observer fObserver;
     private Integer fCursor = 0;
     private ThreadPoolExecutor fThreadPoolExecutor;
 
@@ -129,7 +129,7 @@ public class LanguageFilterClient implements LanguageClient, IObservable {
     }
 
     @Override
-    public void register(@NonNull IObserver obs) {
+    public void register(@NonNull Observer obs) {
         fObserver = obs;
     }
 
