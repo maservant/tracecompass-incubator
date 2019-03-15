@@ -36,6 +36,7 @@ import org.eclipse.lsp4j.DocumentRangeFormattingParams;
 import org.eclipse.lsp4j.DocumentSymbolParams;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.Location;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.ReferenceParams;
 import org.eclipse.lsp4j.RenameParams;
@@ -75,6 +76,14 @@ public class FilterBoxService implements TextDocumentService {
      */
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
+        try {
+            AutoCompletion.autoCompletion(fInput, new Position(0, 53));
+        } catch (RecognitionException e) {
+            // TODO: Activator
+            e.printStackTrace();
+        } catch (IOException err) {
+            err.printStackTrace();
+        }
         return CompletableFuture.completedFuture(Either.forLeft(new ArrayList<CompletionItem>()));
     }
 
