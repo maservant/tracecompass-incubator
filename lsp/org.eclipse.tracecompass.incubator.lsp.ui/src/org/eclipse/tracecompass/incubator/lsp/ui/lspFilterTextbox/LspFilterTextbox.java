@@ -49,12 +49,14 @@ public class LspFilterTextbox implements Observer {
     private @Nullable LSPFilterClient lspClient;
     private List<ValidListener> fListeners = new ArrayList<>();
     private final Color fDefaultFilterTextColor;
+    private final Color fDefaultFilterBackgroundColor;
     private final StyledText fFilterStyledText;
     private final TextViewer fTextViewer;
     private final CLabel fSearchButton;
     private final CLabel fCancelButton;
     private Boolean fIsValidString = false;
-    private static Color ERROR_BACKGROUND_COLOR;
+    private List<ColorInformation> fColors = new ArrayList<>();
+    private List<Diagnostic> fDiagnostics = new ArrayList<>();
 
     /**
      * Constructor
@@ -87,14 +89,13 @@ public class LspFilterTextbox implements Observer {
 
         setIconsListener();
         setKeyListener();
-        fDefaultFilterTextColor = fFilterStyledText.getBackground();
+        fDefaultFilterBackgroundColor = fFilterStyledText.getBackground();
         try {
             lspClient = new LSPFilterClient(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Device device = Display.getCurrent();
-        ERROR_BACKGROUND_COLOR = new Color(device, 255, 150, 150);
+        fDefaultFilterTextColor = fFilterStyledText.getForeground();
     }
 
     /**
@@ -221,33 +222,28 @@ public class LspFilterTextbox implements Observer {
     }
 
     /**
-     * Method called by the lsp client to notify the view of changes
+     * Method called by the lsp client to notify the view of errors
      */
     @Override
-    public void diagnostic(final List<Diagnostic> diagnostics) {
+    public void diagnostic(List<Diagnostic> diagnostics) {
         Display.getDefault().syncExec(new Runnable() {
             @Override()
             public void run() {
                 if (diagnostics.size() > 0) {
-                    diagnostics.forEach((diagnostic) -> {
-                        int start = diagnostic.getRange().getStart().getCharacter();
-                        int end = diagnostic.getRange().getEnd().getCharacter();
-                        if (end - start > 0) {
-                            showErrorView(diagnostic);
-                        } else {
-                            showBackgroundRed();
-                        }
-                    });
+                    fDiagnostics = diagnostics;
+                    updateView();
                     fIsValidString = false;
                     notifyInvalid();
                 } else {
-                    resetView();
                     fIsValidString = true;
                 }
             }
         });
     }
 
+    /**
+     * Method called by the lsp client to notify the view of completion items
+     */
     @Override
     public void completion(final Either<List<CompletionItem>, CompletionList> completion) {
         Display.getDefault().syncExec(new Runnable() {
@@ -258,14 +254,16 @@ public class LspFilterTextbox implements Observer {
         });
     }
 
+    /**
+     * Method called by the lsp client to notify the view of colors' definition
+     */
     @Override
     public void syntaxHighlighting(List<ColorInformation> colors) {
         Display.getDefault().syncExec(new Runnable() {
             @Override()
             public void run() {
-                colors.forEach((color) -> {
-                    addColor(color);
-                });
+                fColors = colors;
+                updateView();
             }
         });
     }
@@ -287,47 +285,103 @@ public class LspFilterTextbox implements Observer {
     }
 
     /**
-     * Method to add a color according to a range
-     *
-     * @param colorInformation
-     */
-    private void addColor(ColorInformation colorInformation) {
-        int start = colorInformation.getRange().getStart().getCharacter();
-        int end = colorInformation.getRange().getEnd().getCharacter();
-        Device device = Display.getCurrent();
-        Color color = new Color(device, (int) (colorInformation.getColor().getRed() * 255),
-                (int) (colorInformation.getColor().getGreen() * 255),
-                (int) (colorInformation.getColor().getBlue() * 255));
-
-        fTextViewer.setTextColor(color, start, end - start + 1, false);
-    }
-
-    /**
      * Method to reset the filter box view (i.e. put back initial color, remove
      * error message, remove suggestions)
      */
     private void resetView() {
-        fFilterStyledText.setBackground(fDefaultFilterTextColor);
+        fFilterStyledText.setBackground(fDefaultFilterBackgroundColor);
     }
 
     /**
-     * Method to put the filter box in error state
+     * Method to call when an update to the text is needed
      */
-    private void showErrorView(Diagnostic diagnostic) {
-        int start = diagnostic.getRange().getStart().getCharacter();
-        int end = diagnostic.getRange().getEnd().getCharacter();
-        Device device = Display.getCurrent();
-        Color color = new Color(device, 255, 0, 0);
+    private void updateView() {
+        List<Integer> errorsRange = new ArrayList<>(fDiagnostics.size() * 2);
+        for (Diagnostic diagnostic : fDiagnostics) {
+            int start = diagnostic.getRange().getStart().getCharacter();
+            int end = diagnostic.getRange().getEnd().getCharacter();
 
-        StyleRange style = new StyleRange();
-        style.start = start;
-        style.length = end - start + 1;
-        style.underline = true;
-        style.underlineColor = color;
-        fFilterStyledText.setStyleRange(style);
+            // In this case, we want to underline the whole string
+            if (start == fFilterStyledText.getText().length()) {
+                start = 0;
+                end = fFilterStyledText.getText().length() - 1;
+            }
+            errorsRange.add(start);
+            errorsRange.add(end);
+        }
+
+        for (int index = 0; index < fFilterStyledText.getText().length(); index++) {
+            Color foregroundColor = getColor(index);
+            Boolean hasError = indexIsError(index, errorsRange);
+            updateViewBetween(index, index + 1, foregroundColor, hasError);
+        }
     }
 
-    private void showBackgroundRed() {
-        fFilterStyledText.setBackground(ERROR_BACKGROUND_COLOR);
+    /**
+     * Method to update the view between the specified indexes
+     *
+     * @param start
+     *            the start index
+     * @param end
+     *            the end index
+     * @param foregroundColor
+     *            the color of the text
+     * @param hasError
+     *            if the range has an error, the underlining will be added
+     */
+    private void updateViewBetween(int start, int end, Color foregroundColor, Boolean hasError) {
+        StyleRange styleRange = new StyleRange();
+        styleRange.start = start;
+        styleRange.length = end - start;
+        styleRange.foreground = foregroundColor;
+
+        if (hasError) {
+            styleRange.underline = true;
+            styleRange.underlineColor = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+        }
+        fFilterStyledText.setStyleRange(styleRange);
+    }
+
+    /**
+     * Method to check if the index passed is inside an error range
+     *
+     * @param index
+     *            the index to check
+     * @param errorsRange
+     *            the ranges of errors to compare the index with
+     * @return true if index is inside error range, false otherwise
+     */
+    private static boolean indexIsError(int index, List<Integer> errorsRange) {
+        for (int i = 0; i < errorsRange.size(); i += 2) {
+            if (index >= errorsRange.get(i) && index <= errorsRange.get(i + 1)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the color at the specified index. Looks into all the received color
+     * information items
+     *
+     * @param index
+     *            the index to check
+     * @return the color, either gotten inside a color information item or the
+     *         default text color
+     */
+    private Color getColor(int index) {
+        for (ColorInformation colorInformation : fColors) {
+            int start = colorInformation.getRange().getStart().getCharacter();
+            int end = colorInformation.getRange().getEnd().getCharacter();
+
+            if (index >= start && index <= end) {
+                Device device = Display.getCurrent();
+                Color color = new Color(device, (int) (colorInformation.getColor().getRed() * 255),
+                        (int) (colorInformation.getColor().getGreen() * 255),
+                        (int) (colorInformation.getColor().getBlue() * 255));
+                return color;
+            }
+        }
+        return fDefaultFilterTextColor;
     }
 }
