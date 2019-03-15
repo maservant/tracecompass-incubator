@@ -54,6 +54,8 @@ public class LspFilterTextbox implements Observer {
     private final TextViewer fTextViewer;
     private final CLabel fSearchButton;
     private final CLabel fCancelButton;
+    private final RecentlyUsedFilters fRecentlyUsedFilters;
+
     private Boolean fIsValidString = false;
     private List<ColorInformation> fColors = new ArrayList<>();
     private List<Diagnostic> fDiagnostics = new ArrayList<>();
@@ -96,6 +98,9 @@ public class LspFilterTextbox implements Observer {
             e.printStackTrace();
         }
         fDefaultFilterTextColor = fFilterStyledText.getForeground();
+        fRecentlyUsedFilters = new RecentlyUsedFilters(5);
+        // TODO: To combine with the completion items once available
+        // List<String> filterStrings = fRecentlyUsedFilters.getRecently();
     }
 
     /**
@@ -140,6 +145,7 @@ public class LspFilterTextbox implements Observer {
      * Method to notify listeners of valid string
      */
     private void notifyValid() {
+        fRecentlyUsedFilters.addFilter(fFilterStyledText.getText());
         if (fIsValidString) {
             for (ValidListener validListener : fListeners) {
                 validListener.valid();
