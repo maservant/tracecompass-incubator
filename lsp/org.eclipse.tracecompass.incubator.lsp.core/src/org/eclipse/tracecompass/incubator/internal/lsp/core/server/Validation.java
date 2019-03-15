@@ -11,17 +11,20 @@ package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.PipedInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
+import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_return;
 
 /**
  *
@@ -55,7 +58,8 @@ public class Validation {
             parserExceptions.add((RecognitionException) e);
         });
 
-        parser.parse();
+        parse_return parse = parser.parse();
+        CommonTree tree = parse.getTree();
 
         List<Diagnostic> diagnostics = new ArrayList<>();
 
