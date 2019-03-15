@@ -29,12 +29,12 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox.LspFilterTextbox;
+import org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox.ValidListener;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
@@ -108,8 +108,26 @@ public class GlobalFilterViewer extends Composite {
 
         Map<String, Boolean> overrideParametersMap = new HashMap();
         overrideParametersMap.put("KeyListener", true); //$NON-NLS-1$
-        fLspFilterTextbox = new LspFilterTextbox(parent, overrideParametersMap);
-        fLspFilterTextbox.setKeyListener(this::keyPressed);
+        fLspFilterTextbox = new LspFilterTextbox(parent);
+        fLspFilterTextbox.addValidListener(new ValidListener() {
+
+            @Override
+            public void valid() {
+                String text = Objects.requireNonNull(fLspFilterTextbox.getText());
+                fLspFilterTextbox.setText(""); //$NON-NLS-1$
+                if (fEnabledFilters.contains(text) || fDisabledFilters.contains(text)) {
+                    return;
+                }
+                fEnabledFilters.add(text);
+                fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
+                filtersUpdated();
+            }
+
+            @Override
+            public void invalid() {
+                // Do nothing
+            }
+        });
 
         fExpandBar = new ExpandBar(parent, SWT.V_SCROLL);
         parent.setLayout(GridLayoutFactory.fillDefaults().create());
@@ -303,22 +321,6 @@ public class GlobalFilterViewer extends Composite {
     @Override
     public boolean setFocus() {
         return fLspFilterTextbox.setFocus();
-    }
-
-    private void keyPressed(@Nullable KeyEvent e) {
-        if (e == null) {
-            return;
-        }
-        if (e.character == SWT.CR) {
-            String text = Objects.requireNonNull(fLspFilterTextbox.getText());
-            fLspFilterTextbox.setText(""); //$NON-NLS-1$
-            if (fEnabledFilters.contains(text) || fDisabledFilters.contains(text)) {
-                return;
-            }
-            fEnabledFilters.add(text);
-            fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
-            filtersUpdated();
-        }
     }
 
     private void filtersUpdated() {

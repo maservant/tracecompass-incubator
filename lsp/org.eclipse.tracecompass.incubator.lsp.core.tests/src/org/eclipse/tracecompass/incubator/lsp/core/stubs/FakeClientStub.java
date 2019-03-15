@@ -15,7 +15,7 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
 
 /**
  * This fake client stub is used to handle function call from the LSPClient bound in the TestEnvironment
@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
  *
  *
  */
-public class FakeClientStub implements IObserver {
+public class FakeClientStub implements Observer {
 
     public FakeClientMockup fMockup = new FakeClientMockup();
 

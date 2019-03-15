@@ -18,8 +18,8 @@ import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LanguageFilterClient;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObservable;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observable;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
 
 /**
  * LanguageClient stub: Wrap around LanguageClientImpl
@@ -29,12 +29,12 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.IObserver;
  * @author Maxime Thibault
  *
  */
-public class LSPClientStub implements LanguageClient, IObservable {
+public class LSPClientStub implements LanguageClient, Observable {
 
     public LanguageFilterClient fClient;
     public LSPClientMockup fMockup = new LSPClientMockup();
     public LanguageServer fServerProxy;
-    public IObserver fObserver;
+    public Observer fObserver;
 
     public LSPClientStub(LanguageFilterClient languageClient) {
         fClient = languageClient;
@@ -71,7 +71,7 @@ public class LSPClientStub implements LanguageClient, IObservable {
     }
 
     @Override
-    public void register(@NonNull IObserver obs) {
+    public void register(@NonNull Observer obs) {
         fObserver = obs;
     }
 

@@ -7,15 +7,21 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.incubator.internal.lsp.core.shared;
-
-import org.eclipse.jdt.annotation.NonNull;
+package org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox;
 
 /**
- *
+ * Interface to define a valid string event
  * @author Jeremy Dube
  *
  */
-public interface IObservable {
-    public void register(@NonNull IObserver observer);
+public interface ValidListener {
+    /**
+     * Called when the string is valid
+     */
+    public void valid();
+
+    /**
+     * Called when the string is invalid
+     */
+    public void invalid();
 }
