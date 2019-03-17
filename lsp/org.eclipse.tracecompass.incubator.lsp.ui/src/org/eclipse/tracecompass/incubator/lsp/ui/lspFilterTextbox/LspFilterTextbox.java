@@ -235,8 +235,8 @@ public class LspFilterTextbox implements Observer {
         Display.getDefault().syncExec(new Runnable() {
             @Override()
             public void run() {
+                fDiagnostics = diagnostics;
                 if (diagnostics.size() > 0) {
-                    fDiagnostics = diagnostics;
                     updateView();
                     fIsValidString = false;
                     notifyInvalid();
