@@ -16,6 +16,12 @@ import java.util.List;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.MismatchedNotSetException;
+import org.antlr.runtime.MismatchedRangeException;
+import org.antlr.runtime.MismatchedSetException;
+import org.antlr.runtime.MismatchedTokenException;
+import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
@@ -65,36 +71,89 @@ public class Validation {
 
         lexerExceptions.forEach(e -> {
            String message = lexer.getErrorMessage(e, lexer.getTokenNames());
-
-           int idx = e.index;
-
-           Position start = new Position(e.line, idx);
-           Position end = new Position(e.line, idx);
-           Range range = new Range(start, end);
+           Range range = getRangeFromException(e, str);
            Diagnostic diagnostic = new Diagnostic(range, message);
-
            diagnostics.add(diagnostic);
-
         });
 
         parserExceptions.forEach(e -> {
            String message = parser.getErrorMessage(e, parser.getTokenNames());
-
-           int idx = e.token.getCharPositionInLine();
-           // EOF error
-           if (idx == -1) {
-               idx = str.length();
-           }
-           Position start = new Position(e.line, idx);
-           Position end = new Position(e.line, idx);
-           Range range = new Range(start, end);
+           Range range = getRangeFromException(e, str);
            Diagnostic diagnostic = new Diagnostic(range, message);
-
            diagnostics.add(diagnostic);
         });
 
-        return diagnostics;
+        return preprocessDiagnostics(diagnostics);
 
     }
+
+    /**
+     * Handler to find the appropriate range of error in the exception
+     *
+     * @see org.antlr.runtime.Lexer#getErrorMessage(RecognitionException e, String[] tokenNames)
+     *                                                                                                         /
+     * @param e The RecognitionException thrown by antlr
+     * @param msg The input string to validate
+     * @return Range of error to be used in diagnostic
+     */
+    private static Range getRangeFromException(RecognitionException e, String msg) {
+
+        int line_start = 1, line_end = 1;
+        int offset_start = 0, offset_end = 0;
+
+        if ( e instanceof MismatchedTokenException ) {
+            //@see: https://www.antlr3.org/api/Java/org/antlr/runtime/MismatchedTokenException.html
+            line_start = line_end = e.line;
+            offset_start = offset_end = e.index;
+        }
+        else if ( e instanceof NoViableAltException ) {
+            //@see: https://www.antlr3.org/api/Java/org/antlr/runtime/NoViableAltException.html
+            line_start = line_end = 1;
+            offset_start = offset_end = msg.length();
+        }
+        else if ( e instanceof EarlyExitException ) {
+            //@see: https://www.antlr3.org/api/Java/org/antlr/runtime/EarlyExitException.html
+            //Just keep the initialized value.
+            //We that that this exception triggers with the string "". Still, we don't know if we should take care of this..
+        }
+        else if ( e instanceof MismatchedNotSetException ) {
+            //@see: https://www.antlr3.org/api/Java/org/antlr/runtime/MismatchedNotSetException.html
+            //No known case of this exception happening..
+        }
+        else if ( e instanceof MismatchedSetException ) {
+            //@see: https://www.antlr3.org/api/Java/org/antlr/runtime/MismatchedSetException.html
+            //No known case of this exception happening..
+        }
+        else if ( e instanceof MismatchedRangeException ) {
+            //@see: https://www.antlr3.org/api/Java/org/antlr/runtime/MismatchedRangeException.html
+            //No known case of this exception happening..
+        }
+        else {
+            //Any other exception..
+        }
+
+        Position start = new Position(line_start, offset_start);
+        Position end = new Position(line_end, offset_end);
+        return new Range(start, end);
+    }
+
+    /**
+     * Remove duplicated error from list of diagnostics
+     *
+     * @param diagnostics
+     */
+    private static List<Diagnostic> preprocessDiagnostics(List<Diagnostic> diagnostics) {
+
+        for(int i = 0; i < diagnostics.size(); i++) {
+            for(int j = i + 1; j < diagnostics.size(); j++) {
+                if(diagnostics.get(i).equals(diagnostics.get(j))) {
+                    diagnostics.remove(j);
+                }
+            }
+        }
+
+        return diagnostics;
+    }
+
 
 }
