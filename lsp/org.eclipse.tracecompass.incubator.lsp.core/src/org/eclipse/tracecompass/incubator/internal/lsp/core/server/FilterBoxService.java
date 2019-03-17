@@ -65,6 +65,11 @@ public class FilterBoxService implements TextDocumentService {
     private String fInput;
     private final LanguageFilterServer fLSPServer;
 
+    /**
+     * Constructor for the filterBoxService
+     *
+     * @param server is a language filter server
+     */
     protected FilterBoxService(LanguageFilterServer server) {
         fInput = new String();
         fLSPServer = server;
@@ -73,18 +78,16 @@ public class FilterBoxService implements TextDocumentService {
     /**
      * Offers completion suggestions based on the user input
      *
-     * @param position
-     *            is the current cursor position
+     * @param position is the current cursor position
      */
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
         try {
             AutoCompletion.autoCompletion(fInput, new Position(0, 53));
-        } catch (RecognitionException e) {
-            // TODO: Activator
-            e.printStackTrace();
-        } catch (IOException err) {
-            err.printStackTrace();
+        } catch (RecognitionException error) {
+            Activator.getInstance().logError(error.getMessage());
+        } catch (IOException error) {
+            Activator.getInstance().logError(error.getMessage());
         }
         return CompletableFuture.completedFuture(Either.forLeft(new ArrayList<CompletionItem>()));
     }
@@ -131,7 +134,7 @@ public class FilterBoxService implements TextDocumentService {
             List<ColorInformation> colorInformation = SyntaxHighlighting.getColorInformationList(fInput);
             return CompletableFuture.completedFuture(colorInformation);
         } catch (IOException error) {
-            error.printStackTrace();
+            Activator.getInstance().logError(error.getMessage());
             return CompletableFuture.completedFuture(null);
         }
     }
@@ -193,8 +196,7 @@ public class FilterBoxService implements TextDocumentService {
     /**
      * Check the string validity and sends a diagnostic to the client
      *
-     * @param params
-     *            contains the changes to the string input
+     * @param params contains the changes to the string input
      */
     @Override
     public void didChange(DidChangeTextDocumentParams params) throws NullPointerException {
@@ -202,7 +204,6 @@ public class FilterBoxService implements TextDocumentService {
         if (contentChange == null) {
             throw new NullPointerException("Event change param cannot be null");
         }
-        // fInput = params.getContentChanges().get(0).getText() + "\n";
         fInput = params.getContentChanges().get(0).getText();
         try {
             List<Diagnostic> diagnostics = Validation.validate(fInput);
