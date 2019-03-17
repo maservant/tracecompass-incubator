@@ -16,5 +16,5 @@ package org.eclipse.tracecompass.incubator.lsp.core.stubs;
  *
  */
 public class LSPServerMockup {
-    public String fReceived = null;
+    public String fStringReceived = null;
 }

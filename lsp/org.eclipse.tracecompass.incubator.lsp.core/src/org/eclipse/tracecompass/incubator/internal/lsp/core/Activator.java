@@ -61,15 +61,5 @@ public class Activator extends TraceCompassActivator {
             }
         }
     }
-
-    /**
-     * Returns the LSP server instance
-     *
-     * @return the LSP server instance
-     */
-    public static @Nullable LSPServer getServer() {
-        return fServer;
-    }
-
 }
 

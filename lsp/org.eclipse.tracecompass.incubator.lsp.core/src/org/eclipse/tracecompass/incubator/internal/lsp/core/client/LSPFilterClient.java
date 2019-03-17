@@ -84,7 +84,7 @@ public class LSPFilterClient {
     }
 
     /**
-     * Initialize the LanguageServer from LanguageClient impementation
+     * Initialize the LanguageServer from LanguageClient implementation
      *
      * @param in
      * @param out
@@ -113,8 +113,8 @@ public class LSPFilterClient {
      * @param str
      *            string to send
      */
-    public void notify(String str) {
-        fLanguageClient.tellDidChange(str);
+    public void notify(String Uri, String input) {
+        fLanguageClient.tellDidChange(Uri, input);
     }
 
     /**

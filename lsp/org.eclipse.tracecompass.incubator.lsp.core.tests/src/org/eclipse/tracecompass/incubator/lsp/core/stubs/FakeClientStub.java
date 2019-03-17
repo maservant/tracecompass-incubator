@@ -30,19 +30,19 @@ public class FakeClientStub implements Observer {
     public FakeClientMockup fMockup = new FakeClientMockup();
 
     @Override
-    public void diagnostic(List<Diagnostic> diagnostics) {
+    public void diagnostic(String uri, List<Diagnostic> diagnostics) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void completion(Either<List<CompletionItem>, CompletionList> completion) {
+    public void completion(String uri, Either<List<CompletionItem>, CompletionList> completion) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void syntaxHighlighting(List<ColorInformation> colors) {
+    public void syntaxHighlighting(String uri, List<ColorInformation> colors) {
         // TODO Auto-generated method stub
 
     }

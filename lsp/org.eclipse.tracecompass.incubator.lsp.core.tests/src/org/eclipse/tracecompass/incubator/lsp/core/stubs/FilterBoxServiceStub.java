@@ -153,7 +153,7 @@ public class FilterBoxServiceStub implements TextDocumentService {
 
     @Override
     public void didChange(DidChangeTextDocumentParams params) {
-        fMockup.fReceived = params.getContentChanges().get(0).getText();
+        fMockup.fInputReceived = params.getContentChanges().get(0).getText();
         fTextDocumentService.didChange(params);
     }
 

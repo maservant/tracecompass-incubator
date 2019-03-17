@@ -27,18 +27,19 @@ public class ClientTest {
      */
     @Test
     public void hello() throws InterruptedException {
-        String str = "Hello";
+        String input = "Hello";
+        String uri = "Mamma mia";
         TestEnvironment te = new TestEnvironment();
-        te.fLSPClient.notify(str);
+        te.fLSPClient.getLanguageClient().tellDidOpen(uri);
+        te.fLSPClient.notify(uri, input);
 
         // TODO: Change synchronization mechanism
-        //Wait for transacitons to be done
+        //Wait for transactions to be done
         TimeUnit.SECONDS.sleep(1);
 
         //Check mockup for stored values
-        assertEquals(str, te.fLSPServerStub.getTextDocumentService().fMockup.fReceived);
-        assertEquals("VALID", te.fLSPClientStub.fMockup.fReceived);
-        assertEquals("VALID", te.fLSPFakeClientStub.fMockup.fReceived);
+        assertEquals(input, te.fLSPServerStub.getTextDocumentService().fMockup.fInputReceived);
+        assertEquals(0, te.fLSPClientStub.fMockup.fDiagnosticsReceived.size());
     }
 
     /**

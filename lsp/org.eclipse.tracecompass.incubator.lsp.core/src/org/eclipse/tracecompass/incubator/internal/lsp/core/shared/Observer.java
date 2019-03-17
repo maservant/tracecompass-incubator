@@ -26,25 +26,28 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 public interface Observer {
     /**
      * Method to notify the observer of diagnostic changes
+     * @param uri The identifier for the document diagnosed
      *
      * @param diagnostics
      *            the diagnostics to go through
      */
-    public void diagnostic(List<Diagnostic> diagnostics);
+    public void diagnostic(String uri, List<Diagnostic> diagnostics);
 
     /**
      * Method to notify the observer of completion changes
+     * @param uri The identifier for the document to complete
      *
      * @param completion
      *            the completion items to render
      */
-    public void completion(Either<List<CompletionItem>, CompletionList> completion);
+    public void completion(String uri, Either<List<CompletionItem>, CompletionList> completion);
 
     /**
      * Method to notify the observer of color changes
+     * @param uri The identifier for the document to highlight
      *
      * @param colors
      *            the colors to render
      */
-    public void syntaxHighlighting(List<ColorInformation> colors);
+    public void syntaxHighlighting(String uri, List<ColorInformation> colors);
 }
