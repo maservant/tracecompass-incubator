@@ -17,9 +17,7 @@ import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.BaseTree;
 import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.Tree;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
@@ -29,10 +27,19 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_retur
  * Class that offer autocompletion parameters based on antlr
  *
  * @author Maxime Thibault
+ * @author David-Alexandre Beaupre
+ * @author Remi Croteau
  *
  */
 public class AutoCompletion {
 
+    /**
+     * Get the simplest expression at current cursor position
+     *
+     * @param tree
+     * @param cursor
+     * @return
+     */
     static private CommonTree getSimpleExpressionAtCursor(CommonTree tree, Position cursor) {
         Stack<CommonTree> treeStack = new Stack<>();
         treeStack.push(tree);
@@ -56,6 +63,14 @@ public class AutoCompletion {
         return null;
     }
 
+    /**
+     * Proposes suggestions based on the cursor position
+     *
+     * @param str is the content of the filter box
+     * @param cursor is the current position in the string
+     * @throws IOException
+     * @throws RecognitionException
+     */
     @SuppressWarnings("restriction") // Suppress restriction on ANTLR
                                      // FilterParser*
     static public void autoCompletion(String str, Position cursor) throws IOException, RecognitionException {

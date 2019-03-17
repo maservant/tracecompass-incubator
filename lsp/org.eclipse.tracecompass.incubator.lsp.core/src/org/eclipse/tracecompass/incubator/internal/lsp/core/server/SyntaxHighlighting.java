@@ -24,13 +24,19 @@ import org.eclipse.lsp4j.Range;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 
 /**
+ * Provides information on the colors for each token in the string
  *
  * @author Maxime Thibault
  *
  */
 public class SyntaxHighlighting {
 
+    final static Color OPERATION_COLOR = new Color(0.3, 0.3, 1, 1);
+    final static Color TEXT_COLOR = new Color(0, 0, 0, 1);
+    final static Color SEPARATOR_COLOR = new Color(0.9, 0.5, 0.1, 1);
+
     /**
+     * Assigns a color information for all tokens based on their type
      *
      * @return colorInformation
      * @throws IOException
@@ -70,13 +76,13 @@ public class SyntaxHighlighting {
     private static Color getColor(int type) {
         switch (type) {
         case FilterParserLexer.OP:
-            return new Color(0, 1, 0, 1);
+            return OPERATION_COLOR;
         case FilterParserLexer.TEXT:
-            return new Color(0, 0, 0, 1);
+            return TEXT_COLOR;
         case FilterParserLexer.SEPARATOR:
-            return new Color(0, 0, 1, 1);
+            return SEPARATOR_COLOR;
         default:
-            return new Color(0, 0, 0, 1);
+            return TEXT_COLOR;
         }
     }
 

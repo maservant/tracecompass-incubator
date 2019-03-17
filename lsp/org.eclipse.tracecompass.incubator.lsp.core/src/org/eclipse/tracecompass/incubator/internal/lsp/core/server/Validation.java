@@ -11,31 +11,32 @@ package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.PipedInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
-import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_return;
 
 /**
+ * Validates the user input with antlr and detects where the errors are in the string
  *
  * @author Maxime Thibault
+ * @author David-Alexandre Beaupre
+ * @author Remi Croteau
  *
  */
 public class Validation {
     /**
+     * Detects all the errors in the input string (if any) and return those as diagnostics
      *
-     * @param str
-     * @return List of Diagnostic
+     * @param str is the content of the filter box
+     * @return diagnostics is a list containing all the errors found by the parser and lexer
      * @throws IOException
      * @throws RecognitionException
      */
@@ -58,8 +59,7 @@ public class Validation {
             parserExceptions.add((RecognitionException) e);
         });
 
-        parse_return parse = parser.parse();
-        CommonTree tree = parse.getTree();
+        parser.parse();
 
         List<Diagnostic> diagnostics = new ArrayList<>();
 
