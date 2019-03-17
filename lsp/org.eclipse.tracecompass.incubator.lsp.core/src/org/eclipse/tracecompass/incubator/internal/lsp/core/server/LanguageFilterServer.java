@@ -9,9 +9,7 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
@@ -30,10 +28,10 @@ public class LanguageFilterServer implements LanguageServer, LanguageClientAware
 
     private TextDocumentService filterBoxService;
     private WorkspaceService filterWorkspaceService;
-    private final List<LanguageClient> clients = new CopyOnWriteArrayList<>();
+    private LanguageClient fClient;
 
     public LanguageFilterServer() {
-        this.filterBoxService = new FilterBoxService(this.clients);
+        this.filterBoxService = new FilterBoxService(this);
         this.filterWorkspaceService = new FilterWorkspaceService();
     }
 
@@ -57,17 +55,24 @@ public class LanguageFilterServer implements LanguageServer, LanguageClientAware
     @Override
     public TextDocumentService getTextDocumentService() {
         // TODO Auto-generated method stub
-        return this.filterBoxService;
+        return filterBoxService;
     }
 
     @Override
     public WorkspaceService getWorkspaceService() {
         // TODO Auto-generated method stub
-        return this.filterWorkspaceService;
+        return filterWorkspaceService;
     }
 
     @Override
     public void connect(LanguageClient client) {
-        this.clients.add(client);
+        fClient = client;
+    }
+
+    /**
+     * Used by the filterBoxService when it needs to make a call on the client.
+     */
+    public LanguageClient getClient() {
+        return fClient;
     }
 }

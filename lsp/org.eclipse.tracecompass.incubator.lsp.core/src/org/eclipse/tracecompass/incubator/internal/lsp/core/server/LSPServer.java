@@ -18,6 +18,7 @@ import java.net.Socket;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.Activator;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
 
 /**
@@ -30,7 +31,6 @@ public class LSPServer {
 
     public LanguageFilterServer fLSPServer;
     private ServerSocket fServerSocket;
-    private Socket fClientSocket;
 
     /**
      * Create serverSocket then wait for a client socket to connect
@@ -40,25 +40,7 @@ public class LSPServer {
      */
     public LSPServer() throws IOException {
         fServerSocket = new ServerSocket(Configuration.PORT);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    fClientSocket = fServerSocket.accept();
-
-                    // Instantiate LSP client
-                    InputStream in = fClientSocket.getInputStream();
-                    OutputStream out = fClientSocket.getOutputStream();
-
-                    fLSPServer = new LanguageFilterServer();
-                    Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(fLSPServer, in, out);
-                    fLSPServer.connect(launcher.getRemoteProxy());
-                    launcher.startListening();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        new Thread(new ServerLoop()).start();
     }
 
     /**
@@ -74,6 +56,58 @@ public class LSPServer {
         Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(fLSPServer, in, out);
         fLSPServer.connect(launcher.getRemoteProxy());
         launcher.startListening();
+    }
+
+    /**
+     * Thread target to be run each time a new connection is accepted
+     *
+     * @author remi
+     *
+     */
+    class ConnectionInitializer implements Runnable {
+        private Socket fClientSocket;
+
+        ConnectionInitializer(Socket clientSocket) {
+            fClientSocket = clientSocket;
+        }
+
+        @Override
+        public void run() {
+            try {
+
+                // Instantiate LSP client
+                InputStream in = fClientSocket.getInputStream();
+                OutputStream out = fClientSocket.getOutputStream();
+
+                fLSPServer = new LanguageFilterServer();
+                Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(fLSPServer, in, out);
+                fLSPServer.connect(launcher.getRemoteProxy());
+                launcher.startListening();
+            } catch (Exception e) {
+                Activator.getInstance().logError(e.getMessage());
+            }
+
+        }
+    }
+
+    /**
+     * Main server loop to accept new connections.
+     *
+     * @author remi
+     *
+     */
+    class ServerLoop implements Runnable {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Socket clientSocket = fServerSocket.accept();
+                    new Thread(new ConnectionInitializer(clientSocket)).start();
+                } catch (IOException e) {
+                    Activator.getInstance().logError(e.getMessage());
+                }
+            }
+        }
     }
 
     /**

@@ -49,23 +49,25 @@ import org.eclipse.lsp4j.WorkspaceEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.Activator;
 
 /**
  * FilterBoxService offers the interface to the client in order to notify the
  * server of the changes and to ask for completions, validations and syntax tips
  * for the filter string.
  *
- * @author David-Alexandre Beaupre and Remi Croteau
+ * @author Remi Croteau
+ * @author David-Alexandre Beaupre
  *
  */
 public class FilterBoxService implements TextDocumentService {
 
     private String fInput;
-    private final List<LanguageClient> fClients;
+    private final LanguageFilterServer fLSPServer;
 
-    protected FilterBoxService(List<LanguageClient> clients) {
+    protected FilterBoxService(LanguageFilterServer server) {
         fInput = new String();
-        fClients = clients;
+        fLSPServer = server;
     }
 
     /**
@@ -206,15 +208,14 @@ public class FilterBoxService implements TextDocumentService {
             List<Diagnostic> diagnostics = Validation.validate(fInput);
             PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
             pd.setDiagnostics(diagnostics);
-            LanguageClient client = fClients.get(0);
-            if (client == null) {
-                throw new NullPointerException("Client cannot be null");
+            LanguageClient client = fLSPServer.getClient();
+            if (client != null) {
+                client.publishDiagnostics(pd);
             }
-            fClients.get(0).publishDiagnostics(pd);
         } catch (RecognitionException error) {
-            error.printStackTrace();
+            Activator.getInstance().logError(error.getMessage());
         } catch (IOException error) {
-            error.printStackTrace();
+            Activator.getInstance().logError(error.getMessage());
         }
     }
 
@@ -228,18 +229,6 @@ public class FilterBoxService implements TextDocumentService {
     public void didSave(DidSaveTextDocumentParams params) {
         // Does not apply to filter box
         throw new UnsupportedOperationException();
-    }
-
-    public List<LanguageClient> getClients() {
-        return fClients;
-    }
-
-    public String getInput() {
-        return fInput;
-    }
-
-    public void setInput(String input) {
-        fInput = input;
     }
 
 }
