@@ -108,7 +108,7 @@ public class GlobalFilterViewer extends Composite {
 
         Map<String, Boolean> overrideParametersMap = new HashMap();
         overrideParametersMap.put("KeyListener", true); //$NON-NLS-1$
-        fLspFilterTextbox = new LspFilterTextbox(parent);
+        fLspFilterTextbox = new LspFilterTextbox(parent, component.getName());
         fLspFilterTextbox.addValidListener(new ValidListener() {
 
             @Override

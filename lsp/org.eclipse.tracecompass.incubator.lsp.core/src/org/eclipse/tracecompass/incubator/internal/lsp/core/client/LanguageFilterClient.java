@@ -22,6 +22,7 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
+import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DocumentColorParams;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
@@ -30,6 +31,9 @@ import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.eclipse.lsp4j.TextDocumentIdentifier;
+import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -47,7 +51,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
 public class LanguageFilterClient implements LanguageClient, Observable {
 
     public LanguageServer fServerProxy;
-    public Observer fObserver;
+    public List<Observer> fObservers = new ArrayList<>();
     private Integer fCursor = 0;
     private ThreadPoolExecutor fThreadPoolExecutor;
 
@@ -73,29 +77,36 @@ public class LanguageFilterClient implements LanguageClient, Observable {
 
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        fObserver.diagnostic(diagnostics.getDiagnostics());
-
+        String uri = diagnostics.getUri();
+        for (Observer observer : fObservers) {
+            observer.diagnostic(uri, diagnostics.getDiagnostics());
+        }
+        System.out.println(uri);
+        TextDocumentIdentifier filterBoxId = new TextDocumentIdentifier(uri);
         // Make request for completion
         Runnable completionTask = () -> {
-            CompletionParams completionParams = new CompletionParams();
             Position position = new Position();
             position.setLine(0);
             position.setCharacter(fCursor);
-            completionParams.setPosition(position);
+            CompletionParams completionParams = new CompletionParams(filterBoxId, position);
 
             try {
                 Either<List<CompletionItem>, CompletionList> completion = fServerProxy.getTextDocumentService().completion(completionParams).get();
-                fObserver.completion(completion);
+                for (Observer observer : fObservers) {
+                    observer.completion(uri, completion);
+                }
             } catch (Exception e) {
                 Activator.getInstance().logError(e.getMessage());
             }
         };
         /// Make request for syntax highlighting
         Runnable syntaxHighlightingTask = () -> {
-            DocumentColorParams colorParams = new DocumentColorParams();
+            DocumentColorParams colorParams = new DocumentColorParams(filterBoxId);
             try {
                 List<ColorInformation> colors = fServerProxy.getTextDocumentService().documentColor(colorParams).get();
-                fObserver.syntaxHighlighting(colors);
+                for (Observer observer : fObservers) {
+                    observer.syntaxHighlighting(uri, colors);
+                }
             } catch (Exception e) {
                 Activator.getInstance().logError(e.getMessage());
             }
@@ -130,26 +141,34 @@ public class LanguageFilterClient implements LanguageClient, Observable {
 
     @Override
     public void register(@NonNull Observer obs) {
-        fObserver = obs;
+        fObservers.add(obs);
     }
 
-    public void tellDidChange(String str) {
-        if (str.isEmpty()) {
+    public void tellDidOpen(String uri) {
+        TextDocumentItem filterBoxId = new TextDocumentItem();
+        filterBoxId.setUri(uri);
+        DidOpenTextDocumentParams didOpenParams = new DidOpenTextDocumentParams(filterBoxId);
+
+        fServerProxy.getTextDocumentService().didOpen(didOpenParams);
+    }
+
+    public void tellDidChange(String uri, String input) {
+        if (input.isEmpty()) {
             return;
         }
         Integer min = 0;
-        Integer max = str.length() - 1;
+        Integer max = input.length() - 1;
         fCursor = max;
         Position p1 = new Position(0, min);
         Position p2 = new Position(0, max);
         Range r = new Range(p1, p2);
-        TextDocumentContentChangeEvent change = new TextDocumentContentChangeEvent(r, max + 1, str);
+        TextDocumentContentChangeEvent change = new TextDocumentContentChangeEvent(r, max + 1, input);
         List<TextDocumentContentChangeEvent> changelist = new ArrayList();
         changelist.add(change);
-        DidChangeTextDocumentParams params = new DidChangeTextDocumentParams();
-        params.setContentChanges(changelist);
+        VersionedTextDocumentIdentifier filterBoxId = new VersionedTextDocumentIdentifier();
+        filterBoxId.setUri(uri);
+        DidChangeTextDocumentParams params = new DidChangeTextDocumentParams(filterBoxId, changelist);
 
         fServerProxy.getTextDocumentService().didChange(params);
     }
-
 }

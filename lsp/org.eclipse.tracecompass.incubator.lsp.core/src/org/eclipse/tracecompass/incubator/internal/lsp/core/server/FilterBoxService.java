@@ -11,7 +11,9 @@ package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.antlr.runtime.RecognitionException;
@@ -62,7 +64,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.Activator;
  */
 public class FilterBoxService implements TextDocumentService {
 
-    private String fInput;
+    private Map<String, String> fFiltersInputs;
     private final LanguageFilterServer fLSPServer;
 
     /**
@@ -71,23 +73,28 @@ public class FilterBoxService implements TextDocumentService {
      * @param server is a language filter server
      */
     protected FilterBoxService(LanguageFilterServer server) {
-        fInput = new String();
+        fFiltersInputs  = new HashMap<>();
         fLSPServer = server;
     }
 
     /**
      * Offers completion suggestions based on the user input
      *
-     * @param position is the current cursor position
+     * @param completionParams
+     *            Contains the current cursor position and uri
      */
     @Override
-    public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
+    public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams completionParams) {
+
         try {
-            AutoCompletion.autoCompletion(fInput, new Position(0, 53));
-        } catch (RecognitionException error) {
-            Activator.getInstance().logError(error.getMessage());
-        } catch (IOException error) {
-            Activator.getInstance().logError(error.getMessage());
+            String uri = completionParams.getTextDocument().getUri();
+            String input = fFiltersInputs.get(uri);
+            AutoCompletion.autoCompletion(input, new Position(0, 53));
+        } catch (RecognitionException e) {
+            // TODO: Activator
+            Activator.getInstance().logError(e.getMessage());
+        } catch (IOException err) {
+            Activator.getInstance().logError(err.getMessage());
         }
         return CompletableFuture.completedFuture(Either.forLeft(new ArrayList<CompletionItem>()));
     }
@@ -131,7 +138,9 @@ public class FilterBoxService implements TextDocumentService {
     @Override
     public CompletableFuture<List<ColorInformation>> documentColor(DocumentColorParams params) {
         try {
-            List<ColorInformation> colorInformation = SyntaxHighlighting.getColorInformationList(fInput);
+            String uri = params.getTextDocument().getUri();
+            String input = fFiltersInputs.get(uri);
+            List<ColorInformation> colorInformation = SyntaxHighlighting.getColorInformationList(input);
             return CompletableFuture.completedFuture(colorInformation);
         } catch (IOException error) {
             Activator.getInstance().logError(error.getMessage());
@@ -189,8 +198,7 @@ public class FilterBoxService implements TextDocumentService {
 
     @Override
     public void didOpen(DidOpenTextDocumentParams params) {
-        // Does not apply to filter box. There is no file to be opened.
-        throw new UnsupportedOperationException();
+        fFiltersInputs.put(params.getTextDocument().getUri(), ""); //$NON-NLS-1$
     }
 
     /**
@@ -200,14 +208,17 @@ public class FilterBoxService implements TextDocumentService {
      */
     @Override
     public void didChange(DidChangeTextDocumentParams params) throws NullPointerException {
+        String uri = params.getTextDocument().getUri();
         TextDocumentContentChangeEvent contentChange = params.getContentChanges().get(0);
         if (contentChange == null) {
             throw new NullPointerException("Event change param cannot be null");
         }
-        fInput = params.getContentChanges().get(0).getText();
+        // fInput = params.getContentChanges().get(0).getText() + "\n";
+        String input = params.getContentChanges().get(0).getText();
+        fFiltersInputs.put(uri, input);
         try {
-            List<Diagnostic> diagnostics = Validation.validate(fInput);
-            PublishDiagnosticsParams pd = new PublishDiagnosticsParams();
+            List<Diagnostic> diagnostics = Validation.validate(input);
+            PublishDiagnosticsParams pd = new PublishDiagnosticsParams(uri, diagnostics);
             pd.setDiagnostics(diagnostics);
             LanguageClient client = fLSPServer.getClient();
             if (client != null) {

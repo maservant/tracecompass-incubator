@@ -47,8 +47,7 @@ public class LSPClientStub implements LanguageClient, Observable {
 
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        fMockup.fReceived = diagnostics.getDiagnostics().get(0).getMessage();
-        fClient.publishDiagnostics(diagnostics);
+        fMockup.fDiagnosticsReceived = diagnostics.getDiagnostics();
     }
 
     @Override
@@ -75,9 +74,9 @@ public class LSPClientStub implements LanguageClient, Observable {
         fObserver = obs;
     }
 
-    public void tellDidChange(String str) {
-        fMockup.fReceived = str;
-        fClient.tellDidChange(str);
+    public void tellDidChange(String uri, String input) {
+        fMockup.fInputReceived = input;
+        fClient.tellDidChange(uri, input);
     }
 
 }

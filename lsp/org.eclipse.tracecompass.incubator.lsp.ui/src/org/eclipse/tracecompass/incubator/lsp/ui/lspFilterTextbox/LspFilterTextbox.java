@@ -46,7 +46,8 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
  */
 public class LspFilterTextbox implements Observer {
 
-    private @Nullable LSPFilterClient lspClient;
+    private final String fFilterBoxUri;
+    private @Nullable LSPFilterClient fLspClient;
     private List<ValidListener> fListeners = new ArrayList<>();
     private final Color fDefaultFilterTextColor;
     private final Color fDefaultFilterBackgroundColor;
@@ -66,7 +67,8 @@ public class LspFilterTextbox implements Observer {
      * @param parent
      *            the parent view
      */
-    public LspFilterTextbox(Composite parent) {
+    public LspFilterTextbox(Composite parent, String filterBoxUri) {
+        fFilterBoxUri = filterBoxUri;
         final Composite baseComposite = new Composite(parent, SWT.BORDER);
         baseComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
         final GridLayout baseCompositeGridLayout = new GridLayout(3, false);
@@ -93,7 +95,8 @@ public class LspFilterTextbox implements Observer {
         setKeyListener();
         fDefaultFilterBackgroundColor = fFilterStyledText.getBackground();
         try {
-            lspClient = new LSPFilterClient(this);
+            fLspClient = new LSPFilterClient(this);
+            fLspClient.getLanguageClient().tellDidOpen(fFilterBoxUri);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -231,47 +234,53 @@ public class LspFilterTextbox implements Observer {
      * Method called by the lsp client to notify the view of errors
      */
     @Override
-    public void diagnostic(List<Diagnostic> diagnostics) {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override()
-            public void run() {
-                fDiagnostics = diagnostics;
-                if (diagnostics.size() > 0) {
-                    updateView();
-                    fIsValidString = false;
-                    notifyInvalid();
-                } else {
-                    fIsValidString = true;
+    public void diagnostic(String uri, List<Diagnostic> diagnostics) {
+        if (fFilterBoxUri.equals(uri)) {
+            Display.getDefault().syncExec(new Runnable() {
+                @Override()
+                public void run() {
+                    fDiagnostics = diagnostics;
+                    if (fDiagnostics.size() > 0) {
+                        updateView();
+                        fIsValidString = false;
+                        notifyInvalid();
+                    } else {
+                        fIsValidString = true;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     /**
      * Method called by the lsp client to notify the view of completion items
      */
     @Override
-    public void completion(final Either<List<CompletionItem>, CompletionList> completion) {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override()
-            public void run() {
-                // TODO: Needs to be implemented
-            }
-        });
+    public void completion(String uri, final Either<List<CompletionItem>, CompletionList> completion) {
+        if (fFilterBoxUri.equals(uri)) {
+            Display.getDefault().syncExec(new Runnable() {
+                @Override()
+                public void run() {
+                    // TODO: Needs to be implemented
+                }
+            });
+        }
     }
 
     /**
      * Method called by the lsp client to notify the view of colors' definition
      */
     @Override
-    public void syntaxHighlighting(List<ColorInformation> colors) {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override()
-            public void run() {
-                fColors = colors;
-                updateView();
-            }
-        });
+    public void syntaxHighlighting(String uri, List<ColorInformation> colors) {
+        if (fFilterBoxUri.equals(uri)) {
+            Display.getDefault().syncExec(new Runnable() {
+                @Override()
+                public void run() {
+                    fColors = colors;
+                    updateView();
+                }
+            });
+        }
     }
 
     /**
@@ -284,8 +293,8 @@ public class LspFilterTextbox implements Observer {
         if (message.isEmpty()) {
             resetView();
         } else {
-            if (lspClient != null) {
-                lspClient.notify(message);
+            if (fLspClient != null) {
+                fLspClient.notify(fFilterBoxUri, message);
             }
         }
     }

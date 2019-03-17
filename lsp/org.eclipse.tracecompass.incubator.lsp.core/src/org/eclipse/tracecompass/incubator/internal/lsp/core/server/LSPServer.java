@@ -61,7 +61,8 @@ public class LSPServer {
     /**
      * Thread target to be run each time a new connection is accepted
      *
-     * @author remi
+     * @author Maxime Thibault
+     * @author Remi Croteau
      *
      */
     class ConnectionInitializer implements Runnable {
@@ -93,7 +94,7 @@ public class LSPServer {
     /**
      * Main server loop to accept new connections.
      *
-     * @author remi
+     * @author Remi Croteau
      *
      */
     class ServerLoop implements Runnable {

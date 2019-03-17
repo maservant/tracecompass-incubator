@@ -9,6 +9,10 @@
 
 package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
+import java.util.List;
+
+import org.eclipse.lsp4j.Diagnostic;
+
 /**
  * Use this class to save data from LSPClientStub
  * Add attributes/functions if necessary
@@ -17,5 +21,6 @@ package org.eclipse.tracecompass.incubator.lsp.core.stubs;
  *
  */
 public class LSPClientMockup {
-    public String fReceived = null;
+    public String fInputReceived = null;
+    public List<Diagnostic> fDiagnosticsReceived = null;
 }

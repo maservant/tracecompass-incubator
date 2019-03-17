@@ -8,6 +8,7 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
+
 /**
  * Use this class to store data from FilterBoxServiceStub
  * Add attributes/functions if necessary
@@ -16,5 +17,5 @@ package org.eclipse.tracecompass.incubator.lsp.core.stubs;
  *
  */
 public class FilterBoxServiceMockup {
-    public String fReceived = null;
+    public String fInputReceived = null;
 }

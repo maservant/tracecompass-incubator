@@ -21,20 +21,24 @@ public class ServerTest {
     @Test
     public void ValidityReply() throws InterruptedException {
         String[] strArray = {"TID", "TID==", "TID==28"};
-        String[] validity = {"VALID", "INVALID", "VALID"};
+        int[] validity = {0, 2, 0};
+
+        String uri = "Arriba";
 
         //TODO: TestEnvironment needs to be reset every time we call a new function!!
         TestEnvironment te = new TestEnvironment();
 
+
         for (int i = 0; i < strArray.length; i++) {
-            te.fLSPClientStub.tellDidChange(strArray[i]);
+            te.fLSPClientStub.fClient.tellDidOpen(uri);
+            te.fLSPClientStub.tellDidChange(uri, strArray[i]);
 
             // TODO: Change synchronization mechanism
             //Wait for transactions to be done
             TimeUnit.SECONDS.sleep(1);
 
             //Check mockup for stored values
-            assertEquals(validity[i], te.fLSPClientStub.fMockup.fReceived);
+            assertEquals(validity[i], te.fLSPClientStub.fMockup.fDiagnosticsReceived.size());
         }
     }
 
