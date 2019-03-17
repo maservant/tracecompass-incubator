@@ -56,27 +56,47 @@ public class ANTLRTest {
     }
 
     @Test
-    public void validationTest() throws IOException, RecognitionException {
+    public void validationMismatchedTokenException() throws IOException, RecognitionException {
 
-        System.out.println("TESING: TID =");
-        List<Diagnostic> diagnostics = Validation.validate("TID =");
+        List<Diagnostic> diagnostics = Validation.validate("TID = 123");
+        int line_start = diagnostics.get(0).getRange().getStart().getLine();
+        int offset_start = diagnostics.get(0).getRange().getStart().getCharacter();
+        int line_end = diagnostics.get(0).getRange().getEnd().getLine();
+        int offset_end = diagnostics.get(0).getRange().getEnd().getCharacter();
+
+        //We expect antlr to see mismatchedTokenException at position 5 because '=' must equals '==' instead
+        int line_expected = 1;
+        int offset_expected = 5;
+        assertEquals(line_expected, line_start);
+        assertEquals(line_expected, line_end);
+        assertEquals(offset_expected, offset_start);
+        assertEquals(offset_expected, offset_end);
+
+        //Detected by both lexer and parser. It is irrelevant, but client should be able to display only one of them
         assertEquals(diagnostics.size(), 1);
 
-        System.out.println("TESING: TID = && ");
-        diagnostics = Validation.validate("TID = && ");
+    }
+
+    @Test
+    public void validationNoViableAltException() throws IOException, RecognitionException {
+
+        String str = "TID == ";
+
+        List<Diagnostic> diagnostics = Validation.validate(str);
+        int line_start = diagnostics.get(0).getRange().getStart().getLine();
+        int offset_start = diagnostics.get(0).getRange().getStart().getCharacter();
+        int line_end = diagnostics.get(0).getRange().getEnd().getLine();
+        int offset_end = diagnostics.get(0).getRange().getEnd().getCharacter();
+
+        //We expect antlr to see NoViableAltException at position 6 because
+        int line_expected = 1;
+        int offset_expected = str.length();
+        assertEquals(line_expected, line_start);
+        assertEquals(line_expected, line_end);
+        assertEquals(offset_expected, offset_start);
+        assertEquals(offset_expected, offset_end);
+
         assertEquals(diagnostics.size(), 1);
 
-        System.out.println("TESING: = 2");
-        diagnostics = Validation.validate("= 2");
-        assertEquals(diagnostics.size(), 1);
-
-        System.out.println("TESING: TI = 100 & TID != 12");
-        diagnostics = Validation.validate("TI = 100 & TID != 12");
-        assertEquals(diagnostics.size(), 2);
-
-
-        System.out.println("\"asdasd = a\"");
-        diagnostics = Validation.validate("TI = 100 & TID != 12");
-        assertEquals(diagnostics.size(), 2);
     }
 }
