@@ -9,19 +9,17 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Stack;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
-import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
-import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_return;
 
 /**
  * Class that offer autocompletion parameters based on antlr
@@ -33,35 +31,8 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_retur
  */
 public class AutoCompletion {
 
-    /**
-     * Get the simplest expression at current cursor position
-     *
-     * @param tree
-     * @param cursor
-     * @return
-     */
-    static private CommonTree getSimpleExpressionAtCursor(CommonTree tree, Position cursor) {
-        Stack<CommonTree> treeStack = new Stack<>();
-        treeStack.push(tree);
-        CommonTree currentTree = null;
-        while (!treeStack.isEmpty()) {
-            currentTree = treeStack.pop();
-            int childCount = currentTree.getChildCount();
-            for (int i = childCount - 1; i >= 0; i--) {
-                treeStack.push((CommonTree)currentTree.getChild(i));
-            }
-            if (childCount == 0) {
-                CommonToken token = (CommonToken)currentTree.getToken();
-                if (cursor.getCharacter() - 1 <= token.getStopIndex()) {
-                    return (CommonTree)currentTree.getParent();
-                }
-            }
-        }
-        if (currentTree != null) {
-            return (CommonTree)currentTree.getParent();
-        }
-        return null;
-    }
+    static private String[] OPERATORS = {"==", "!=", "<", ">", "matches", "contains", "present"};
+    static private String[] SEPARATORS = {"&&", "||"};
 
     /**
      * Proposes suggestions based on the cursor position
@@ -73,27 +44,43 @@ public class AutoCompletion {
      */
     @SuppressWarnings("restriction") // Suppress restriction on ANTLR
                                      // FilterParser*
-    static public void autoCompletion(String str, Position cursor) throws IOException, RecognitionException {
+    static public List<String> autoCompletion(String str, Position cursor) throws IOException, RecognitionException {
+
+        String subString = str.substring(0, cursor.getCharacter());
+        String endString = str.substring(cursor.getCharacter(), str.length());
 
         // Initialize the lexerParser, parse str and return list of CommonToken
-        ByteArrayInputStream input = new ByteArrayInputStream(str.getBytes());
+        ByteArrayInputStream input = new ByteArrayInputStream(subString.getBytes());
         ANTLRInputStream antlrStream = new ANTLRInputStream(input);
         FilterParserLexer lexer = new FilterParserLexer(antlrStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-        FilterParserParser filterParserParser = new FilterParserParser(tokenStream);
 
-        parse_return parse = filterParserParser.parse();
-        CommonTree tree = parse.getTree();
+        List<CommonToken> commonTokens = tokenStream.getTokens();
+        CommonToken lastToken = commonTokens.get(commonTokens.size());
+        int lastType = lastToken.getType();
+        CommonToken beforeLastToken = commonTokens.get(commonTokens.size() - 1);
+        int beforeLastType = beforeLastToken.getType();
 
-        CommonTree simpleTree = getSimpleExpressionAtCursor(tree, cursor);
-
-        if (simpleTree.getChildCount() == 1) {
-            CommonTree child = (CommonTree)simpleTree.getChild(0);
-            CommonToken token = (CommonToken)child.getToken();
-            if (cursor.getCharacter() > token.getStopIndex()) {
-                // TODO: hello
+        List<String> suggestions = new ArrayList<>();
+        if (lastType == FilterParserLexer.TEXT) {
+            // separator
+            for (int i = 0; i < SEPARATORS.length; i++) {
+                suggestions.add(new String(subString + SEPARATORS[i] + endString));
+            }
+            if (beforeLastType != FilterParserLexer.OP) {
+                // ops
+                for (int i = 0; i < OPERATORS.length; i++) {
+                    suggestions.add(new String(subString + OPERATORS[i] + endString));
+                }
             }
         }
+        if (lastType == FilterParserLexer.T__23) {
+            // separators
+            for (int i = 0; i < SEPARATORS.length; i++) {
+                suggestions.add(new String(subString + SEPARATORS[i] + endString));
+            }
+        }
+        return suggestions;
     }
 
 }
