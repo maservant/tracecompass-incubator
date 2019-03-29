@@ -89,12 +89,12 @@ public class FilterBoxService implements TextDocumentService {
         try {
             String uri = completionParams.getTextDocument().getUri();
             String input = fFiltersInputs.get(uri);
-            AutoCompletion.autoCompletion(input, new Position(0, 53));
-        } catch (RecognitionException e) {
-            // TODO: Activator
-            Activator.getInstance().logError(e.getMessage());
-        } catch (IOException err) {
-            Activator.getInstance().logError(err.getMessage());
+            Position cursor = completionParams.getPosition();
+            List<String> suggestions = AutoCompletion.autoCompletion(input, cursor);
+        } catch (RecognitionException error) {
+            Activator.getInstance().logError(error.getMessage());
+        } catch (IOException error) {
+            Activator.getInstance().logError(error.getMessage());
         }
         return CompletableFuture.completedFuture(Either.forLeft(new ArrayList<CompletionItem>()));
     }

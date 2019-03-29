@@ -314,13 +314,13 @@ public class LspFilterTextbox implements Observer {
         List<Integer> errorsRange = new ArrayList<>(fDiagnostics.size() * 2);
         for (Diagnostic diagnostic : fDiagnostics) {
             int start = diagnostic.getRange().getStart().getCharacter();
-            int end = diagnostic.getRange().getEnd().getCharacter();
+            int end = diagnostic.getRange().getEnd().getCharacter() - 1;
 
             // In this case, we want to underline the whole string
-            if (start == fFilterStyledText.getText().length()) {
+            /*if (start == fFilterStyledText.getText().length()) {
                 start = 0;
                 end = fFilterStyledText.getText().length() - 1;
-            }
+            }*/
             errorsRange.add(start);
             errorsRange.add(end);
         }
