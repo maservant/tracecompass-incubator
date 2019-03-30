@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.zone.ZoneOffsetTransitionRule.TimeDefinition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -30,7 +29,6 @@ import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_return;
