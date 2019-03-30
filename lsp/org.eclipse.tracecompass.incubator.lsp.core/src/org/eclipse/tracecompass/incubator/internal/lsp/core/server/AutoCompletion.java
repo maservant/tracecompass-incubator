@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -31,14 +32,17 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
  */
 public class AutoCompletion {
 
-    static private String[] OPERATORS = {"==", "!=", "<", ">", "matches", "contains", "present"};
-    static private String[] SEPARATORS = {"&&", "||"};
+    // theree seems to be no way of getting those directly from the grammar
+    static private String[] OPERATORS = { "==", "!=", "<", ">", "matches", "contains", "present" };
+    static private String[] SEPARATORS = { "&&", "||" };
 
     /**
      * Proposes suggestions based on the cursor position
      *
-     * @param str is the content of the filter box
-     * @param cursor is the current position in the string
+     * @param str
+     *            is the content of the filter box
+     * @param cursor
+     *            is the current position in the string
      * @throws IOException
      * @throws RecognitionException
      */
@@ -48,33 +52,50 @@ public class AutoCompletion {
 
         String subString = str.substring(0, cursor.getCharacter());
         String endString = str.substring(cursor.getCharacter(), str.length());
+        List<String> suggestions = new ArrayList<>();
 
         // Initialize the lexerParser, parse str and return list of CommonToken
         ByteArrayInputStream input = new ByteArrayInputStream(subString.getBytes());
         ANTLRInputStream antlrStream = new ANTLRInputStream(input);
         FilterParserLexer lexer = new FilterParserLexer(antlrStream);
+        ArrayList<RecognitionException> lexerExceptions = new ArrayList<>();
+        lexer.setErrorListener(e -> {
+            lexerExceptions.add((RecognitionException) e);
+        });
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 
         List<CommonToken> commonTokens = tokenStream.getTokens();
-        CommonToken lastToken = commonTokens.get(commonTokens.size());
-        int lastType = lastToken.getType();
-        CommonToken beforeLastToken = commonTokens.get(commonTokens.size() - 1);
-        int beforeLastType = beforeLastToken.getType();
+        if (commonTokens.isEmpty()) {
+            return suggestions;
+        }
 
-        List<String> suggestions = new ArrayList<>();
-        if (lastType == FilterParserLexer.TEXT) {
+        CommonToken lastToken = null;
+        int lastType = -1;
+        if (!commonTokens.isEmpty()) {
+            lastToken = commonTokens.get(commonTokens.size() - 1);
+            lastType = lastToken.getType();
+        }
+
+        CommonToken beforeLastToken = null;
+        int beforeLastType = -1;
+        if (commonTokens.size() > 1) {
+            beforeLastToken = commonTokens.get(commonTokens.size() - 2);
+            beforeLastType = beforeLastToken.getType();
+        }
+
+        if (lastToken != null && lastType == FilterParserLexer.TEXT) {
             // separator
             for (int i = 0; i < SEPARATORS.length; i++) {
                 suggestions.add(new String(subString + SEPARATORS[i] + endString));
             }
-            if (beforeLastType != FilterParserLexer.OP) {
+            if (beforeLastToken != null && beforeLastType != FilterParserLexer.OP) {
                 // ops
                 for (int i = 0; i < OPERATORS.length; i++) {
                     suggestions.add(new String(subString + OPERATORS[i] + endString));
                 }
             }
         }
-        if (lastType == FilterParserLexer.T__23) {
+        if (lastToken != null && lastType == FilterParserLexer.T__23) {
             // separators
             for (int i = 0; i < SEPARATORS.length; i++) {
                 suggestions.add(new String(subString + SEPARATORS[i] + endString));

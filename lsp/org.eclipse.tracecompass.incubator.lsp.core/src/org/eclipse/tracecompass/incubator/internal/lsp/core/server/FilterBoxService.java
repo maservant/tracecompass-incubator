@@ -40,6 +40,7 @@ import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
+import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ReferenceParams;
 import org.eclipse.lsp4j.RenameParams;
 import org.eclipse.lsp4j.SignatureHelp;
@@ -70,10 +71,11 @@ public class FilterBoxService implements TextDocumentService {
     /**
      * Constructor for the filterBoxService
      *
-     * @param server is a language filter server
+     * @param server
+     *            is a language filter server
      */
     protected FilterBoxService(LanguageFilterServer server) {
-        fFiltersInputs  = new HashMap<>();
+        fFiltersInputs = new HashMap<>();
         fLSPServer = server;
     }
 
@@ -86,17 +88,29 @@ public class FilterBoxService implements TextDocumentService {
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams completionParams) {
 
+        List<CompletionItem> completions = new ArrayList<>();
         try {
             String uri = completionParams.getTextDocument().getUri();
             String input = fFiltersInputs.get(uri);
+            if (input == null) {
+                return CompletableFuture.completedFuture(Either.forLeft(completions));
+            }
             Position cursor = completionParams.getPosition();
             List<String> suggestions = AutoCompletion.autoCompletion(input, cursor);
+            for (int i = 0; i < suggestions.size(); i++) {
+                Position start = new Position(0, 0);
+                Position end = new Position(0, input.length());
+                CompletionItem item = new CompletionItem();
+                TextEdit textEdit = new TextEdit(new Range(start, end), suggestions.get(i));
+                item.setTextEdit(textEdit);
+                completions.add(item);
+            }
         } catch (RecognitionException error) {
             Activator.getInstance().logError(error.getMessage());
         } catch (IOException error) {
             Activator.getInstance().logError(error.getMessage());
         }
-        return CompletableFuture.completedFuture(Either.forLeft(new ArrayList<CompletionItem>()));
+        return CompletableFuture.completedFuture(Either.forLeft(completions));
     }
 
     @Override
@@ -204,7 +218,8 @@ public class FilterBoxService implements TextDocumentService {
     /**
      * Check the string validity and sends a diagnostic to the client
      *
-     * @param params contains the changes to the string input
+     * @param params
+     *            contains the changes to the string input
      */
     @Override
     public void didChange(DidChangeTextDocumentParams params) throws NullPointerException {
