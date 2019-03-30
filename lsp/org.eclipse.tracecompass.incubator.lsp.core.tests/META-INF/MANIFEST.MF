@@ -15,4 +15,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.lsp4j.jsonrpc;bundle-version="0.4.1"
 Export-Package: org.eclipse.tracecompass.incubator.lsp.core.tests
 Automatic-Module-Name: org.eclipse.tracecompass.incubator.lsp.core.tests
-Import-Package: org.antlr.runtime
+Import-Package: org.antlr.runtime,
+ org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox

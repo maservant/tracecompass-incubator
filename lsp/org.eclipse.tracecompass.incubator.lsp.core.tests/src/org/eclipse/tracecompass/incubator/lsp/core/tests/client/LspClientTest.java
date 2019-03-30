@@ -17,7 +17,7 @@ import org.eclipse.tracecompass.incubator.lsp.core.environment.TestEnvironment;
 import org.junit.Test;
 
 
-public class ClientTest {
+public class LspClientTest {
 
     /**
      * Simple hello world tests.

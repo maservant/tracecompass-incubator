@@ -56,6 +56,7 @@ public class LspFilterTextbox implements Observer {
     private final CLabel fSearchButton;
     private final CLabel fCancelButton;
     private final RecentlyUsedFilters fRecentlyUsedFilters;
+    private String fLastTextUpdate;
 
     private Boolean fIsValidString = false;
     private List<ColorInformation> fColors = new ArrayList<>();
@@ -104,6 +105,7 @@ public class LspFilterTextbox implements Observer {
         fRecentlyUsedFilters = new RecentlyUsedFilters(5);
         // TODO: To combine with the completion items once available
         // List<String> filterStrings = fRecentlyUsedFilters.getRecently();
+
     }
 
     /**
@@ -173,7 +175,28 @@ public class LspFilterTextbox implements Observer {
 
             @Override
             public void keyReleased(@Nullable KeyEvent e) {
+                if (e == null) {
+                    return;
+                }
+
+                //Get the filterbox texte
                 String text = Objects.requireNonNull(fFilterStyledText.getText());
+
+                //If text has not change since last update from autocompletion, do nothing
+                //Also if the last key-up is not backspace and delete,
+                if (e.character != SWT.BS && e.character != SWT.DEL && !text.equals(fLastTextUpdate)) {
+                    //it means a new character has been inserted, so try to autocomplete it
+                    Integer cursorPosition = fFilterStyledText.getCaretOffset();
+                    String newText = FilterBoxLocalTextCompletion.autocomplete(text, cursorPosition);
+                    //If the autocompletion changed the string
+                    if(!newText.equals(text)) {
+                        //Update the filtertextbox
+                        fFilterStyledText.setText(newText);
+                        fFilterStyledText.setCaretOffset(cursorPosition);
+                        text = newText;
+                    }
+                }
+                fLastTextUpdate = text;
                 notifyLspClient(text);
             }
 
