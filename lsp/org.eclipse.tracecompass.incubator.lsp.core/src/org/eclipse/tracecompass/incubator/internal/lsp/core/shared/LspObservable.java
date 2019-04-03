@@ -17,12 +17,12 @@ import org.eclipse.jdt.annotation.NonNull;
  * @author Jeremy Dube
  *
  */
-public interface Observable {
+public interface LspObservable {
     /**
      * Method to register an observer
      *
      * @param observer
      *            the observer to be registered
      */
-    public void register(@NonNull Observer observer);
+    void register(@NonNull LspObserver observer);
 }

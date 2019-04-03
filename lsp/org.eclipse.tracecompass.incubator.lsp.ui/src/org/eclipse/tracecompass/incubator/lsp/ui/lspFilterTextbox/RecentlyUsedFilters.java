@@ -21,7 +21,7 @@ import java.util.prefs.Preferences;
  */
 public class RecentlyUsedFilters {
 
-    private Preferences fPreferences;
+    private final Preferences fPreferences;
     private final int fSize;
     private final List<String> fFilters;
 
@@ -31,9 +31,9 @@ public class RecentlyUsedFilters {
      * @param size
      *            size of the filters to save
      */
-    public RecentlyUsedFilters(int size) {
+    public RecentlyUsedFilters(int size, String listName) {
         fSize = size;
-        fPreferences = Preferences.userRoot().node(this.getClass().getName());
+        fPreferences = Preferences.userRoot().node(listName);
         fFilters = new ArrayList<>(fSize);
         getFilters();
     }

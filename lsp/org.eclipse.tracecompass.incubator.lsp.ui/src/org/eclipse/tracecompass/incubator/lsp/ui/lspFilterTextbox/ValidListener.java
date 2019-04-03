@@ -18,10 +18,12 @@ public interface ValidListener {
     /**
      * Called when the string is valid
      */
-    public void valid();
+    void valid();
 
     /**
      * Called when the string is invalid
      */
-    public void invalid();
+    default void invalid() {
+        // Do nothing
+    }
 }
