@@ -20,7 +20,7 @@ import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
 
 /**
  * LSP Client simplification that offers an API to its observer. The underlying
@@ -44,7 +44,7 @@ public class LSPFilterClient {
      * @param observer
      *            that uses this API and get notified
      */
-    public LSPFilterClient(@NonNull Observer observer) throws UnknownHostException, IOException {
+    public LSPFilterClient(@NonNull LspObserver observer) throws UnknownHostException, IOException {
         fSocket = new Socket(Configuration.HOSTNAME, Configuration.PORT);
         initialize(fSocket.getInputStream(), fSocket.getOutputStream(), observer);
     }
@@ -61,7 +61,7 @@ public class LSPFilterClient {
      * @param observer
      *            that uses this API and get notified
      */
-    public LSPFilterClient(String hostname, Integer port, @NonNull Observer observer) throws UnknownHostException, IOException {
+    public LSPFilterClient(String hostname, Integer port, @NonNull LspObserver observer) throws UnknownHostException, IOException {
         fSocket = new Socket(hostname, port);
         initialize(fSocket.getInputStream(), fSocket.getOutputStream(), observer);
     }
@@ -79,7 +79,7 @@ public class LSPFilterClient {
      * @param observer
      *            that uses this API and get notified
      */
-    public LSPFilterClient(InputStream in, OutputStream out, @NonNull Observer observer) {
+    public LSPFilterClient(InputStream in, OutputStream out, @NonNull LspObserver observer) {
         initialize(in, out, observer);
     }
 
@@ -90,7 +90,7 @@ public class LSPFilterClient {
      * @param out
      * @param observer
      */
-    private void initialize(InputStream in, OutputStream out, @NonNull Observer observer) {
+    private void initialize(InputStream in, OutputStream out, @NonNull LspObserver observer) {
         fLanguageClient = new LanguageFilterClient();
         Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(fLanguageClient, in, out);
         fLanguageClient.setServer(launcher.getRemoteProxy());

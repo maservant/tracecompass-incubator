@@ -38,8 +38,8 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.Activator;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observable;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObservable;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
 
 /**
  * LanguageClient to be used by 1 LSPFilterClient.
@@ -48,10 +48,10 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
  * @author Maxime Thibault
  *
  */
-public class LanguageFilterClient implements LanguageClient, Observable {
+public class LanguageFilterClient implements LanguageClient, LspObservable {
 
     public LanguageServer fServerProxy;
-    public List<Observer> fObservers = new ArrayList<>();
+    public List<LspObserver> fObservers = new ArrayList<>();
     private Integer fCursor = 0;
     private ThreadPoolExecutor fThreadPoolExecutor;
 
@@ -78,7 +78,7 @@ public class LanguageFilterClient implements LanguageClient, Observable {
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
         String uri = diagnostics.getUri();
-        for (Observer observer : fObservers) {
+        for (LspObserver observer : fObservers) {
             observer.diagnostic(uri, diagnostics.getDiagnostics());
         }
         System.out.println(uri);
@@ -92,7 +92,7 @@ public class LanguageFilterClient implements LanguageClient, Observable {
 
             try {
                 Either<List<CompletionItem>, CompletionList> completion = fServerProxy.getTextDocumentService().completion(completionParams).get();
-                for (Observer observer : fObservers) {
+                for (LspObserver observer : fObservers) {
                     observer.completion(uri, completion);
                 }
             } catch (Exception e) {
@@ -104,7 +104,7 @@ public class LanguageFilterClient implements LanguageClient, Observable {
             DocumentColorParams colorParams = new DocumentColorParams(filterBoxId);
             try {
                 List<ColorInformation> colors = fServerProxy.getTextDocumentService().documentColor(colorParams).get();
-                for (Observer observer : fObservers) {
+                for (LspObserver observer : fObservers) {
                     observer.syntaxHighlighting(uri, colors);
                 }
             } catch (Exception e) {
@@ -140,7 +140,7 @@ public class LanguageFilterClient implements LanguageClient, Observable {
     }
 
     @Override
-    public void register(@NonNull Observer obs) {
+    public void register(@NonNull LspObserver obs) {
         fObservers.add(obs);
     }
 

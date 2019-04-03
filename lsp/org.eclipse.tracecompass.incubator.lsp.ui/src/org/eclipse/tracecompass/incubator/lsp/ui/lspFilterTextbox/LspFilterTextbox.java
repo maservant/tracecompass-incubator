@@ -17,6 +17,7 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.text.TextViewer;
+import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyleRange;
@@ -27,6 +28,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -36,7 +38,7 @@ import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPFilterClient;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
 
 /**
  * Widget to wrap a FilterText widget with additional logic of a filter lsp
@@ -44,7 +46,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Observer;
  *
  * @author Jeremy Dube
  */
-public class LspFilterTextbox implements Observer {
+public class LspFilterTextbox implements LspObserver {
 
     private final String fFilterBoxUri;
     private @Nullable LSPFilterClient fLspClient;
@@ -57,6 +59,7 @@ public class LspFilterTextbox implements Observer {
     private final CLabel fCancelButton;
     private final RecentlyUsedFilters fRecentlyUsedFilters;
     private String fLastTextUpdate;
+    private final DefaultToolTip fToolTip;
 
     private Boolean fIsValidString = false;
     private List<ColorInformation> fColors = new ArrayList<>();
@@ -102,10 +105,12 @@ public class LspFilterTextbox implements Observer {
             e.printStackTrace();
         }
         fDefaultFilterTextColor = fFilterStyledText.getForeground();
-        fRecentlyUsedFilters = new RecentlyUsedFilters(5);
+        fRecentlyUsedFilters = new RecentlyUsedFilters(5, "GlobalFilterViewer");
         // TODO: To combine with the completion items once available
         // List<String> filterStrings = fRecentlyUsedFilters.getRecently();
 
+        fToolTip = new DefaultToolTip(fFilterStyledText);
+        styleToolTip();
     }
 
     /**
@@ -144,6 +149,16 @@ public class LspFilterTextbox implements Observer {
      */
     public void addValidListener(ValidListener validListener) {
         fListeners.add(validListener);
+    }
+
+    /**
+     * Method to add some custom style to the toolTip
+     */
+    private void styleToolTip() {
+        fToolTip.setBackgroundColor(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+        fToolTip.setForegroundColor(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+        fToolTip.setShift(new Point(0, 10));
+        fToolTip.deactivate();
     }
 
     /**
@@ -267,7 +282,9 @@ public class LspFilterTextbox implements Observer {
                         updateView();
                         fIsValidString = false;
                         notifyInvalid();
+                        addErrorPopup();
                     } else {
+                        fToolTip.deactivate();
                         fIsValidString = true;
                     }
                 }
@@ -331,26 +348,31 @@ public class LspFilterTextbox implements Observer {
     }
 
     /**
+     * Method to add a popup on hover of the range to show the error message
+     * @param diagnostic
+     */
+    private void addErrorPopup() {
+        fToolTip.activate();
+        String toolTipText = "";
+        int index = 0;
+        for (Diagnostic diagnostic : fDiagnostics) {
+            int start = diagnostic.getRange().getStart().getCharacter() + 1;
+            toolTipText += "Error at character " + start + " : " + diagnostic.getMessage();
+            index++;
+            if (index < fDiagnostics.size()) {
+                toolTipText += "\n";
+            }
+        }
+        fToolTip.setText(toolTipText);
+    }
+
+    /**
      * Method to call when an update to the text is needed
      */
     private void updateView() {
-        List<Integer> errorsRange = new ArrayList<>(fDiagnostics.size() * 2);
-        for (Diagnostic diagnostic : fDiagnostics) {
-            int start = diagnostic.getRange().getStart().getCharacter();
-            int end = diagnostic.getRange().getEnd().getCharacter() - 1;
-
-            // In this case, we want to underline the whole string
-            /*if (start == fFilterStyledText.getText().length()) {
-                start = 0;
-                end = fFilterStyledText.getText().length() - 1;
-            }*/
-            errorsRange.add(start);
-            errorsRange.add(end);
-        }
-
         for (int index = 0; index < fFilterStyledText.getText().length(); index++) {
             Color foregroundColor = getColor(index);
-            Boolean hasError = indexIsError(index, errorsRange);
+            Boolean hasError = indexIsError(index);
             updateViewBetween(index, index + 1, foregroundColor, hasError);
         }
     }
@@ -385,13 +407,14 @@ public class LspFilterTextbox implements Observer {
      *
      * @param index
      *            the index to check
-     * @param errorsRange
-     *            the ranges of errors to compare the index with
      * @return true if index is inside error range, false otherwise
      */
-    private static boolean indexIsError(int index, List<Integer> errorsRange) {
-        for (int i = 0; i < errorsRange.size(); i += 2) {
-            if (index >= errorsRange.get(i) && index <= errorsRange.get(i + 1)) {
+    private boolean indexIsError(int index) {
+        for (Diagnostic diagnostic : fDiagnostics) {
+            int start = diagnostic.getRange().getStart().getCharacter();
+            int end = diagnostic.getRange().getEnd().getCharacter() - 1;
+
+            if (index >= start && index <= end) {
                 return true;
             }
         }

@@ -23,7 +23,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  * @author Jeremy Dube
  *
  */
-public interface Observer {
+public interface LspObserver {
     /**
      * Method to notify the observer of diagnostic changes
      * @param uri The identifier for the document diagnosed
@@ -31,7 +31,7 @@ public interface Observer {
      * @param diagnostics
      *            the diagnostics to go through
      */
-    public void diagnostic(String uri, List<Diagnostic> diagnostics);
+    void diagnostic(String uri, List<Diagnostic> diagnostics);
 
     /**
      * Method to notify the observer of completion changes
@@ -40,7 +40,7 @@ public interface Observer {
      * @param completion
      *            the completion items to render
      */
-    public void completion(String uri, Either<List<CompletionItem>, CompletionList> completion);
+    void completion(String uri, Either<List<CompletionItem>, CompletionList> completion);
 
     /**
      * Method to notify the observer of color changes
@@ -49,5 +49,5 @@ public interface Observer {
      * @param colors
      *            the colors to render
      */
-    public void syntaxHighlighting(String uri, List<ColorInformation> colors);
+    void syntaxHighlighting(String uri, List<ColorInformation> colors);
 }
