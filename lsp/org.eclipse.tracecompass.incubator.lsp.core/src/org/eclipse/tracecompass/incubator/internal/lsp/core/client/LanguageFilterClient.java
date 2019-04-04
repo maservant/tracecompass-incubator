@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.incubator.internal.lsp.core.client;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -42,22 +43,22 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObservable
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
 
 /**
- * LanguageClient to be used by 1 LSPFilterClient.
- * This class implements the LSP4J LanguageClient for the tracecompass FilterBox
+ * LanguageClient to be used by 1 LSPFilterClient. This class implements the
+ * LSP4J LanguageClient for the tracecompass FilterBox
  *
  * @author Maxime Thibault
  *
  */
 public class LanguageFilterClient implements LanguageClient, LspObservable {
 
-    public LanguageServer fServerProxy;
-    public List<LspObserver> fObservers = new ArrayList<>();
+    private LanguageServer fServerProxy;
+    private List<LspObserver> fObservers = new ArrayList<>();
     private Integer fCursor = 0;
     private ThreadPoolExecutor fThreadPoolExecutor;
 
-    private final static int fCorePoolSize = 1;
-    private final static int fMaxPoolSize = 3;
-    private final static long fKeepAliveTime = 5000;
+    private final static int fCorePoolSize = 2;
+    private final static int fMaxPoolSize = 4;
+    private final static long fKeepAliveTime = 3000;
 
     public LanguageFilterClient() {
         LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
@@ -83,8 +84,20 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
         }
         System.out.println(uri);
         TextDocumentIdentifier filterBoxId = new TextDocumentIdentifier(uri);
-        // Make request for completion
-        Runnable completionTask = () -> {
+
+        fThreadPoolExecutor.execute(completionTask(uri, filterBoxId));
+        fThreadPoolExecutor.execute(syntaxHighlightingTask(uri, filterBoxId));
+    }
+
+    /**
+     * Task that ask the server for completion
+     *
+     * @param uri
+     * @param filterBoxId
+     * @return
+     */
+    private Runnable completionTask(String uri, TextDocumentIdentifier filterBoxId) {
+        return () -> {
             Position position = new Position();
             position.setLine(0);
             position.setCharacter(fCursor + 1);
@@ -99,8 +112,17 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
                 Activator.getInstance().logError(e.getMessage());
             }
         };
-        /// Make request for syntax highlighting
-        Runnable syntaxHighlightingTask = () -> {
+    }
+
+    /**
+     * Task that ask the server for syntax color information
+     *
+     * @param uri
+     * @param filterBoxId
+     * @return
+     */
+    private Runnable syntaxHighlightingTask(String uri, TextDocumentIdentifier filterBoxId) {
+        return () -> {
             DocumentColorParams colorParams = new DocumentColorParams(filterBoxId);
             try {
                 List<ColorInformation> colors = fServerProxy.getTextDocumentService().documentColor(colorParams).get();
@@ -111,10 +133,6 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
                 Activator.getInstance().logError(e.getMessage());
             }
         };
-
-        fThreadPoolExecutor.execute(completionTask);
-        fThreadPoolExecutor.execute(syntaxHighlightingTask);
-
     }
 
     @Override
@@ -170,5 +188,17 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
         DidChangeTextDocumentParams params = new DidChangeTextDocumentParams(filterBoxId, changelist);
 
         fServerProxy.getTextDocumentService().didChange(params);
+    }
+
+    /**
+     * Tell the server to shutdown
+     *
+     * @return the LanguageServer proxy
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    public void shutdown() throws InterruptedException, ExecutionException {
+        // fServerProxy.shutdown();
+        fServerProxy.exit();
     }
 }

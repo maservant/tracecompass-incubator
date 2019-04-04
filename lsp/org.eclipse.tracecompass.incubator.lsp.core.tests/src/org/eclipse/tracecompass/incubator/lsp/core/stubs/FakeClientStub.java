@@ -18,8 +18,9 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
 
 /**
- * This fake client stub is used to handle function call from the LSPClient bound in the TestEnvironment
- * Use this class to store the data into the FakeClientMockup
+ * This fake client stub is used to handle function call from the LSPClient
+ * bound in the TestEnvironment Use this class to store the data into the
+ * FakeClientMockup
  *
  * @author Maxime Thibault
  *
