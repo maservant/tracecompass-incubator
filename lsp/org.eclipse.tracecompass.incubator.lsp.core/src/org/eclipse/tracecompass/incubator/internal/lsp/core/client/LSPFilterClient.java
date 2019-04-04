@@ -31,8 +31,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
  */
 public class LSPFilterClient {
 
-    //Avoid using the lspclient directly
-    public LanguageFilterClient fLanguageClient;
+    private LanguageFilterClient fLanguageClient;
     private Socket fSocket;
 
     /**
@@ -123,6 +122,14 @@ public class LSPFilterClient {
      * @throws IOException
      */
     public void dispose() throws IOException {
-        fSocket.close();
+        try {
+            fLanguageClient.shutdown();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(fSocket != null) {
+            fSocket.close();
+        }
     }
 }

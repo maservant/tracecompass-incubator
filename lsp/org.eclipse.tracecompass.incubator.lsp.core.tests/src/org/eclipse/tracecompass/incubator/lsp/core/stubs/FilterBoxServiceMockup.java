@@ -8,10 +8,9 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
-
 /**
- * Use this class to store data from FilterBoxServiceStub
- * Add attributes/functions if necessary
+ * Use this class to store data from FilterBoxServiceStub Add
+ * attributes/functions if necessary
  *
  * @author Maxime Thibault
  *

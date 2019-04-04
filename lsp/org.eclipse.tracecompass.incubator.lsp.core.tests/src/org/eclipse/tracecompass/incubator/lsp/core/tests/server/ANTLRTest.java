@@ -29,7 +29,8 @@ import org.junit.Test;
  * @author Maxime Thibault
  * @author David-Alexandre Beaupre
  *
- * This class tests server-side class using antlr for syntax color, validation and autocompletion
+ *         This class tests server-side class using antlr for syntax color,
+ *         validation and autocompletion
  */
 public class ANTLRTest {
 
@@ -67,7 +68,8 @@ public class ANTLRTest {
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
         int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
 
-        //We expect antlr to see mismatchedTokenException at range (4, 5) because '=' must equals '==' instead
+        // We expect antlr to see mismatchedTokenException at range (4, 5)
+        // because '=' must equals '==' instead
         int lineExpected = 0;
         int startOffsetExpected = 4;
         int endOffsetExpected = 5;
@@ -76,7 +78,8 @@ public class ANTLRTest {
         assertEquals(startOffsetExpected, offsetStart);
         assertEquals(endOffsetExpected, offsetEnd);
 
-        //Detected by both lexer and parser. It is irrelevant, but client should be able to display only one of them
+        // Detected by both lexer and parser. It is irrelevant, but client
+        // should be able to display only one of them
         assertEquals(diagnostics.size(), 1);
 
     }
@@ -92,7 +95,7 @@ public class ANTLRTest {
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
         int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
 
-        //We expect antlr to see NoViableAltException at position 6 because
+        // We expect antlr to see NoViableAltException at position 6 because
         int lineExpected = 0;
         int startOffsetExpected = 0;
         int endOffsetExpected = str.length();
@@ -129,7 +132,8 @@ public class ANTLRTest {
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
         int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
 
-        //We expect antlr to see mismatchedTokenException at range (8, 9) because there is no closing parenthese after last character
+        // We expect antlr to see mismatchedTokenException at range (8, 9)
+        // because there is no closing parenthese after last character
         int lineExpected = 0;
         int startOffsetExpected = 8;
         int endOffsetExpected = 9;
@@ -152,7 +156,8 @@ public class ANTLRTest {
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
         int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
 
-        //We expect antlr to see mismatchedTokenException at range (8, 17) because there is no closing parenthese after last value
+        // We expect antlr to see mismatchedTokenException at range (8, 17)
+        // because there is no closing parenthese after last value
         int lineExpected = 0;
         int startOffsetExpected = 8;
         int endOffsetExpected = 17;

@@ -9,6 +9,7 @@
 package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Semaphore;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.lsp4j.MessageActionItem;
@@ -22,9 +23,8 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObservable
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
 
 /**
- * LanguageClient stub: Wrap around LanguageClientImpl
- * Helps to store data about the real implementation.
- * Use the LSPClientMockup to store data from calls
+ * LanguageClient stub: Wrap around LanguageClientImpl Helps to store data about
+ * the real implementation. Use the LSPClientMockup to store data from calls
  *
  * @author Maxime Thibault
  *
@@ -35,9 +35,11 @@ public class LSPClientStub implements LanguageClient, LspObservable {
     public LSPClientMockup fMockup = new LSPClientMockup();
     public LanguageServer fServerProxy;
     public LspObserver fObserver;
+    private Semaphore fTransactionsLock;
 
-    public LSPClientStub(LanguageFilterClient languageClient) {
+    public LSPClientStub(LanguageFilterClient languageClient, Semaphore transactionsLock) {
         fClient = languageClient;
+        fTransactionsLock = transactionsLock;
     }
 
     @Override
@@ -47,7 +49,12 @@ public class LSPClientStub implements LanguageClient, LspObservable {
 
     @Override
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
+        // Store data into mockup
         fMockup.fDiagnosticsReceived = diagnostics.getDiagnostics();
+        // Call the real Client implementation
+        fClient.publishDiagnostics(diagnostics);
+        // Count this transaction
+        fTransactionsLock.release();
     }
 
     @Override
@@ -72,11 +79,6 @@ public class LSPClientStub implements LanguageClient, LspObservable {
     @Override
     public void register(@NonNull LspObserver obs) {
         fObserver = obs;
-    }
-
-    public void tellDidChange(String uri, String input) {
-        fMockup.fInputReceived = input;
-        fClient.tellDidChange(uri, input);
     }
 
 }
