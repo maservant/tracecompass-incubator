@@ -228,7 +228,6 @@ public class FilterBoxService implements TextDocumentService {
         if (contentChange == null) {
             throw new NullPointerException("Event change param cannot be null");
         }
-        // fInput = params.getContentChanges().get(0).getText() + "\n";
         String input = params.getContentChanges().get(0).getText();
         fFiltersInputs.put(uri, input);
         try {
