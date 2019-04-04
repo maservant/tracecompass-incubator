@@ -135,19 +135,21 @@ public class Validation {
      */
     private static Range getRangeFromException(RecognitionException e, String msg, CommonTree tree) {
 
-        int line_start = 0, line_end = 0;
-        int offset_start = 0, offset_end = 0;
+        int lineStart = 0;
+        int lineEnd = 0;
+        int offsetStart = 0;
+        int offsetEnd = 0;
 
         if (e instanceof MismatchedTokenException) {
             // @see:
             // https://www.antlr3.org/api/Java/org/antlr/runtime/MismatchedTokenException.html
-            offset_start = e.index - 1;
-            offset_end = e.index;
+            offsetStart = e.index - 1;
+            offsetEnd = e.index;
         } else if (e instanceof NoViableAltException) {
             // @see:
             // https://www.antlr3.org/api/Java/org/antlr/runtime/NoViableAltException.html
-            offset_start = getErrorStartIndex(tree);
-            offset_end = msg.length();
+            offsetStart = getErrorStartIndex(tree);
+            offsetEnd = msg.length();
         } else if (e instanceof EarlyExitException) {
             // @see:
             // https://www.antlr3.org/api/Java/org/antlr/runtime/EarlyExitException.html
@@ -170,8 +172,8 @@ public class Validation {
             // Any other exception..
         }
 
-        Position start = new Position(line_start, offset_start);
-        Position end = new Position(line_end, offset_end);
+        Position start = new Position(lineStart, offsetStart);
+        Position end = new Position(lineEnd, offsetEnd);
         return new Range(start, end);
     }
 
