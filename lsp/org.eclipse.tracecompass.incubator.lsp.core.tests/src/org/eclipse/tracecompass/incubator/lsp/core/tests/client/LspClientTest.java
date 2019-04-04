@@ -28,11 +28,13 @@ public class LspClientTest {
     public void hello() throws InterruptedException, IOException {
         String input = "Hello";
         String uri = "Mamma mia";
-        /*
-         * 3 transactions (thhat's what we want to verify)
-         * 1. didOpen: client -> server
-         * 2. didCHange: client -> server
-         * 3. publishDiagnostics : server -> client
+        /**
+         * We expect 5 transactions:
+         * 1.DidOpen: client -> Server
+         * 2.DidChange: client -> server
+         * 3.publishDiagnostics: server -> client
+         * 4.syntaxHighlight: client <-> server
+         * 5.documentColor: client <->server
          */
         TestEnvironment te = new TestEnvironment(5);
         te.fLSPClient.getLanguageClient().tellDidOpen(uri);
