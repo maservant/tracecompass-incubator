@@ -27,10 +27,12 @@ public class ServerTest {
 
         for (int i = 0; i < strArray.length; i++) {
             /**
-             * We expect 5 transactions: 1.DidOpen: client -> Server
-             * 2.DidChange: client -> server 3.publishDiagnostics: server ->
-             * client 4.syntaxHighlight: client <-> server 5.documentColor:
-             * client <->server
+             * We expect 5 transactions:
+             * 1.DidOpen: client -> Server
+             * 2.DidChange: client -> server
+             * 3.publishDiagnostics: server -> client
+             * 4.syntaxHighlight: client <-> server
+             * 5.documentColor: client <->server
              */
             TestEnvironment te = new TestEnvironment(5);
             te.fLSPClient.getLanguageClient().tellDidOpen(uri);

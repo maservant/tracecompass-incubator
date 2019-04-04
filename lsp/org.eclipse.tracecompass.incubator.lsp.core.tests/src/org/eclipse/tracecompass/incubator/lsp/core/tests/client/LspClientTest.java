@@ -29,9 +29,10 @@ public class LspClientTest {
         String input = "Hello";
         String uri = "Mamma mia";
         /*
-         * 3 transactions (thhat's what we want to verify) 1. didOpen: client ->
-         * server 2. didCHange: client -> server 3. publishDiagnostics : server
-         * -> client
+         * 3 transactions (thhat's what we want to verify)
+         * 1. didOpen: client -> server
+         * 2. didCHange: client -> server
+         * 3. publishDiagnostics : server -> client
          */
         TestEnvironment te = new TestEnvironment(5);
         te.fLSPClient.getLanguageClient().tellDidOpen(uri);
