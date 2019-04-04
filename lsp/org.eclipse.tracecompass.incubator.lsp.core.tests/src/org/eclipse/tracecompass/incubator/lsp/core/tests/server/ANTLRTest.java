@@ -116,4 +116,50 @@ public class ANTLRTest {
         List<Diagnostic> diagnostics = Validation.validate(str);
         assertEquals(diagnostics.size(), 0);
     }
+
+    @Test
+    public void validationMissingClosingParentheseOneChar() throws IOException, RecognitionException {
+        String str = "(TID == 1";
+
+        List<Diagnostic> diagnostics = Validation.validate(str);
+        int lineStart = diagnostics.get(0).getRange().getStart().getLine();
+        int offsetStart = diagnostics.get(0).getRange().getStart().getCharacter();
+        int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
+        int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
+
+        //We expect antlr to see mismatchedTokenException at range (7, 8) because there is no closing parenthese after last character
+        int lineExpected = 0;
+        int startOffsetExpected = 8;
+        int endOffsetExpected = 9;
+        assertEquals(lineExpected, lineStart);
+        assertEquals(lineExpected, lineEnd);
+        assertEquals(startOffsetExpected, offsetStart);
+        assertEquals(endOffsetExpected, offsetEnd);
+
+        assertEquals(diagnostics.size(), 1);
+
+    }
+
+    @Test
+    public void validationMissingClosingParentheseMultipleChars() throws IOException, RecognitionException {
+        String str = "(TID == 123456789";
+
+        List<Diagnostic> diagnostics = Validation.validate(str);
+        int lineStart = diagnostics.get(0).getRange().getStart().getLine();
+        int offsetStart = diagnostics.get(0).getRange().getStart().getCharacter();
+        int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
+        int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
+
+        //We expect antlr to see mismatchedTokenException at range (8, 17) because there is no closing parenthese after last value
+        int lineExpected = 0;
+        int startOffsetExpected = 8;
+        int endOffsetExpected = 17;
+        assertEquals(lineExpected, lineStart);
+        assertEquals(lineExpected, lineEnd);
+        assertEquals(startOffsetExpected, offsetStart);
+        assertEquals(endOffsetExpected, offsetEnd);
+
+        assertEquals(diagnostics.size(), 1);
+
+    }
 }

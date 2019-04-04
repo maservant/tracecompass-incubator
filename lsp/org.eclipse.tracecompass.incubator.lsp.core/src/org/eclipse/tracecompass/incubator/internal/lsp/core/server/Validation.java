@@ -51,7 +51,7 @@ public class Validation {
      * @param cursor
      * @return
      */
-    static private int getErrorStartIndex(CommonTree tree) {
+    static private int getErrorStartEndIndex(CommonTree tree, boolean startIndex) {
         Stack<CommonTree> treeStack = new Stack<>();
         treeStack.push(tree);
         CommonTree currentTree = null;
@@ -62,8 +62,12 @@ public class Validation {
                 treeStack.push((CommonTree) currentTree.getChild(i));
             }
             if (currentTree instanceof CommonErrorNode) {
-                int start = ((CommonErrorNode) currentTree).start.getCharPositionInLine();
-                return start;
+                if (startIndex) {
+                    int start = ((CommonErrorNode) currentTree).start.getCharPositionInLine();
+                    return start;
+                }
+                int stop = ((CommonErrorNode) currentTree).stop.getCharPositionInLine();
+                return stop;
             }
         }
         return -1;
@@ -143,12 +147,18 @@ public class Validation {
         if (e instanceof MismatchedTokenException) {
             // @see:
             // https://www.antlr3.org/api/Java/org/antlr/runtime/MismatchedTokenException.html
-            offsetStart = e.index - 1;
-            offsetEnd = e.index;
+            offsetStart = getErrorStartEndIndex(tree, false);
+            offsetEnd = msg.length();
+            // if we do not find stop error index, this means that the error is an
+            // unknown operator, so we use the index to find its position
+            if (offsetStart == -1) {
+                offsetStart = e.index - 1;
+                offsetEnd = e.index;
+            }
         } else if (e instanceof NoViableAltException) {
             // @see:
             // https://www.antlr3.org/api/Java/org/antlr/runtime/NoViableAltException.html
-            offsetStart = getErrorStartIndex(tree);
+            offsetStart = getErrorStartEndIndex(tree, true);
             offsetEnd = msg.length();
         } else if (e instanceof EarlyExitException) {
             // @see:
