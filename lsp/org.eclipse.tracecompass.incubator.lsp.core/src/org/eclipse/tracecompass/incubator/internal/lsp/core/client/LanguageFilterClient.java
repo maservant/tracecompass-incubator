@@ -87,7 +87,7 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
         Runnable completionTask = () -> {
             Position position = new Position();
             position.setLine(0);
-            position.setCharacter(fCursor);
+            position.setCharacter(fCursor + 1);
             CompletionParams completionParams = new CompletionParams(filterBoxId, position);
 
             try {

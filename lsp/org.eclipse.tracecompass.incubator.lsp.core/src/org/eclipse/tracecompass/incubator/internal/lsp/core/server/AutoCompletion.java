@@ -86,21 +86,42 @@ public class AutoCompletion {
         if (lastToken != null && lastType == FilterParserLexer.TEXT) {
             // separator
             for (int i = 0; i < SEPARATORS.length; i++) {
-                suggestions.add(new String(subString + SEPARATORS[i] + endString));
+                suggestions.add(new String(subString + " " + SEPARATORS[i] + " " + endString)); //$NON-NLS-1$ //$NON-NLS-2$
             }
-            if (beforeLastToken != null && beforeLastType != FilterParserLexer.OP) {
-                // ops
+            if (beforeLastToken == null || beforeLastType != FilterParserLexer.OP) {
+                // operators
                 for (int i = 0; i < OPERATORS.length; i++) {
-                    suggestions.add(new String(subString + OPERATORS[i] + endString));
+                    suggestions.add(new String(subString + " " + OPERATORS[i] + " " + endString)); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
         }
         if (lastToken != null && lastType == FilterParserLexer.T__23) {
             // separators
             for (int i = 0; i < SEPARATORS.length; i++) {
-                suggestions.add(new String(subString + SEPARATORS[i] + endString));
+                suggestions.add(new String(subString + " " + SEPARATORS[i] + " " + endString));  //$NON-NLS-1$//$NON-NLS-2$
             }
         }
+
+        // format output so there is one space between each token
+        for (int i = 0; i < suggestions.size(); i++) {
+            input = new ByteArrayInputStream(suggestions.get(i).getBytes());
+            antlrStream = new ANTLRInputStream(input);
+            lexer = new FilterParserLexer(antlrStream);
+            tokenStream = new CommonTokenStream(lexer);
+            lexer.setErrorListener(e -> {
+                lexerExceptions.add((RecognitionException) e);
+            });
+
+            commonTokens = tokenStream.getTokens();
+
+            String suggestion = new String();
+
+            for (int j = 0; j < commonTokens.size(); j++) {
+                suggestion = new String(suggestion + commonTokens.get(j).getText() + " "); //$NON-NLS-1$
+            }
+            suggestions.set(i, suggestion);
+        }
+
         return suggestions;
     }
 
