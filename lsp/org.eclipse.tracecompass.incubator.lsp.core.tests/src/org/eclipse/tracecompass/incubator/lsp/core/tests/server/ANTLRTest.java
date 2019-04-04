@@ -18,8 +18,10 @@ import org.antlr.runtime.RecognitionException;
 import org.eclipse.lsp4j.Color;
 import org.eclipse.lsp4j.ColorInformation;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.Position;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlighting;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.Validation;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.AutoCompletion;
 import org.junit.Test;
 
 /**
@@ -127,7 +129,7 @@ public class ANTLRTest {
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
         int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
 
-        //We expect antlr to see mismatchedTokenException at range (7, 8) because there is no closing parenthese after last character
+        //We expect antlr to see mismatchedTokenException at range (8, 9) because there is no closing parenthese after last character
         int lineExpected = 0;
         int startOffsetExpected = 8;
         int endOffsetExpected = 9;
@@ -161,5 +163,45 @@ public class ANTLRTest {
 
         assertEquals(diagnostics.size(), 1);
 
+    }
+
+    @Test
+    public void completionOperatorsSeparators() throws IOException, RecognitionException {
+        String str = "TID";
+        Position cursor = new Position(0, 3);
+
+        List<String> suggestions = AutoCompletion.autoCompletion(str, cursor);
+        int sizeExpected = 9;
+        assertEquals(sizeExpected, suggestions.size());
+    }
+
+    @Test
+    public void completionSeparatorsAfterParentheses() throws IOException, RecognitionException {
+        String str = "(TID == 42)";
+        Position cursor = new Position(0, 11);
+
+        List<String> suggestions = AutoCompletion.autoCompletion(str, cursor);
+        int sizeExpected = 2;
+        assertEquals(sizeExpected, suggestions.size());
+    }
+
+    @Test
+    public void completionLongInputOperatorsSeparators() throws IOException, RecognitionException {
+        String str = "(TID == 42 && PID != 12) || Poly";
+        Position cursor = new Position(0, 32);
+
+        List<String> suggestions = AutoCompletion.autoCompletion(str, cursor);
+        int sizeExpected = 9;
+        assertEquals(sizeExpected, suggestions.size());
+    }
+
+    @Test
+    public void completionSeparatorsOnly() throws IOException, RecognitionException {
+        String str = "TID == 42";
+        Position cursor = new Position(0, 9);
+
+        List<String> suggestions = AutoCompletion.autoCompletion(str, cursor);
+        int sizeExpected = 2;
+        assertEquals(sizeExpected, suggestions.size());
     }
 }
