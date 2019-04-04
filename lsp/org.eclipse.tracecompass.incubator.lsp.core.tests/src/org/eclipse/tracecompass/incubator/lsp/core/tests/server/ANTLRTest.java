@@ -25,6 +25,7 @@ import org.junit.Test;
 /**
  *
  * @author Maxime Thibault
+ * @author David-Alexandre Beaupre
  *
  * This class tests server-side class using antlr for syntax color, validation and autocompletion
  */
@@ -39,17 +40,17 @@ public class ANTLRTest {
         List<ColorInformation> ci = SyntaxHighlighting.getColorInformationList(full);
 
         ColorInformation ci1 = ci.get(0);
-        assertEquals(new Color(1, 1, 1, 1), ci1.getColor());
+        assertEquals(new Color(0, 0, 0, 1), ci1.getColor());
         assertEquals(0, ci1.getRange().getStart().getCharacter());
         assertEquals(2, ci1.getRange().getEnd().getCharacter());
 
         ColorInformation ci2 = ci.get(1);
-        assertEquals(new Color(1, 0, 0, 1), ci2.getColor());
+        assertEquals(new Color(0.3, 0.3, 1, 1), ci2.getColor());
         assertEquals(4, ci2.getRange().getStart().getCharacter());
         assertEquals(5, ci2.getRange().getEnd().getCharacter());
 
         ColorInformation ci3 = ci.get(2);
-        assertEquals(new Color(0, 0, 1, 1), ci3.getColor());
+        assertEquals(new Color(0.9, 0.5, 0.1, 1), ci3.getColor());
         assertEquals(7, ci3.getRange().getStart().getCharacter());
         assertEquals(8, ci3.getRange().getEnd().getCharacter());
 
@@ -59,18 +60,19 @@ public class ANTLRTest {
     public void validationMismatchedTokenException() throws IOException, RecognitionException {
 
         List<Diagnostic> diagnostics = Validation.validate("TID = 123");
-        int line_start = diagnostics.get(0).getRange().getStart().getLine();
-        int offset_start = diagnostics.get(0).getRange().getStart().getCharacter();
-        int line_end = diagnostics.get(0).getRange().getEnd().getLine();
-        int offset_end = diagnostics.get(0).getRange().getEnd().getCharacter();
+        int lineStart = diagnostics.get(0).getRange().getStart().getLine();
+        int offsetStart = diagnostics.get(0).getRange().getStart().getCharacter();
+        int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
+        int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
 
-        //We expect antlr to see mismatchedTokenException at position 5 because '=' must equals '==' instead
-        int line_expected = 1;
-        int offset_expected = 5;
-        assertEquals(line_expected, line_start);
-        assertEquals(line_expected, line_end);
-        assertEquals(offset_expected, offset_start);
-        assertEquals(offset_expected, offset_end);
+        //We expect antlr to see mismatchedTokenException at range (4, 5) because '=' must equals '==' instead
+        int lineExpected = 0;
+        int startOffsetExpected = 4;
+        int endOffsetExpected = 5;
+        assertEquals(lineExpected, lineStart);
+        assertEquals(lineExpected, lineEnd);
+        assertEquals(startOffsetExpected, offsetStart);
+        assertEquals(endOffsetExpected, offsetEnd);
 
         //Detected by both lexer and parser. It is irrelevant, but client should be able to display only one of them
         assertEquals(diagnostics.size(), 1);
@@ -83,20 +85,35 @@ public class ANTLRTest {
         String str = "TID == ";
 
         List<Diagnostic> diagnostics = Validation.validate(str);
-        int line_start = diagnostics.get(0).getRange().getStart().getLine();
-        int offset_start = diagnostics.get(0).getRange().getStart().getCharacter();
-        int line_end = diagnostics.get(0).getRange().getEnd().getLine();
-        int offset_end = diagnostics.get(0).getRange().getEnd().getCharacter();
+        int lineStart = diagnostics.get(0).getRange().getStart().getLine();
+        int offsetStart = diagnostics.get(0).getRange().getStart().getCharacter();
+        int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
+        int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
 
         //We expect antlr to see NoViableAltException at position 6 because
-        int line_expected = 1;
-        int offset_expected = str.length();
-        assertEquals(line_expected, line_start);
-        assertEquals(line_expected, line_end);
-        assertEquals(offset_expected, offset_start);
-        assertEquals(offset_expected, offset_end);
+        int lineExpected = 0;
+        int startOffsetExpected = 0;
+        int endOffsetExpected = str.length();
+        assertEquals(lineExpected, lineStart);
+        assertEquals(lineExpected, lineEnd);
+        assertEquals(startOffsetExpected, offsetStart);
+        assertEquals(endOffsetExpected, offsetEnd);
 
         assertEquals(diagnostics.size(), 1);
 
+    }
+
+    @Test
+    public void validationSimpleStringNoErrors() throws IOException, RecognitionException {
+        String str = "PID == 42";
+        List<Diagnostic> diagnostics = Validation.validate(str);
+        assertEquals(diagnostics.size(), 0);
+    }
+
+    @Test
+    public void validationComplexStringNoErrors() throws IOException, RecognitionException {
+        String str = "TID < 12 && (PID == 42 && (Ericsson > 1 || Poly matches 2))";
+        List<Diagnostic> diagnostics = Validation.validate(str);
+        assertEquals(diagnostics.size(), 0);
     }
 }
