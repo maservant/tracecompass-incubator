@@ -27,19 +27,21 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
  * Provides information on the colors for each token in the string
  *
  * @author Maxime Thibault
+ * @author David-Alexandre Beaupre
  *
  */
 public class SyntaxHighlighting {
 
-    final static Color OPERATION_COLOR = new Color(0.3, 0.3, 1, 1);
-    final static Color TEXT_COLOR = new Color(0, 0, 0, 1);
-    final static Color SEPARATOR_COLOR = new Color(0.9, 0.5, 0.1, 1);
+    private static final Color OPERATION_COLOR = new Color(0.3, 0.3, 1, 1);
+    private static final Color TEXT_COLOR = new Color(0, 0, 0, 1);
+    private static final Color SEPARATOR_COLOR = new Color(0.9, 0.5, 0.1, 1);
 
     /**
      * Assigns a color information for all tokens based on their type
+     * @param str input of the filter box
      *
      * @return colorInformation
-     * @throws IOException
+     * @throws IOException from antlr
      */
     @SuppressWarnings("restriction")
     static public List<ColorInformation> getColorInformationList(String str) throws IOException {
@@ -68,7 +70,7 @@ public class SyntaxHighlighting {
     }
 
     /**
-     * Returns rgb color that matches type
+     * Returns RGB color that matches type
      *
      * @param index
      * @return Color

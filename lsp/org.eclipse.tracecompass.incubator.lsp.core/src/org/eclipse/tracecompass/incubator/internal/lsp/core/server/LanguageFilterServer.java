@@ -22,22 +22,26 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 /**
  * LanguageServer implementation for the tracecompass FilterBox
  *
- *
+ * @author Maxime Thibault
+ * @author David-Alexandre Beaupre
+ * @author Remi Croteau
  */
 public class LanguageFilterServer implements LanguageServer, LanguageClientAware {
 
-    private TextDocumentService filterBoxService;
-    private WorkspaceService filterWorkspaceService;
+    private final TextDocumentService filterBoxService;
+    private final WorkspaceService filterWorkspaceService;
     private LanguageClient fClient;
 
+    /**
+     * Server constructor
+     */
     public LanguageFilterServer() {
-        this.filterBoxService = new FilterBoxService(this);
-        this.filterWorkspaceService = new FilterWorkspaceService();
+        filterBoxService = new FilterBoxService(this);
+        filterWorkspaceService = new FilterWorkspaceService();
     }
 
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
-        // TODO : send initialize result with actual capabilities
         return CompletableFuture.completedFuture(new InitializeResult());
     }
 
@@ -54,13 +58,11 @@ public class LanguageFilterServer implements LanguageServer, LanguageClientAware
 
     @Override
     public TextDocumentService getTextDocumentService() {
-        // TODO Auto-generated method stub
         return filterBoxService;
     }
 
     @Override
     public WorkspaceService getWorkspaceService() {
-        // TODO Auto-generated method stub
         return filterWorkspaceService;
     }
 
@@ -71,6 +73,8 @@ public class LanguageFilterServer implements LanguageServer, LanguageClientAware
 
     /**
      * Used by the filterBoxService when it needs to make a call on the client.
+     *
+     * @return LanguageClient
      */
     public LanguageClient getClient() {
         return fClient;
