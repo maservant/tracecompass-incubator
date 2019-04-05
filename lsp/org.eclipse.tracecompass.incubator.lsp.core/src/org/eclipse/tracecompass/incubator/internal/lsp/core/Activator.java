@@ -53,7 +53,7 @@ public class Activator extends TraceCompassActivator {
 
     @Override
     protected void stopActions() {
-        if(fServer != null) {
+        if (fServer != null) {
             try {
                 fServer.dispose();
             } catch (IOException e) {
@@ -62,4 +62,3 @@ public class Activator extends TraceCompassActivator {
         }
     }
 }
-

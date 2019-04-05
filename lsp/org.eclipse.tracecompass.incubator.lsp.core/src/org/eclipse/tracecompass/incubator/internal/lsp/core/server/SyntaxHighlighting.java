@@ -38,10 +38,13 @@ public class SyntaxHighlighting {
 
     /**
      * Assigns a color information for all tokens based on their type
-     * @param str input of the filter box
+     *
+     * @param str
+     *            input of the filter box
      *
      * @return colorInformation
-     * @throws IOException from antlr
+     * @throws IOException
+     *             from antlr
      */
     @SuppressWarnings("restriction")
     static public List<ColorInformation> getColorInformationList(String str) throws IOException {

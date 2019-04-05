@@ -47,15 +47,15 @@ public class FilterBoxLocalTextCompletion {
     }
 
     /**
-     * Check if the string can be completed based on the cursor's position
-     * We assume that the token before the cursor's position is the token to be completed
+     * Check if the string can be completed based on the cursor's position We
+     * assume that the token before the cursor's position is the token to be
+     * completed
      *
      * @param str
      *            The string to autocomplete
      * @param cursorPos
      *            The caret position when the token has been inserted
-     * @return boolean that indicated wheter the string can be completed or
-     *         not
+     * @return boolean that indicated wheter the string can be completed or not
      */
     private static boolean canComplete(String str, Integer cursorPos) {
         boolean isValid = true;
@@ -77,7 +77,7 @@ public class FilterBoxLocalTextCompletion {
                     nextChar.equals(SINGLE_QUOTE) ||
                     nextChar.equals(SPACE);
 
-            if(charAtCursor.equals(LEFT_BRACKET) ||
+            if (charAtCursor.equals(LEFT_BRACKET) ||
                     charAtCursor.equals(LEFT_PARENTHESIS) ||
                     charAtCursor.equals(LEFT_SQUARE_BRACKET)) {
                 rightOK &= !nextChar.equals(DOUBLE_QUOTE) && !nextChar.equals(SINGLE_QUOTE);

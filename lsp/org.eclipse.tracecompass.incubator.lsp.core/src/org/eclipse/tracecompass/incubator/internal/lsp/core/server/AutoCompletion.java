@@ -98,7 +98,7 @@ public class AutoCompletion {
         if (lastToken != null && lastType == FilterParserLexer.T__23) {
             // separators
             for (int i = 0; i < SEPARATORS.length; i++) {
-                suggestions.add(new String(subString + " " + SEPARATORS[i] + " " + endString));  //$NON-NLS-1$//$NON-NLS-2$
+                suggestions.add(new String(subString + " " + SEPARATORS[i] + " " + endString)); //$NON-NLS-1$//$NON-NLS-2$
             }
         }
 

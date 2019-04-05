@@ -149,7 +149,8 @@ public class Validation {
             // https://www.antlr3.org/api/Java/org/antlr/runtime/MismatchedTokenException.html
             offsetStart = getErrorStartEndIndex(tree, false);
             offsetEnd = msg.length();
-            // if we do not find stop error index, this means that the error is an
+            // if we do not find stop error index, this means that the error is
+            // an
             // unknown operator, so we use the index to find its position
             if (offsetStart == -1) {
                 offsetStart = e.index - 1;

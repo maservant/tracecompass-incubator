@@ -34,8 +34,9 @@ public class LSPServer {
     private ServerSocket fServerSocket;
 
     /**
-     * Create serverSocket then wait for a client socket to connect
-     * When a client socket is connected, create the lspLauncher to listen to incoming requests
+     * Create serverSocket then wait for a client socket to connect When a
+     * client socket is connected, create the lspLauncher to listen to incoming
+     * requests
      *
      * @throws IOException
      */

@@ -35,10 +35,9 @@ public class LSPFilterClient {
     private Socket fSocket;
 
     /**
-     * Create client:
-     * -Connect to server with socket from default hostname and port
-     * -Register an observer who can use client API and get notified when
-     *  server responds
+     * Create client: -Connect to server with socket from default hostname and
+     * port -Register an observer who can use client API and get notified when
+     * server responds
      *
      * @param observer
      *            that uses this API and get notified
@@ -49,9 +48,9 @@ public class LSPFilterClient {
     }
 
     /**
-     * Create client:
-     * -Connect to server with socket from hostname and port
-     * -Register an observer who can use client API and get notified when server responds
+     * Create client: -Connect to server with socket from hostname and port
+     * -Register an observer who can use client API and get notified when server
+     * responds
      *
      * @param hostname
      *            address of server to connect to
@@ -66,10 +65,9 @@ public class LSPFilterClient {
     }
 
     /**
-     * Create client:
-     * -Use InputStream and OutputStream instead of socket
+     * Create client: -Use InputStream and OutputStream instead of socket
      * -Register an observer who can use client API and get notified when server
-     *  responds
+     * responds
      *
      * @param in
      *            input stream of a stream communication
@@ -128,7 +126,7 @@ public class LSPFilterClient {
             e.printStackTrace();
         }
 
-        if(fSocket != null) {
+        if (fSocket != null) {
             fSocket.close();
         }
     }

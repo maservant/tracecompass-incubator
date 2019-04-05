@@ -26,7 +26,9 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 public interface LspObserver {
     /**
      * Method to notify the observer of diagnostic changes
-     * @param uri The identifier for the document diagnosed
+     *
+     * @param uri
+     *            The identifier for the document diagnosed
      *
      * @param diagnostics
      *            the diagnostics to go through
@@ -35,7 +37,9 @@ public interface LspObserver {
 
     /**
      * Method to notify the observer of completion changes
-     * @param uri The identifier for the document to complete
+     *
+     * @param uri
+     *            The identifier for the document to complete
      *
      * @param completion
      *            the completion items to render
@@ -44,7 +48,9 @@ public interface LspObserver {
 
     /**
      * Method to notify the observer of color changes
-     * @param uri The identifier for the document to highlight
+     *
+     * @param uri
+     *            The identifier for the document to highlight
      *
      * @param colors
      *            the colors to render

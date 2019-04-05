@@ -16,8 +16,8 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.server.LSPServer;
 import org.eclipse.tracecompass.incubator.lsp.core.stubs.Stub;
 
 /**
- * Create a test environment for testing LSP implementations
- * Use this object in your test case to synchronize and probe transactions
+ * Create a test environment for testing LSP implementations Use this object in
+ * your test case to synchronize and probe transactions
  *
  * @author Maxime Thibault
  *
@@ -56,32 +56,34 @@ public class TestEnvironment {
         fExepectedTransaction = expectedTransaction;
         fTransactionsLock = new Semaphore(expectedTransaction);
         try {
-            //Empty the semaphore
+            // Empty the semaphore
             fTransactionsLock.acquire(fExepectedTransaction);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        //Connect stubs and real implementations
+        // Connect stubs and real implementations
 
         Stream clientStream = new Stream();
         Stream serverStream = new Stream();
         Stream clientStubStream = new Stream();
         Stream serverStubStream = new Stream();
 
-        //Init stub
+        // Init stub
         fStub = new Stub(fTransactionsLock);
 
-        //Server read from client stub, write its own stream back to it
+        // Server read from client stub, write its own stream back to it
         fServer = new LSPServer(clientStubStream.read, serverStream.write);
 
-        //Init clientStub: stub read from server and write its own stream back to it
+        // Init clientStub: stub read from server and write its own stream back
+        // to it
         fStub.initClient(serverStream.read, clientStubStream.write);
 
-        //Init serverStub: stub read from client and write its own stream back to it
+        // Init serverStub: stub read from client and write its own stream back
+        // to it
         fStub.initServer(clientStream.read, serverStubStream.write);
 
-        //Client read from server stub, write its own stream back to it
+        // Client read from server stub, write its own stream back to it
         fClient = new LSPFilterClient(serverStubStream.read, clientStream.write, fStub.getObserver());
 
     }
@@ -102,6 +104,7 @@ public class TestEnvironment {
 
     /**
      * Return the stub
+     *
      * @return
      */
     public Stub getStub() {
@@ -110,6 +113,7 @@ public class TestEnvironment {
 
     /**
      * Return the real client implementation
+     *
      * @return
      */
     public LSPFilterClient getClient() {
@@ -118,6 +122,7 @@ public class TestEnvironment {
 
     /**
      * Return the real server implementation
+     *
      * @return
      */
     public LSPServer getServer() {

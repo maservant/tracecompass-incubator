@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox;
 
 /**
  * Interface to define a valid string event
+ *
  * @author Jeremy Dube
  *
  */
