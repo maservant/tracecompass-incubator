@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.incubator.internal.lsp.core.shared;
  * @author Maxime Thibault
  *
  */
-public class Configuration {
+public interface Configuration {
     public static String HOSTNAME = "127.0.0.1";
     public static Integer PORT = 9090;
 }

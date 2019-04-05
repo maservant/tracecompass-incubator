@@ -30,7 +30,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration
  */
 public class LSPServer {
 
-    public LanguageFilterServer fLSPServer;
+    private LanguageFilterServer fLSPServer;
     private ServerSocket fServerSocket;
 
     /**
@@ -55,7 +55,6 @@ public class LSPServer {
      */
     public LSPServer(InputStream in, OutputStream out) {
         fLSPServer = new LanguageFilterServer();
-        LanguageServer ls = new LanguageFilterServer();
         Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(fLSPServer, in, out);
         fLSPServer.connect(launcher.getRemoteProxy());
         launcher.startListening();

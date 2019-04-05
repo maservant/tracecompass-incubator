@@ -51,14 +51,14 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
  */
 public class LanguageFilterClient implements LanguageClient, LspObservable {
 
+    private final static int fCorePoolSize = 2;
+    private final static int fMaxPoolSize = 4;
+    private final static long fKeepAliveTime = 3000;
+
     private LanguageServer fServerProxy;
     private List<LspObserver> fObservers = new ArrayList<>();
     private Integer fCursor = 0;
     private ThreadPoolExecutor fThreadPoolExecutor;
-
-    private final static int fCorePoolSize = 2;
-    private final static int fMaxPoolSize = 4;
-    private final static long fKeepAliveTime = 3000;
 
     public LanguageFilterClient() {
         LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
