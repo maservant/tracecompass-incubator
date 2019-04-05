@@ -82,7 +82,6 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
         for (LspObserver observer : fObservers) {
             observer.diagnostic(uri, diagnostics.getDiagnostics());
         }
-        System.out.println(uri);
         TextDocumentIdentifier filterBoxId = new TextDocumentIdentifier(uri);
 
         fThreadPoolExecutor.execute(completionTask(uri, filterBoxId));

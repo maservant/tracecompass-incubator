@@ -307,7 +307,6 @@ public class LspFilterTextbox implements LspObserver {
                     for (int i = 0; i < completions.size(); i++) {
                         TextEdit textEdit = completions.get(i).getTextEdit();
                         String suggestion = textEdit.getNewText();
-                        System.out.println(suggestion);
                     }
                 }
             });
