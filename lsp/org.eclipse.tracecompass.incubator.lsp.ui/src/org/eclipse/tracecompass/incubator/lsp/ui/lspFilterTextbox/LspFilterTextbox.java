@@ -71,6 +71,8 @@ public class LspFilterTextbox implements LspObserver {
      *
      * @param parent
      *            the parent view
+     * @param filterBoxUri
+     *            the uri of the lsp client
      */
     public LspFilterTextbox(Composite parent, String filterBoxUri) {
         fFilterBoxUri = filterBoxUri;

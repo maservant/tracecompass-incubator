@@ -72,6 +72,7 @@ public class RecentlyUsedFilters {
         for (int i = 0; i < fFilters.size(); i++) {
             fPreferences.remove("filter" + i);
         }
+        fFilters.clear();
     }
 
     /**
