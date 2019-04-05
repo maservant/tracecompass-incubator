@@ -64,7 +64,9 @@ public class FilterBoxServiceStub implements TextDocumentService {
         fStub.count();
 
         // Call the real implementation
-        return fStub.getProxyServer().getTextDocumentService().completion(position);
+        fMockup.fCursor = position.getPosition().getCharacter();
+        fMockup.fCompletionsReceived = fStub.getProxyServer().getTextDocumentService().completion(position);
+        return fMockup.fCompletionsReceived;
     }
 
     @Override
@@ -186,7 +188,8 @@ public class FilterBoxServiceStub implements TextDocumentService {
         fStub.count();
 
         // Call the real implementation
-        return fStub.getProxyServer().getTextDocumentService().documentColor(params);
+        fMockup.fColorsReceived = fStub.getProxyServer().getTextDocumentService().documentColor(params);
+        return fMockup.fColorsReceived;
 
     }
 

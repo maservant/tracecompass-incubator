@@ -11,14 +11,10 @@ package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.lsp4j.CompletionParams;
-import org.eclipse.lsp4j.DocumentColorParams;
 import org.eclipse.lsp4j.MessageActionItem;
 import org.eclipse.lsp4j.MessageParams;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
-import org.eclipse.lsp4j.TextDocumentIdentifier;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObservable;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
@@ -52,15 +48,6 @@ public class LSPClientStub implements LanguageClient, LspObservable {
         fMockup.fDiagnosticsReceived = diagnostics.getDiagnostics();
         // Call the real Client implementation
         fStub.getProxyClient().publishDiagnostics(diagnostics);
-
-        fMockup.fInputReceived = fStub.getServerStub().getTextDocumentService().fMockup.fInputReceived;
-        String uri = diagnostics.getUri();
-        TextDocumentIdentifier filterBoxId = new TextDocumentIdentifier(uri);
-        Position position = new Position(0, fMockup.fInputReceived.length());
-        DocumentColorParams colorParams = new DocumentColorParams(filterBoxId);
-        fMockup.fColorsReceived = fStub.getProxyServer().getTextDocumentService().documentColor(colorParams);
-        CompletionParams completionParams = new CompletionParams(filterBoxId, position);
-        fMockup.fCompletionsReceived = fStub.getProxyServer().getTextDocumentService().completion(completionParams);
         // Count this transaction
         fStub.count();
     }
