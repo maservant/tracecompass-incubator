@@ -36,7 +36,7 @@ public class LspClientTest {
          */
         TestEnvironment te = new TestEnvironment(5);
         te.getClient().getLanguageClient().tellDidOpen(uri);
-        te.getClient().notify(uri, input, input.length());
+        te.getClient().notify(uri, input);
 
         // Lock till the transactions we're expecting is not over
         te.waitForTransactionToTerminate();
