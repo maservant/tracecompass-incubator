@@ -9,7 +9,6 @@
 package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Semaphore;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.lsp4j.MessageActionItem;
@@ -17,8 +16,6 @@ import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
 import org.eclipse.lsp4j.ShowMessageRequestParams;
 import org.eclipse.lsp4j.services.LanguageClient;
-import org.eclipse.lsp4j.services.LanguageServer;
-import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LanguageFilterClient;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObservable;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
 
@@ -31,15 +28,12 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
  */
 public class LSPClientStub implements LanguageClient, LspObservable {
 
-    public LanguageFilterClient fClient;
     public LSPClientMockup fMockup = new LSPClientMockup();
-    public LanguageServer fServerProxy;
+    private final Stub fStub;
     public LspObserver fObserver;
-    private Semaphore fTransactionsLock;
 
-    public LSPClientStub(LanguageFilterClient languageClient, Semaphore transactionsLock) {
-        fClient = languageClient;
-        fTransactionsLock = transactionsLock;
+    public LSPClientStub(Stub stub) {
+        fStub = stub;
     }
 
     @Override
@@ -52,9 +46,9 @@ public class LSPClientStub implements LanguageClient, LspObservable {
         // Store data into mockup
         fMockup.fDiagnosticsReceived = diagnostics.getDiagnostics();
         // Call the real Client implementation
-        fClient.publishDiagnostics(diagnostics);
+        fStub.getProxyClient().publishDiagnostics(diagnostics);
         // Count this transaction
-        fTransactionsLock.release();
+        fStub.count();
     }
 
     @Override
@@ -70,10 +64,6 @@ public class LSPClientStub implements LanguageClient, LspObservable {
     @Override
     public void logMessage(MessageParams message) {
         // Not implemented
-    }
-
-    public void setServer(LanguageServer server) {
-        fServerProxy = server;
     }
 
     @Override

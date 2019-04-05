@@ -10,8 +10,6 @@ package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Semaphore;
 
 import org.eclipse.lsp4j.CodeActionParams;
 import org.eclipse.lsp4j.CodeLens;
@@ -54,27 +52,19 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 public class FilterBoxServiceStub implements TextDocumentService {
 
     public FilterBoxServiceMockup fMockup = new FilterBoxServiceMockup();
-    public TextDocumentService fTextDocumentService;
-    private Semaphore fTransactionsLock;
+    private final Stub fStub;
 
-    public FilterBoxServiceStub(TextDocumentService textDocumentService, Semaphore transactionsLock) {
-        fTextDocumentService = textDocumentService;
-        fTransactionsLock = transactionsLock;
+    public FilterBoxServiceStub(Stub stub) {
+        fStub = stub;
     }
 
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
         // Count the transaction
-        fTransactionsLock.release();
+        fStub.count();
+
         // Call the real implementation
-        Either<List<CompletionItem>, CompletionList> completion = null;
-        try {
-            completion = fTextDocumentService.completion(position).get();
-        } catch (InterruptedException | ExecutionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return CompletableFuture.completedFuture(completion);
+        return fStub.getProxyServer().getTextDocumentService().completion(position);
     }
 
     @Override
@@ -165,9 +155,9 @@ public class FilterBoxServiceStub implements TextDocumentService {
     public void didOpen(DidOpenTextDocumentParams params) {
         // Not implemented
         // Call the real implementation
-        fTextDocumentService.didOpen(params);
+        fStub.getProxyServer().getTextDocumentService().didOpen(params);
         // Count this transaction
-        fTransactionsLock.release();
+        fStub.count();
     }
 
     @Override
@@ -175,9 +165,9 @@ public class FilterBoxServiceStub implements TextDocumentService {
         // Store data in mockup
         fMockup.fInputReceived = params.getContentChanges().get(0).getText();
         // Call the function on the real implementation
-        fTextDocumentService.didChange(params);
+        fStub.getProxyServer().getTextDocumentService().didChange(params);
         // Count this transaction
-        fTransactionsLock.release();
+        fStub.count();
     }
 
     @Override
@@ -193,15 +183,10 @@ public class FilterBoxServiceStub implements TextDocumentService {
     @Override
     public CompletableFuture<List<ColorInformation>> documentColor(DocumentColorParams params) {
         // Count transaction
-        fTransactionsLock.release();
+        fStub.count();
+
         // Call the real implementation
-        List<ColorInformation> colors = null;
-        try {
-            colors = fTextDocumentService.documentColor(params).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return CompletableFuture.completedFuture(colors);
+        return fStub.getProxyServer().getTextDocumentService().documentColor(params);
 
     }
 
