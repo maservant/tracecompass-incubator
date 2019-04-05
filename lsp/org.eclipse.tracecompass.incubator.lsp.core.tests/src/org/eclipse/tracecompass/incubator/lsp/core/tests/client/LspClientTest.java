@@ -11,33 +11,39 @@ package org.eclipse.tracecompass.incubator.lsp.core.tests.client;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 
 import org.eclipse.tracecompass.incubator.lsp.core.environment.TestEnvironment;
 import org.junit.Test;
 
-
 public class LspClientTest {
 
     /**
-     * Simple hello world tests.
-     * LSPClient send 'hello' to LSPServer
+     * Simple hello world tests. LSPClient send 'hello' to LSPServer
      *
      * @throws InterruptedException
+     * @throws IOException
      */
     @Test
-    public void hello() throws InterruptedException {
+    public void hello() throws InterruptedException, IOException {
         String input = "Hello";
         String uri = "Mamma mia";
-        TestEnvironment te = new TestEnvironment();
+        /**
+         * We expect 5 transactions:
+         * 1.DidOpen: client -> Server
+         * 2.DidChange: client -> server
+         * 3.publishDiagnostics: server -> client
+         * 4.syntaxHighlight: client <-> server
+         * 5.documentColor: client <->server
+         */
+        TestEnvironment te = new TestEnvironment(5);
         te.fLSPClient.getLanguageClient().tellDidOpen(uri);
         te.fLSPClient.notify(uri, input);
 
-        // TODO: Change synchronization mechanism
-        //Wait for transactions to be done
-        TimeUnit.SECONDS.sleep(1);
+        // Lock till the transactions we're expecting is not over
+        te.waitForTransactionToTerminate();
 
-        //Check mockup for stored values
+        // Check mockup for stored values
         assertEquals(input, te.fLSPServerStub.getTextDocumentService().fMockup.fInputReceived);
         assertEquals(0, te.fLSPClientStub.fMockup.fDiagnosticsReceived.size());
     }

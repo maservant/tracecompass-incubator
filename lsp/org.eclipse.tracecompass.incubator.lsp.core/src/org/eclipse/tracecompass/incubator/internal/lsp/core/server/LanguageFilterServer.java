@@ -48,7 +48,7 @@ public class LanguageFilterServer implements LanguageServer, LanguageClientAware
     @Override
     public CompletableFuture<Object> shutdown() {
         // Nothing to do
-        return null;
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
