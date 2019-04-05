@@ -44,7 +44,7 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
 
 /**
  * LanguageClient to be used by 1 LSPFilterClient. This class implements the
- * LSP4J LanguageClient for the tracecompass FilterBox
+ * LSP4J LanguageClient and update an LspObserver
  *
  * @author Maxime Thibault
  *
@@ -82,27 +82,30 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
         for (LspObserver observer : fObservers) {
             observer.diagnostic(uri, diagnostics.getDiagnostics());
         }
-        TextDocumentIdentifier filterBoxId = new TextDocumentIdentifier(uri);
+        TextDocumentIdentifier textDocumentIdentifier = new TextDocumentIdentifier(uri);
 
-        fThreadPoolExecutor.execute(completionTask(uri, filterBoxId));
-        fThreadPoolExecutor.execute(syntaxHighlightingTask(uri, filterBoxId));
+        //Ask for completion update
+        fThreadPoolExecutor.execute(completionTask(uri, textDocumentIdentifier));
+        //Ask for syntax highlight update
+        fThreadPoolExecutor.execute(syntaxHighlightingTask(uri, textDocumentIdentifier));
     }
 
     /**
-     * Task that ask the server for completion
+     * Task that ask the server for completion and then update the observer
      *
-     * @param uri
+     * @param uri path to file
      * @param filterBoxId
      * @return
      */
-    private Runnable completionTask(String uri, TextDocumentIdentifier filterBoxId) {
+    private Runnable completionTask(String uri, TextDocumentIdentifier textDocumentIdentifier) {
         return () -> {
             Position position = new Position();
             position.setLine(0);
-            position.setCharacter(fCursor + 1);
-            CompletionParams completionParams = new CompletionParams(filterBoxId, position);
+            position.setCharacter(fCursor); // Get characterAt cursor position
+            CompletionParams completionParams = new CompletionParams(textDocumentIdentifier, position);
 
             try {
+                // Get the completion list
                 Either<List<CompletionItem>, CompletionList> completion = fServerProxy.getTextDocumentService().completion(completionParams).get();
                 for (LspObserver observer : fObservers) {
                     observer.completion(uri, completion);
@@ -114,16 +117,17 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
     }
 
     /**
-     * Task that ask the server for syntax color information
+     * Task that ask the server for syntax color information and the update the observer
      *
      * @param uri
      * @param filterBoxId
      * @return
      */
-    private Runnable syntaxHighlightingTask(String uri, TextDocumentIdentifier filterBoxId) {
+    private Runnable syntaxHighlightingTask(String uri, TextDocumentIdentifier textDocumentIdentifier) {
         return () -> {
-            DocumentColorParams colorParams = new DocumentColorParams(filterBoxId);
+            DocumentColorParams colorParams = new DocumentColorParams(textDocumentIdentifier);
             try {
+                // Get the color list
                 List<ColorInformation> colors = fServerProxy.getTextDocumentService().documentColor(colorParams).get();
                 for (LspObserver observer : fObservers) {
                     observer.syntaxHighlighting(uri, colors);
@@ -161,6 +165,10 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
         fObservers.add(obs);
     }
 
+    /**
+     * Tell the server that the document at uri has beed open
+     * @param uri
+     */
     public void tellDidOpen(String uri) {
         TextDocumentItem filterBoxId = new TextDocumentItem();
         filterBoxId.setUri(uri);
@@ -169,13 +177,18 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
         fServerProxy.getTextDocumentService().didOpen(didOpenParams);
     }
 
-    public void tellDidChange(String uri, String input) {
+    /**
+     * Tell the server that the document at uri as change.
+     * @param uri
+     * @param input the changed (full string)
+     */
+    public void tellDidChange(String uri, String input, int cursorPos) {
+        fCursor = cursorPos;
         if (input.isEmpty()) {
             return;
         }
         Integer min = 0;
         Integer max = input.length() - 1;
-        fCursor = max;
         Position p1 = new Position(0, min);
         Position p2 = new Position(0, max);
         Range r = new Range(p1, p2);
@@ -186,13 +199,13 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
         filterBoxId.setUri(uri);
         DidChangeTextDocumentParams params = new DidChangeTextDocumentParams(filterBoxId, changelist);
 
+        // Tell the server
         fServerProxy.getTextDocumentService().didChange(params);
     }
 
     /**
      * Tell the server to shutdown
      *
-     * @return the LanguageServer proxy
      * @throws ExecutionException
      * @throws InterruptedException
      */

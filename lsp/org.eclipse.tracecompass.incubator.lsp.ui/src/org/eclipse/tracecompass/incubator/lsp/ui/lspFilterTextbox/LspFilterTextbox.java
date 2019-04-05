@@ -344,7 +344,7 @@ public class LspFilterTextbox implements LspObserver {
             resetView();
         } else {
             if (fLspClient != null) {
-                fLspClient.notify(fFilterBoxUri, message);
+                fLspClient.notify(fFilterBoxUri, message, fFilterStyledText.getCaretOffset());
             }
         }
     }

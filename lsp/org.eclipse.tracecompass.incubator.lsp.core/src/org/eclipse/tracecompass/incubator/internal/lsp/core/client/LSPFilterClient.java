@@ -22,6 +22,8 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.Configuration;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.shared.LspObserver;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * LSP Client simplification that offers an API to its observer. The underlying
  * class is the LanguageClient implementation for the tracecompass FilterBox.
@@ -65,17 +67,18 @@ public class LSPFilterClient {
     }
 
     /**
-     * Create client: -Use InputStream and OutputStream instead of socket
-     * -Register an observer who can use client API and get notified when server
-     * responds
+     * Use this class for testing only Create client: -Use InputStream and
+     * OutputStream instead of socket -Register an observer who can use client
+     * API and get notified when server responds
      *
      * @param in
      *            input stream of a stream communication
      * @param out
      *            output stream of a stream communication
      * @param observer
-     *            that uses this API and get notified
+     *            that uses this API to get notified
      */
+    @VisibleForTesting
     public LSPFilterClient(InputStream in, OutputStream out, @NonNull LspObserver observer) {
         initialize(in, out, observer);
     }
@@ -105,13 +108,14 @@ public class LSPFilterClient {
     }
 
     /**
-     * PUBLIC API: Send string to server using the LSP client
+     * PUBLIC API: Observers use this to tell the server that the file has
+     * change
      *
      * @param str
      *            string to send
      */
-    public void notify(String Uri, String input) {
-        fLanguageClient.tellDidChange(Uri, input);
+    public void notify(String Uri, String input, int cursorPos) {
+        fLanguageClient.tellDidChange(Uri, input, cursorPos);
     }
 
     /**
@@ -121,11 +125,13 @@ public class LSPFilterClient {
      */
     public void dispose() throws IOException {
         try {
+            //Tell server to shutdown
             fLanguageClient.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        // Close socket if exists
         if (fSocket != null) {
             fSocket.close();
         }
