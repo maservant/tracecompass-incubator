@@ -11,7 +11,14 @@ package org.eclipse.tracecompass.incubator.lsp.ui.lspFilterTextbox;
 
 /**
  *
- * Client-side autocompletion for parenthesis/brackets/quotes
+ * Client-side autocompletion for parenthesis/brackets/quotes FIXME: When
+ * entering the first say '(' or '"', the text is completed correctly. But
+ * sometimes the user will close the character himself to avoid having to use
+ * the arrow to go after the closing character. If the user enters the closing
+ * character, it should just move to the next one, ie remove the one that was
+ * auto-added. For example, if I type '"', 'a', '"', I would expect the string
+ * to be "a", now, it is "a""", with two trailing "". Same with parenthesis '(',
+ * 'a', ')' should be (a), not (a)). See the behavior in Eclipse itself.
  *
  * @author Maxime Thibault
  */

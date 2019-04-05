@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.incubator.internal.lsp.core.server;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,13 +46,15 @@ public class LSPServer {
     }
 
     /**
-     * Create server from InputStream and OutputStream
+     * Create server from InputStream and OutputStream FIXME: This class is used
+     * by the tests case only. This needs to be fixed.
      *
      * @param in:
      *            InputStream (data in)
      * @param out
      *            OutputStream (data out)
      */
+    @VisibleForTesting
     public LSPServer(InputStream in, OutputStream out) {
         fLSPServer = new LanguageFilterServer();
         Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(fLSPServer, in, out);
