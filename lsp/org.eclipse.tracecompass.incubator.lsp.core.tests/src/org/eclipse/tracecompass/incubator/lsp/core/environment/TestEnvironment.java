@@ -11,47 +11,35 @@ package org.eclipse.tracecompass.incubator.lsp.core.environment;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
-import org.eclipse.lsp4j.jsonrpc.Launcher;
-import org.eclipse.lsp4j.launch.LSPLauncher;
-import org.eclipse.lsp4j.services.LanguageClient;
-import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.client.LSPFilterClient;
 import org.eclipse.tracecompass.incubator.internal.lsp.core.server.LSPServer;
-import org.eclipse.tracecompass.incubator.lsp.core.stubs.FakeClientStub;
-import org.eclipse.tracecompass.incubator.lsp.core.stubs.LSPClientStub;
-import org.eclipse.tracecompass.incubator.lsp.core.stubs.LSPServerStub;
+import org.eclipse.tracecompass.incubator.lsp.core.stubs.Stub;
 
 /**
- * Create a test environment for testing LSP implementations This class returns
- * a stub for LSPServer, LSPClient and a fakeClient. Theses stubs gather data
- * about transactions and calls the real implementations. The unit tests can
- * simply read from stub's mockup to check if values are valid.
+ * Create a test environment for testing LSP implementations
+ * Use this object in your test case to synchronize and probe transactions
  *
  * @author Maxime Thibault
  *
  */
 public class TestEnvironment {
 
-    public LSPServer fLSPServer = null;
-    public LSPFilterClient fLSPClient = null;
-
-    public LSPClientStub fLSPClientStub;
-    public LSPServerStub fLSPServerStub;
-    public FakeClientStub fLSPFakeClientStub;
+    private LSPServer fServer = null;
+    private LSPFilterClient fClient = null;
+    private Stub fStub;
 
     private int fExepectedTransaction;
     private Semaphore fTransactionsLock;
 
     /**
-     * Create a test environment. Use this object to invoke function from
-     * fLSPServer or fLSPClient, then probe data from stub's mockup.
+     * Create a test environment
      */
     public TestEnvironment(int expectedTransaction) {
         initialize(expectedTransaction);
     }
 
     /**
-     * Reset the test environment Simply re-initialize it
+     * Reset the test environment
      */
     public void reset(int expectedTransaction) {
         initialize(expectedTransaction);
@@ -68,36 +56,34 @@ public class TestEnvironment {
         fExepectedTransaction = expectedTransaction;
         fTransactionsLock = new Semaphore(expectedTransaction);
         try {
+            //Empty the semaphore
             fTransactionsLock.acquire(fExepectedTransaction);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        // Streams to simulate socket communication between LSPClient and
-        // LSPServer
-        Stream LSPserverStream = new Stream();
-        Stream LSPserverStubStream = new Stream();
-        Stream LSPclientStream = new Stream();
-        Stream LSPclientStubStream = new Stream();
+        //Connect stubs and real implementations
 
-        fLSPFakeClientStub = new FakeClientStub();
+        Stream clientStream = new Stream();
+        Stream serverStream = new Stream();
+        Stream clientStubStream = new Stream();
+        Stream serverStubStream = new Stream();
 
-        fLSPServer = new LSPServer(LSPserverStubStream.read, LSPserverStream.write);
-        fLSPServerStub = new LSPServerStub(fLSPServer.fLSPServer, fTransactionsLock);
-        // LSPServer reads from LSPClient and write into LSPClientStub
-        Launcher<LanguageClient> LSPServerLauncher = LSPLauncher.createServerLauncher(fLSPServerStub, LSPclientStream.read, LSPserverStubStream.write);
-        // Then listen for incoming request
-        LSPServerLauncher.startListening();
+        //Init stub
+        fStub = new Stub(fTransactionsLock);
 
-        fLSPClient = new LSPFilterClient(LSPclientStubStream.read, LSPclientStream.write, fLSPFakeClientStub);
-        fLSPClientStub = new LSPClientStub(fLSPClient.getLanguageClient(), fTransactionsLock);
-        // LSPClient reads from LSPServer and write into LSPServertStub
-        Launcher<LanguageServer> LSPClientLauncher = LSPLauncher.createClientLauncher(fLSPClientStub, LSPserverStream.read, LSPclientStream.write);
-        // Get reference to the server
-        fLSPClientStub.setServer(LSPClientLauncher.getRemoteProxy());
-        // Listen for incoming request
-        LSPClientLauncher.startListening();
+        //Server read from client stub, write its own stream back to it
+        fServer = new LSPServer(clientStubStream.read, serverStream.write);
+
+        //Init clientStub: stub read from server and write its own stream back to it
+        fStub.initClient(serverStream.read, clientStubStream.write);
+
+        //Init serverStub: stub read from client and write its own stream back to it
+        fStub.initServer(clientStream.read, serverStubStream.write);
+
+        //Client read from server stub, write its own stream back to it
+        fClient = new LSPFilterClient(serverStubStream.read, clientStream.write, fStub.getObserver());
+
     }
 
     /**
@@ -110,7 +96,31 @@ public class TestEnvironment {
         fTransactionsLock.acquire(fExepectedTransaction);
         // Do one more for exit call -> This ensure that the last transaction
         // we've expected has finished
-        fLSPClient.dispose();
+        fClient.dispose();
         fTransactionsLock.acquire();
+    }
+
+    /**
+     * Return the stub
+     * @return
+     */
+    public Stub getStub() {
+        return fStub;
+    }
+
+    /**
+     * Return the real client implementation
+     * @return
+     */
+    public LSPFilterClient getClient() {
+        return fClient;
+    }
+
+    /**
+     * Return the real server implementation
+     * @return
+     */
+    public LSPServer getServer() {
+        return fServer;
     }
 }

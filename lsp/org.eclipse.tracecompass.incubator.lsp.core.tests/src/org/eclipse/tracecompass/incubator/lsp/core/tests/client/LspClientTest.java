@@ -37,15 +37,15 @@ public class LspClientTest {
          * 5.documentColor: client <->server
          */
         TestEnvironment te = new TestEnvironment(5);
-        te.fLSPClient.getLanguageClient().tellDidOpen(uri);
-        te.fLSPClient.notify(uri, input);
+        te.getClient().getLanguageClient().tellDidOpen(uri);
+        te.getClient().notify(uri, input);
 
         // Lock till the transactions we're expecting is not over
         te.waitForTransactionToTerminate();
 
         // Check mockup for stored values
-        assertEquals(input, te.fLSPServerStub.getTextDocumentService().fMockup.fInputReceived);
-        assertEquals(0, te.fLSPClientStub.fMockup.fDiagnosticsReceived.size());
+        assertEquals(input, te.getStub().getServerStub().getTextDocumentService().fMockup.fInputReceived);
+        assertEquals(0, te.getStub().getClientStub().fMockup.fDiagnosticsReceived.size());
     }
 
     /**

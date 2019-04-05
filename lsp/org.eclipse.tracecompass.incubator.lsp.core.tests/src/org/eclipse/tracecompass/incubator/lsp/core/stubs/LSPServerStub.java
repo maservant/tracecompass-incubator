@@ -10,8 +10,6 @@ package org.eclipse.tracecompass.incubator.lsp.core.stubs;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Semaphore;
-
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -29,10 +27,9 @@ import org.eclipse.tracecompass.incubator.internal.lsp.core.server.FilterWorkspa
 public class LSPServerStub implements LanguageServer {
 
     public LSPServerMockup fMockup = new LSPServerMockup();
-    public LanguageServer fServer;
-    protected FilterBoxServiceStub fFilterBoxService;
-    private WorkspaceService fFilterWorkspaceService;
-    private Semaphore fTransactionsLock;
+    private final FilterBoxServiceStub fFilterBoxService;
+    private final WorkspaceService fFilterWorkspaceService;
+    private final Stub fStub;
 
     /**
      *
@@ -42,10 +39,9 @@ public class LSPServerStub implements LanguageServer {
      *            use this semaphore to count the transactions and use it in the
      *            TestEnvironment
      */
-    public LSPServerStub(LanguageServer languageServer, Semaphore transactionsLock) {
-        fServer = languageServer;
-        fTransactionsLock = transactionsLock;
-        fFilterBoxService = new FilterBoxServiceStub(fServer.getTextDocumentService(), fTransactionsLock);
+    LSPServerStub(Stub stub) {
+        fStub = stub;
+        fFilterBoxService = new FilterBoxServiceStub(stub);
         fFilterWorkspaceService = new FilterWorkspaceService();
     }
 
@@ -58,7 +54,7 @@ public class LSPServerStub implements LanguageServer {
     public CompletableFuture<Object> shutdown() {
         Object returnVal = null;
         try {
-            returnVal = fServer.shutdown().get();
+            returnVal = fStub.getProxyServer().shutdown().get();
         } catch (InterruptedException | ExecutionException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -68,9 +64,9 @@ public class LSPServerStub implements LanguageServer {
 
     @Override
     public void exit() {
-        fServer.exit();
+        fStub.getProxyServer().exit();
         // Count this transaction
-        fTransactionsLock.release();
+        fStub.count();
     }
 
     @Override

@@ -35,14 +35,14 @@ public class ServerTest {
              * 5.documentColor: client <->server
              */
             TestEnvironment te = new TestEnvironment(5);
-            te.fLSPClient.getLanguageClient().tellDidOpen(uri);
-            te.fLSPClient.getLanguageClient().tellDidChange(uri, strArray[i]);
+            te.getClient().getLanguageClient().tellDidOpen(uri);
+            te.getClient().getLanguageClient().tellDidChange(uri, strArray[i]);
 
             // Wait for transactions to complete
             te.waitForTransactionToTerminate();
 
             // Check mockup for stored values
-            assertEquals(validity[i], te.fLSPClientStub.fMockup.fDiagnosticsReceived.size());
+            assertEquals(validity[i], te.getStub().getClientStub().fMockup.fDiagnosticsReceived.size());
         }
     }
 

@@ -198,7 +198,7 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
      * @throws InterruptedException
      */
     public void shutdown() throws InterruptedException, ExecutionException {
-        // fServerProxy.shutdown();
+        fServerProxy.shutdown();
         fServerProxy.exit();
     }
 }
