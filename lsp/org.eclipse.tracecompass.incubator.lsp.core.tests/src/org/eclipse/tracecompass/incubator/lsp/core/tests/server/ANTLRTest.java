@@ -201,6 +201,26 @@ public class ANTLRTest {
     }
 
     @Test
+    public void completionLongInputOperatorsSeparatorsCursorMiddle() throws IOException, RecognitionException {
+        String str = "(TID == 42 && PID != 12) || Poly";
+        Position cursor = new Position(0, 5);
+
+        List<String> suggestions = AutoCompletion.autoCompletion(str, cursor);
+        int sizeExpected = 9;
+        assertEquals(sizeExpected, suggestions.size());
+    }
+
+    @Test
+    public void completionLongInputOperatorsSeparatorsCursorMiddleNoSuggestions() throws IOException, RecognitionException {
+        String str = "(TID == 42 && PID != 12) || Poly";
+        Position cursor = new Position(0, 7);
+
+        List<String> suggestions = AutoCompletion.autoCompletion(str, cursor);
+        int sizeExpected = 0;
+        assertEquals(sizeExpected, suggestions.size());
+    }
+
+    @Test
     public void completionSeparatorsOnly() throws IOException, RecognitionException {
         String str = "TID == 42";
         Position cursor = new Position(0, 9);

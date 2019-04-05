@@ -32,9 +32,9 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
  */
 public class SyntaxHighlighting {
 
-    private static final Color OPERATION_COLOR = new Color(0.3, 0.3, 1, 1);
-    private static final Color TEXT_COLOR = new Color(0, 0, 0, 1);
-    private static final Color SEPARATOR_COLOR = new Color(0.9, 0.5, 0.1, 1);
+    public static final Color OPERATION_COLOR = new Color(0.3, 0.3, 1, 1);
+    public static final Color TEXT_COLOR = new Color(0, 0, 0, 1);
+    public static final Color SEPARATOR_COLOR = new Color(0.9, 0.5, 0.1, 1);
 
     /**
      * Assigns a color information for all tokens based on their type

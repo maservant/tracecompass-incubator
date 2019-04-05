@@ -12,7 +12,12 @@ package org.eclipse.tracecompass.incubator.lsp.core.tests.server;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import org.eclipse.lsp4j.Color;
+import org.eclipse.lsp4j.ColorInformation;
+import org.eclipse.tracecompass.incubator.internal.lsp.core.server.SyntaxHighlighting;
 import org.eclipse.tracecompass.incubator.lsp.core.environment.TestEnvironment;
 import org.junit.Test;
 
@@ -44,7 +49,33 @@ public class ServerTest {
         }
     }
 
-    /**
-     * TODO: ADD MORE TESTS!
-     */
+    @Test
+    public void ColorHighlightReply() throws InterruptedException, IOException, ExecutionException {
+        String input = "TID == 42 || PID != 12 && Poly matches Ericsson";
+        Color[] expectedColors = {SyntaxHighlighting.TEXT_COLOR,
+                SyntaxHighlighting.OPERATION_COLOR,
+                SyntaxHighlighting.TEXT_COLOR,
+                SyntaxHighlighting.SEPARATOR_COLOR,
+                SyntaxHighlighting.TEXT_COLOR,
+                SyntaxHighlighting.OPERATION_COLOR,
+                SyntaxHighlighting.TEXT_COLOR,
+                SyntaxHighlighting.SEPARATOR_COLOR,
+                SyntaxHighlighting.TEXT_COLOR,
+                SyntaxHighlighting.OPERATION_COLOR,
+                SyntaxHighlighting.TEXT_COLOR};
+
+        String uri = "Arriba";
+
+        TestEnvironment tEnvironment = new TestEnvironment(5);
+        tEnvironment.getClient().getLanguageClient().tellDidOpen(uri);
+        tEnvironment.getClient().getLanguageClient().tellDidChange(uri, input);
+
+        tEnvironment.waitForTransactionToTerminate();
+
+        List<ColorInformation> colors = tEnvironment.getStub().getClientStub().fMockup.fColorsReceived.get();
+
+        for (int j = 0; j < colors.size(); j++) {
+            assertEquals(expectedColors[j], colors.get(j).getColor());
+        }
+    }
 }
