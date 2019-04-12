@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
@@ -177,8 +178,10 @@ public class LSPFilterClient {
      * Close client-side socket connection. Also tell the server to shutdown.
      *
      * @throws IOException
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
-    public void dispose() throws IOException {
+    public void dispose() {
 
         try {
             // Tell server to shutdown
@@ -187,11 +190,17 @@ public class LSPFilterClient {
             }
         } catch (Exception e) {
             Activator.getInstance().logError(e.getMessage());
+        } finally {
+
+            try {
+                // Close socket if not null
+                if (fSocket != null) {
+                    fSocket.close();
+                }
+            } catch (Exception e) {
+                Activator.getInstance().logError(e.getMessage());
+            }
         }
 
-        // Close socket if exists
-        if (fSocket != null) {
-            fSocket.close();
-        }
     }
 }

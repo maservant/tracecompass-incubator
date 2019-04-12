@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox.LspFilterTextbox;
-import org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox.ValidListener;
+import org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox.FilterValidityListener;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
@@ -109,10 +109,10 @@ public class GlobalFilterViewer extends Composite {
         Map<String, Boolean> overrideParametersMap = new HashMap();
         overrideParametersMap.put("KeyListener", true); //$NON-NLS-1$
         fLspFilterTextbox = new LspFilterTextbox(parent, component.getName());
-        fLspFilterTextbox.addValidListener(new ValidListener() {
+        fLspFilterTextbox.addValidListener(new FilterValidityListener() {
 
             @Override
-            public void valid() {
+            public void validFilter() {
                 String text = Objects.requireNonNull(fLspFilterTextbox.getText());
                 fLspFilterTextbox.setText(""); //$NON-NLS-1$
                 if (fEnabledFilters.contains(text) || fDisabledFilters.contains(text)) {
@@ -124,7 +124,7 @@ public class GlobalFilterViewer extends Composite {
             }
 
             @Override
-            public void invalid() {
+            public void invalidFilter() {
                 // Do nothing
             }
         });

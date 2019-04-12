@@ -30,12 +30,14 @@ public class RecentlyUsedFilters {
      *
      * @param size
      *            size of the filters to save
+     * @param listName
+     *            the name the list of recently used filters should have
      */
     public RecentlyUsedFilters(int size, String listName) {
         fSize = size;
         fPreferences = Preferences.userRoot().node(listName);
         fFilters = new ArrayList<>(fSize);
-        getFilters();
+        loadFilters();
     }
 
     /**
@@ -57,7 +59,7 @@ public class RecentlyUsedFilters {
      *
      * @return an array starting with the latest used filter at first index
      */
-    public List<String> getRecently() {
+    public List<String> getRecentlyFilters() {
         List<String> filters = new ArrayList<>(fSize);
         for (int i = fFilters.size() - 1; i >= 0; i--) {
             filters.add(fFilters.get(i));
@@ -76,9 +78,9 @@ public class RecentlyUsedFilters {
     }
 
     /**
-     * Get filters from the preferences
+     * load filters from the preferences
      */
-    private void getFilters() {
+    private void loadFilters() {
         for (int i = 0; i < fSize; i++) {
             String filter = fPreferences.get("filter" + i, null);
             if (filter != null) {

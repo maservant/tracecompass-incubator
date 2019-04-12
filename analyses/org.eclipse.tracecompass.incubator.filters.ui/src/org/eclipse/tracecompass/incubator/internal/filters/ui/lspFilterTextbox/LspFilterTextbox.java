@@ -51,7 +51,7 @@ public class LspFilterTextbox implements LspObserver {
 
     private final String fFilterBoxUri;
     private @Nullable LSPFilterClient fLspClient;
-    private List<ValidListener> fListeners = new ArrayList<>();
+    private List<FilterValidityListener> fListeners = new ArrayList<>();
     private final Color fDefaultFilterTextColor;
     private final Color fDefaultFilterBackgroundColor;
     private final StyledText fFilterStyledText;
@@ -105,6 +105,7 @@ public class LspFilterTextbox implements LspObserver {
             fLspClient = new LSPFilterClient(this, fFilterBoxUri);
         } catch (IOException e) {
             e.printStackTrace();
+            fIsValidString = true;
         }
         fDefaultFilterTextColor = fFilterStyledText.getForeground();
         fRecentlyUsedFilters = new RecentlyUsedFilters(5, "GlobalFilterViewer");
@@ -149,7 +150,7 @@ public class LspFilterTextbox implements LspObserver {
      * @param validListener
      *            the listener to add
      */
-    public void addValidListener(ValidListener validListener) {
+    public void addValidListener(FilterValidityListener validListener) {
         fListeners.add(validListener);
     }
 
@@ -169,8 +170,8 @@ public class LspFilterTextbox implements LspObserver {
     private void notifyValid() {
         fRecentlyUsedFilters.addFilter(fFilterStyledText.getText());
         if (fIsValidString) {
-            for (ValidListener validListener : fListeners) {
-                validListener.valid();
+            for (FilterValidityListener validListener : fListeners) {
+                validListener.validFilter();
             }
         }
     }
@@ -179,8 +180,8 @@ public class LspFilterTextbox implements LspObserver {
      * Method to notify listeners of invalid string
      */
     private void notifyInvalid() {
-        for (ValidListener validListener : fListeners) {
-            validListener.invalid();
+        for (FilterValidityListener validListener : fListeners) {
+            validListener.invalidFilter();
         }
     }
 
