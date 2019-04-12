@@ -37,7 +37,7 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.tracecompass.incubator.internal.filters.core.client.LSPFilterClient;
+import org.eclipse.tracecompass.incubator.internal.filters.core.client.wrapper.LanguageFilterClientWrapper;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserver;
 
 /**
@@ -49,7 +49,7 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserv
 public class LspFilterTextbox implements LspObserver {
 
     private final String fFilterBoxUri;
-    private @Nullable LSPFilterClient fLspClient;
+    private @Nullable LanguageFilterClientWrapper fLspClient;
     private List<FilterValidityListener> fListeners = new ArrayList<>();
     private final Color fDefaultFilterTextColor;
     private final Color fDefaultFilterBackgroundColor;
@@ -101,7 +101,7 @@ public class LspFilterTextbox implements LspObserver {
         setKeyListener();
         fDefaultFilterBackgroundColor = fFilterStyledText.getBackground();
         try {
-            fLspClient = new LSPFilterClient(this, fFilterBoxUri);
+            fLspClient = new LanguageFilterClientWrapper(this, fFilterBoxUri);
         } catch (IOException e) {
             fIsValidString = true;
         }

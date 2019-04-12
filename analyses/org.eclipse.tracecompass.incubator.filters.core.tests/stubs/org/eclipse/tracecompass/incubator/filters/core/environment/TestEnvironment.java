@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
 import org.eclipse.tracecompass.incubator.filters.core.stubs.Stub;
-import org.eclipse.tracecompass.incubator.internal.filters.core.client.LSPFilterClient;
+import org.eclipse.tracecompass.incubator.internal.filters.core.client.wrapper.LanguageFilterClientWrapper;
 import org.eclipse.tracecompass.incubator.internal.filters.core.server.LSPServer;
 
 /**
@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.server.LSPServer
 public class TestEnvironment {
 
     private LSPServer fServer = null;
-    private LSPFilterClient fClient = null;
+    private LanguageFilterClientWrapper fClient = null;
     private Stub fStub;
 
     private int fExepectedTransaction;
@@ -99,7 +99,7 @@ public class TestEnvironment {
         fStub.initServer(clientStream.read, serverStubStream.write);
 
         // Client read from server stub, write its own stream back to it
-        fClient = new LSPFilterClient(serverStubStream.read, clientStream.write, fStub.getObserver());
+        fClient = new LanguageFilterClientWrapper(serverStubStream.read, clientStream.write, fStub.getObserver());
 
     }
 
@@ -131,7 +131,7 @@ public class TestEnvironment {
      *
      * @return
      */
-    public LSPFilterClient getClient() {
+    public LanguageFilterClientWrapper getClient() {
         return fClient;
     }
 

@@ -121,7 +121,14 @@ public class FilterBoxLocalTextCompletion {
      * @return The completed string
      */
     private static String complete(String str, Integer cursorPos) {
-        String charAtCursor = String.valueOf(str.charAt(cursorPos - 1));
+
+        String charAtCursor = ""; //$NON-NLS-1$
+        // If cursorPos = 0, it means there's no char behind. Then left
+        // charAtCursor blank
+        if (cursorPos > 0) {
+            charAtCursor = String.valueOf(str.charAt(cursorPos - 1));
+        }
+        
         String charToInsert;
         switch (charAtCursor) {
         case LEFT_PARENTHESIS:

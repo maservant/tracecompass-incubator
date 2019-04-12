@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.incubator.internal.filters.core.client;
+package org.eclipse.tracecompass.incubator.internal.filters.core.client.wrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +21,7 @@ import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.filters.core.Activator;
+import org.eclipse.tracecompass.incubator.internal.filters.core.client.LanguageFilterClient;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.FilterLspConfiguration;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserver;
 
@@ -30,12 +31,15 @@ import com.google.common.annotations.VisibleForTesting;
  * This class intent is to be use by the LspFilterTextbox.java
  *
  * This class simplify the LanguageFilterClient used by the LspFilterTextbox
- * reducing the number of call required to achieve an update in a document.
+ * reducing the number of call required to achieve an update in a document. In
+ * other words, this class wraps around the LanguageFilterClient.
+ *
+ * @link LanguageFilterClient
  *
  * @author Maxime Thibault
  *
  */
-public class LSPFilterClient {
+public class LanguageFilterClientWrapper {
 
     private LanguageFilterClient fLanguageClient = null;
     private Socket fSocket = null;
@@ -55,7 +59,7 @@ public class LSPFilterClient {
      *            OPTIONAL document identifier on which the LSP should work. See
      *            LSP specifications
      */
-    public LSPFilterClient(String hostname, Integer port, @NonNull LspObserver observer, String documentUri) {
+    public LanguageFilterClientWrapper(String hostname, Integer port, @NonNull LspObserver observer, String documentUri) {
 
         // Start a thread that periodically try to connect to the server if not
         // already connected
@@ -103,7 +107,7 @@ public class LSPFilterClient {
      *            OPIONAL document identifier on which the LSP should work. See
      *            LSP specifications
      */
-    public LSPFilterClient(@NonNull LspObserver observer, String documentUri) throws UnknownHostException, IOException {
+    public LanguageFilterClientWrapper(@NonNull LspObserver observer, String documentUri) throws UnknownHostException, IOException {
         this(FilterLspConfiguration.HOSTNAME, FilterLspConfiguration.PORT, observer, documentUri);
     }
 
@@ -118,7 +122,7 @@ public class LSPFilterClient {
      *            to update and get update from
      */
     @VisibleForTesting
-    public LSPFilterClient(InputStream in, OutputStream out, @NonNull LspObserver observer) {
+    public LanguageFilterClientWrapper(InputStream in, OutputStream out, @NonNull LspObserver observer) {
         initialize(in, out, observer, null);
     }
 
