@@ -16,6 +16,6 @@ package org.eclipse.tracecompass.incubator.internal.filters.core.shared;
  *
  */
 public interface Configuration {
-    public static String HOSTNAME = "127.0.0.1";
-    public static Integer PORT = 9090;
+    public static final String HOSTNAME = "127.0.0.1";
+    public static final Integer PORT = 9090;
 }
