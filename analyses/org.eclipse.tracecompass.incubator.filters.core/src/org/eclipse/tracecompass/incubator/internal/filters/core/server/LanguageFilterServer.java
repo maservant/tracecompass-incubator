@@ -20,7 +20,9 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.eclipse.lsp4j.services.WorkspaceService;
 
 /**
- * LanguageServer implementation for the tracecompass FilterBox
+ * LanguageServer implementation for the tracecompass FilterBox.
+ * A new instance of this class is created for each client so that
+ * only one client is known for this class. See LSPServer.ConnetionInitializer
  *
  * @author Maxime Thibault
  * @author David-Alexandre Beaupre
@@ -30,6 +32,7 @@ public class LanguageFilterServer implements LanguageServer, LanguageClientAware
 
     private final TextDocumentService filterBoxService;
     private final WorkspaceService filterWorkspaceService;
+    // The only client a given instance needs to know (1:1 relationship)
     private LanguageClient fClient;
 
     /**
