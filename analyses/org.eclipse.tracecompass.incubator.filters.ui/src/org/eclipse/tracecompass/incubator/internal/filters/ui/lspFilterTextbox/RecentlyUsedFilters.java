@@ -72,7 +72,7 @@ public class RecentlyUsedFilters {
      */
     public void clearFilters() {
         for (int i = 0; i < fFilters.size(); i++) {
-            fPreferences.remove("filter" + i);
+            fPreferences.remove("filter" + i); //$NON-NLS-1$
         }
         fFilters.clear();
     }
@@ -82,7 +82,7 @@ public class RecentlyUsedFilters {
      */
     private void loadFilters() {
         for (int i = 0; i < fSize; i++) {
-            String filter = fPreferences.get("filter" + i, null);
+            String filter = fPreferences.get("filter" + i, null); //$NON-NLS-1$
             if (filter != null) {
                 fFilters.add(filter);
             }
@@ -94,7 +94,7 @@ public class RecentlyUsedFilters {
      */
     private void saveFilters() {
         for (int i = 0; i < fFilters.size(); i++) {
-            fPreferences.put("filter" + i, fFilters.get(i));
+            fPreferences.put("filter" + i, fFilters.get(i)); //$NON-NLS-1$
         }
     }
 }

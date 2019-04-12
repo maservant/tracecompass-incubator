@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
  * @author Maxime Thibault
  *
  */
+@SuppressWarnings("restriction")
 public class FilterBoxLocalAutoCompletionAllTests {
 
     /**

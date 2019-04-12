@@ -36,7 +36,6 @@ import org.eclipse.lsp4j.ColorInformation;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.tracecompass.incubator.internal.filters.core.client.LSPFilterClient;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserver;
@@ -86,7 +85,7 @@ public class LspFilterTextbox implements LspObserver {
         // Search icon
         fSearchButton = new CLabel(baseComposite, SWT.CENTER);
         fSearchButton.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create());
-        fSearchButton.setText("search"); // Will be changed for an image
+        fSearchButton.setText("search"); //$NON-NLS-1$ // Will be changed for an image
 
         // Text box
         fTextViewer = new TextViewer(baseComposite, SWT.SINGLE | SWT.BORDER);
@@ -96,7 +95,7 @@ public class LspFilterTextbox implements LspObserver {
         // Cancel icon
         fCancelButton = new CLabel(baseComposite, SWT.CENTER);
         fCancelButton.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create());
-        fCancelButton.setText("clear"); // Will be changed for an image
+        fCancelButton.setText("clear"); //$NON-NLS-1$ // Will be changed for an image
 
         setIconsListener();
         setKeyListener();
@@ -108,7 +107,7 @@ public class LspFilterTextbox implements LspObserver {
             fIsValidString = true;
         }
         fDefaultFilterTextColor = fFilterStyledText.getForeground();
-        fRecentlyUsedFilters = new RecentlyUsedFilters(5, "GlobalFilterViewer");
+        fRecentlyUsedFilters = new RecentlyUsedFilters(5, "GlobalFilterViewer"); //$NON-NLS-1$
         // TODO: To combine with the completion items once available
         // List<String> filterStrings = fRecentlyUsedFilters.getRecently();
 
@@ -306,14 +305,12 @@ public class LspFilterTextbox implements LspObserver {
             Display.getDefault().syncExec(new Runnable() {
                 @Override()
                 public void run() {
-                    // TODO: Needs to be implemented
-                    List<CompletionItem> completions = completion.getLeft();
-                    for (int i = 0; i < completions.size(); i++) {
-                        TextEdit textEdit = completions.get(i).getTextEdit();
-                        String suggestion = textEdit.getNewText();
-                        // this need to be link with the dropdown
-                        System.out.println("Please do something with this variable " + suggestion);
-                    }
+                    // TODO: link this with the dropdown
+                    // List<CompletionItem> completions = completion.getLeft();
+                    // for (int i = 0; i < completions.size(); i++) {
+                    //     TextEdit textEdit = completions.get(i).getTextEdit();
+                    //     String suggestion = textEdit.getNewText();
+                    // }
                 }
             });
         }
@@ -366,14 +363,14 @@ public class LspFilterTextbox implements LspObserver {
      */
     private void addErrorPopup() {
         fToolTip.activate();
-        String toolTipText = "";
+        String toolTipText = ""; //$NON-NLS-1$
         int index = 0;
         for (Diagnostic diagnostic : fDiagnostics) {
             int start = diagnostic.getRange().getStart().getCharacter() + 1;
-            toolTipText += "Error at character " + start + " : " + diagnostic.getMessage();
+            toolTipText += "Error at character " + start + " : " + diagnostic.getMessage();  //$NON-NLS-1$//$NON-NLS-2$
             index++;
             if (index < fDiagnostics.size()) {
-                toolTipText += "\n";
+                toolTipText += "\n"; //$NON-NLS-1$
             }
         }
         fToolTip.setText(toolTipText);

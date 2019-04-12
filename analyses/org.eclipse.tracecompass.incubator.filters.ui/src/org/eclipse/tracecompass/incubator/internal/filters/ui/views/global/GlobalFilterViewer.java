@@ -10,10 +10,8 @@
 package org.eclipse.tracecompass.incubator.internal.filters.ui.views.global;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -106,8 +104,6 @@ public class GlobalFilterViewer extends Composite {
         super(parent, style);
         fComponent = component;
 
-        Map<String, Boolean> overrideParametersMap = new HashMap();
-        overrideParametersMap.put("KeyListener", true); //$NON-NLS-1$
         fLspFilterTextbox = new LspFilterTextbox(parent, component.getName());
         fLspFilterTextbox.addValidListener(new FilterValidityListener() {
 

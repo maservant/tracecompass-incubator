@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
  * @author Jeremy Dube
  *
  */
+@SuppressWarnings("restriction")
 public class RecentlyUsedFiltersAllTests {
     /**
      * Test when one filter is added

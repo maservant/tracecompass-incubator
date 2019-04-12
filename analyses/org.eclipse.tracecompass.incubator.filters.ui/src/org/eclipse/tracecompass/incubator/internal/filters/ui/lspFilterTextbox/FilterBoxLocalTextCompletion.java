@@ -28,15 +28,15 @@ package org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox;
  */
 public class FilterBoxLocalTextCompletion {
 
-    private static final String LEFT_PARENTHESIS = "(";
-    private static final String RIGHT_PARENTHESIS = ")";
-    private static final String LEFT_SQUARE_BRACKET = "[";
-    private static final String RIGHT_SQUARE_BRACKET = "]";
-    private static final String LEFT_BRACKET = "{";
-    private static final String RIGHT_BRACKET = "}";
-    private static final String DOUBLE_QUOTE = "\"";
-    private static final String SINGLE_QUOTE = "'";
-    private static final String SPACE = " ";
+    private static final String LEFT_PARENTHESIS = "("; //$NON-NLS-1$
+    private static final String RIGHT_PARENTHESIS = ")"; //$NON-NLS-1$
+    private static final String LEFT_SQUARE_BRACKET = "["; //$NON-NLS-1$
+    private static final String RIGHT_SQUARE_BRACKET = "]"; //$NON-NLS-1$
+    private static final String LEFT_BRACKET = "{"; //$NON-NLS-1$
+    private static final String RIGHT_BRACKET = "}"; //$NON-NLS-1$
+    private static final String DOUBLE_QUOTE = "\""; //$NON-NLS-1$
+    private static final String SINGLE_QUOTE = "'"; //$NON-NLS-1$
+    private static final String SPACE = " "; //$NON-NLS-1$
 
     /**
      * Autocomplete the string based on the cursorPos. This function suppose
@@ -71,7 +71,7 @@ public class FilterBoxLocalTextCompletion {
     private static boolean canComplete(String str, Integer cursorPos) {
         boolean isValid = true;
 
-        String charAtCursor = "";
+        String charAtCursor = ""; //$NON-NLS-1$
         // If cursorPos = 0, it means there's no char behind. Then left
         // charAtCursor blank
         if (cursorPos > 0) {
@@ -141,7 +141,7 @@ public class FilterBoxLocalTextCompletion {
             break;
         default:
             // D'ont modify
-            charToInsert = "";
+            charToInsert = ""; //$NON-NLS-1$
             break;
         }
 
