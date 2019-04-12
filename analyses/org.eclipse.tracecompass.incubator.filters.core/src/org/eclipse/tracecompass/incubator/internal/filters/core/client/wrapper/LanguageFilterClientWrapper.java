@@ -107,13 +107,8 @@ public class LanguageFilterClientWrapper {
      *            OPIONAL document identifier on which the LSP should work. See
      *            LSP specifications
      */
-<<<<<<< HEAD:analyses/org.eclipse.tracecompass.incubator.filters.core/src/org/eclipse/tracecompass/incubator/internal/filters/core/client/wrapper/LanguageFilterClientWrapper.java
     public LanguageFilterClientWrapper(@NonNull LspObserver observer, String documentUri) throws UnknownHostException, IOException {
-        this(Configuration.HOSTNAME, Configuration.PORT, observer, documentUri);
-=======
-    public LSPFilterClient(@NonNull LspObserver observer, String documentUri) throws UnknownHostException, IOException {
         this(FilterLspConfiguration.HOSTNAME, FilterLspConfiguration.PORT, observer, documentUri);
->>>>>>> 4dfdcccab4e3599a8a0e0688428aec2f34d29598:analyses/org.eclipse.tracecompass.incubator.filters.core/src/org/eclipse/tracecompass/incubator/internal/filters/core/client/LSPFilterClient.java
     }
 
     /**

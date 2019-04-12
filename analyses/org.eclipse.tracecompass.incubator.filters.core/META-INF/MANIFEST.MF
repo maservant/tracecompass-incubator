@@ -17,6 +17,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.google.gson
 Export-Package: org.eclipse.tracecompass.incubator.internal.filters.core;x-friends:="org.eclipse.tracecompass.incubator.filters.core.tests",
  org.eclipse.tracecompass.incubator.internal.filters.core.client;x-friends:="org.eclipse.tracecompass.incubator.filters.core.tests,org.eclipse.tracecompass.incubator.filters.ui",
+ org.eclipse.tracecompass.incubator.internal.filters.core.client.wrapper,
  org.eclipse.tracecompass.incubator.internal.filters.core.server;x-friends:="org.eclipse.tracecompass.incubator.filters.core.tests",
  org.eclipse.tracecompass.incubator.internal.filters.core.shared;x-friends:="org.eclipse.tracecompass.incubator.filters.core.tests,org.eclipse.tracecompass.incubator.filters.ui"
 Automatic-Module-Name: org.eclipse.tracecompass.incubator.lsp.core
