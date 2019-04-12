@@ -305,12 +305,14 @@ public class LspFilterTextbox implements LspObserver {
             Display.getDefault().syncExec(new Runnable() {
                 @Override()
                 public void run() {
-                    // TODO: link this with the dropdown
-                    // List<CompletionItem> completions = completion.getLeft();
-                    // for (int i = 0; i < completions.size(); i++) {
-                    //     TextEdit textEdit = completions.get(i).getTextEdit();
-                    //     String suggestion = textEdit.getNewText();
-                    // }
+                    // TODO: Needs to be implemented and linked with the dropdown
+                    /*List<CompletionItem> completions = completion.getLeft();
+                    for (int i = 0; i < completions.size(); i++) {
+                        TextEdit textEdit = completions.get(i).getTextEdit();
+                        String suggestion = textEdit.getNewText();
+                        // this need to be link with the dropdown
+                        System.out.println("Please do something with this variable " + suggestion);
+                    }*/
                 }
             });
         }
