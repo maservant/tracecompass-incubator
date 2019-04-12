@@ -103,7 +103,6 @@ public class LspFilterTextbox implements LspObserver {
         try {
             fLspClient = new LanguageFilterClientWrapper(this, fFilterBoxUri);
         } catch (IOException e) {
-            e.printStackTrace();
             fIsValidString = true;
         }
         fDefaultFilterTextColor = fFilterStyledText.getForeground();

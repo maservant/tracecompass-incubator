@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.TraceCompassActivator;
-import org.eclipse.tracecompass.incubator.internal.filters.core.server.LSPServer;
+import org.eclipse.tracecompass.incubator.internal.filters.core.server.FilterServerFactory;
 
 /**
  * Activator
@@ -24,7 +24,7 @@ public class Activator extends TraceCompassActivator {
     public static final String PLUGIN_ID = "org.eclipse.tracecompass.incubator.filters.core"; //$NON-NLS-1$
 
     /** The LSP server instance */
-    private static @Nullable LSPServer fServer;
+    private static @Nullable FilterServerFactory fServer;
 
     /**
      * The constructor
@@ -45,7 +45,7 @@ public class Activator extends TraceCompassActivator {
     @Override
     protected void startActions() {
         try {
-            fServer = new LSPServer();
+            fServer = new FilterServerFactory();
         } catch (IOException e) {
             getInstance().logError(e.getMessage());
         }

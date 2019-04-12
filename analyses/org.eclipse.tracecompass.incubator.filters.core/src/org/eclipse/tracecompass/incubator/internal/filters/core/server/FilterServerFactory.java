@@ -25,15 +25,17 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.Activator;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.FilterLspConfiguration;
 
 /**
- * LSPServer wrapper
+ * It's the class responsible for listening on the server socket and instanciate
+ * a language server instance to associate with a client
  *
  * @author Maxime Thibault
  *
  */
-public class LSPServer {
+public class FilterServerFactory {
 
     private LanguageFilterServer fLSPServer;
     private ServerSocket fServerSocket;
+    private Thread fMainThread;
     private List<Thread> fClientThreads = new ArrayList<>();
     private Boolean fCanRun = true;
 
@@ -45,9 +47,10 @@ public class LSPServer {
      * @throws IOException
      *             can be thrown by the socket
      */
-    public LSPServer() throws IOException {
+    public FilterServerFactory() throws IOException {
         fServerSocket = new ServerSocket(FilterLspConfiguration.PORT);
-        new Thread(new ServerLoop()).start();
+        fMainThread = new Thread(new ServerLoop());
+        fMainThread.start();
     }
 
     /**
@@ -60,7 +63,7 @@ public class LSPServer {
      *            OutputStream (data out)
      */
     @VisibleForTesting
-    public LSPServer(InputStream in, OutputStream out) {
+    public FilterServerFactory(InputStream in, OutputStream out) {
         fLSPServer = new LanguageFilterServer();
         Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(fLSPServer, in, out);
         fLSPServer.connect(launcher.getRemoteProxy());
@@ -112,18 +115,17 @@ public class LSPServer {
             while (fCanRun) {
                 try {
                     Socket clientSocket = fServerSocket.accept();
-                    Thread thread =  new Thread(new ConnectionInitializer(clientSocket));
+                    Thread thread = new Thread(new ConnectionInitializer(clientSocket));
                     fClientThreads.add(thread);
                     thread.start();
                 } catch (IOException e) {
-                    e.printStackTrace();
                     Activator.getInstance().logError(e.getMessage());
                 }
             }
             try {
                 fServerSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                // Nothing to do, just closing the socket
             }
         }
     }
@@ -137,5 +139,6 @@ public class LSPServer {
             t.interrupt();
         });
         fCanRun = false;
+        fMainThread.interrupt();
     }
 }

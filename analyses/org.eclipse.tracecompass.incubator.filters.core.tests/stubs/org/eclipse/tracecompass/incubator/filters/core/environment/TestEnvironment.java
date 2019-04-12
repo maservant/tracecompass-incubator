@@ -13,7 +13,7 @@ import java.util.concurrent.Semaphore;
 
 import org.eclipse.tracecompass.incubator.filters.core.stubs.TestConnector;
 import org.eclipse.tracecompass.incubator.internal.filters.core.client.wrapper.LanguageFilterClientWrapper;
-import org.eclipse.tracecompass.incubator.internal.filters.core.server.LSPServer;
+import org.eclipse.tracecompass.incubator.internal.filters.core.server.FilterServerFactory;
 
 /**
  * Create a test environment for testing LSP implementations Use this object in
@@ -37,10 +37,8 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.server.LSPServer
  */
 public class TestEnvironment {
 
-    // The real LSP server implementation
-    private LSPServer fServer = null;
-
     // The real LSP client implementation
+    private FilterServerFactory fServer = null;
     private LanguageFilterClientWrapper fClient = null;
 
     // Stub that contains the fake server and the face client implementation
@@ -114,7 +112,7 @@ public class TestEnvironment {
         fStub = new TestConnector(fTransactionsLock);
 
         // Server read from client stub, write its own stream back to it
-        fServer = new LSPServer(clientStubStream.read, serverStream.write);
+        fServer = new FilterServerFactory(clientStubStream.read, serverStream.write);
 
         // Init clientStub: stub read from server and write its own stream back
         // to it
@@ -169,7 +167,7 @@ public class TestEnvironment {
      *
      * @return
      */
-    public LSPServer getServer() {
+    public FilterServerFactory getServer() {
         return fServer;
     }
 }
