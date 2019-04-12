@@ -113,7 +113,7 @@ public class LspFilterTextbox implements LspObserver {
         }
         fDefaultFilterTextColor = fFilterStyledText.getForeground();
 
-        fRecentlyUsedFilters = new RecentlyUsedFilters(5, "GlobalFilterViewer");
+        fRecentlyUsedFilters = new RecentlyUsedFilters(5, "GlobalFilterViewer"); //$NON-NLS-1$
         // TODO: To combine with the completion items once available
         // List<String> filterStrings = fRecentlyUsedFilters.getRecently();
 
@@ -332,7 +332,7 @@ public class LspFilterTextbox implements LspObserver {
                         completions = completion.getRight().getItems();
                     }
 
-                    fContentAssistProcessor.setLspCompletions(completions);
+                    fContentAssistProcessor.setFilterCompletions(completions);
                 }
             });
         }

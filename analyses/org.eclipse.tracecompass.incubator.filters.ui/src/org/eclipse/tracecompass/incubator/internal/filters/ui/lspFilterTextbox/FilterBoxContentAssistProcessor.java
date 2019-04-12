@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2019 École Polytechnique de Montréal
+ *
+ * All rights reserved. This program and the accompanying materials are
+ * made available under the terms of the Eclipse Public License v1.0 which
+ * accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
+
 package org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox;
 
 import java.util.List;
@@ -23,23 +32,31 @@ import org.eclipse.lsp4j.CompletionItem;
 public class FilterBoxContentAssistProcessor implements IContentAssistProcessor {
 
     // For now, only auto-complete from the list received from the LSP client
-    List<CompletionItem> fLspCompletions;
+    private List<CompletionItem> fFilterCompletions;
+
+    static final ICompletionProposal[] EMPTY_COMPLETION_PROPOSAL_LIST = new ICompletionProposal[] {};
+
+    // For now we activate whenever the user enters a space character. The
+    // default behaviour of CompletionAssistant is to not show an empty
+    // list, so the window should disappear when the LSP client provides no
+    // completions.
+    static final char[] AUTO_ACTIVATION_CHARACTERS = new char[] { ' ' };
 
     /**
      * Constructor
      *
      */
     public FilterBoxContentAssistProcessor() {
-        fLspCompletions = null;
+        fFilterCompletions = null;
     }
 
     @Override
     public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset) {
-        if (fLspCompletions != null) {
-            ICompletionProposal[] results = new ICompletionProposal[fLspCompletions.size()];
+        if (fFilterCompletions != null) {
+            ICompletionProposal[] results = new ICompletionProposal[fFilterCompletions.size()];
 
-            for (int i = 0; i < fLspCompletions.size(); i++) {
-                CompletionItem item = fLspCompletions.get(i);
+            for (int i = 0; i < fFilterCompletions.size(); i++) {
+                CompletionItem item = fFilterCompletions.get(i);
                 String proposal = item.getTextEdit().getNewText();
                 // Range range = item.getTextEdit().getRange();
 
@@ -83,18 +100,18 @@ public class FilterBoxContentAssistProcessor implements IContentAssistProcessor 
             return results;
         }
 
-        return new ICompletionProposal[] {};
+        return EMPTY_COMPLETION_PROPOSAL_LIST;
     }
 
     /**
      * Sets the list of completions proposed by the LSP client
      *
-     * @param lspCompletions
+     * @param filterCompletions
      *            A list of completions to propose
      *
      */
-    public void setLspCompletions(List<CompletionItem> lspCompletions) {
-        fLspCompletions = lspCompletions;
+    public void setFilterCompletions(List<CompletionItem> filterCompletions) {
+        fFilterCompletions = filterCompletions;
     }
 
     @Override
@@ -105,11 +122,7 @@ public class FilterBoxContentAssistProcessor implements IContentAssistProcessor 
 
     @Override
     public char[] getCompletionProposalAutoActivationCharacters() {
-        // For now we activate whenever the user enters a space character. The
-        // default behaviour of CompletionAssistant is to not show an empty
-        // list, so the window should disappear when the LSP client provides no
-        // completions.
-        return new char[] { ' ' };
+        return AUTO_ACTIVATION_CHARACTERS;
     }
 
     @Override
