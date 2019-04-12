@@ -36,7 +36,6 @@ import org.eclipse.lsp4j.ColorInformation;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.tracecompass.incubator.internal.filters.core.client.LSPFilterClient;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserver;
@@ -306,14 +305,14 @@ public class LspFilterTextbox implements LspObserver {
             Display.getDefault().syncExec(new Runnable() {
                 @Override()
                 public void run() {
-                    // TODO: Needs to be implemented
-                    List<CompletionItem> completions = completion.getLeft();
+                    // TODO: Needs to be implemented and linked with the dropdown
+                    /*List<CompletionItem> completions = completion.getLeft();
                     for (int i = 0; i < completions.size(); i++) {
                         TextEdit textEdit = completions.get(i).getTextEdit();
                         String suggestion = textEdit.getNewText();
                         // this need to be link with the dropdown
                         System.out.println("Please do something with this variable " + suggestion);
-                    }
+                    }*/
                 }
             });
         }
