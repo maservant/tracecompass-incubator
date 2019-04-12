@@ -15,6 +15,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
@@ -32,6 +34,8 @@ public class LSPServer {
 
     private LanguageFilterServer fLSPServer;
     private ServerSocket fServerSocket;
+    private List<Thread> fClientThreads = new ArrayList<>();
+    private Boolean fCanRun = true;
 
     /**
      * Create serverSocket then wait for a client socket to connect When a
@@ -105,13 +109,21 @@ public class LSPServer {
     class ServerLoop implements Runnable {
         @Override
         public void run() {
-            while (true) {
+            while (fCanRun) {
                 try {
                     Socket clientSocket = fServerSocket.accept();
-                    new Thread(new ConnectionInitializer(clientSocket)).start();
+                    Thread thread =  new Thread(new ConnectionInitializer(clientSocket));
+                    fClientThreads.add(thread);
+                    thread.start();
                 } catch (IOException e) {
+                    e.printStackTrace();
                     Activator.getInstance().logError(e.getMessage());
                 }
+            }
+            try {
+                fServerSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -119,9 +131,11 @@ public class LSPServer {
     /**
      * Close client-end and server socket
      *
-     * @throws IOException from the socket
      */
-    public void dispose() throws IOException {
-        fServerSocket.close();
+    public void dispose() {
+        fClientThreads.forEach((Thread t) -> {
+            t.interrupt();
+        });
+        fCanRun = false;
     }
 }

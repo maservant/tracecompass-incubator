@@ -53,12 +53,8 @@ public class Activator extends TraceCompassActivator {
 
     @Override
     protected void stopActions() {
-        try {
-            if (fServer != null) {
-                fServer.dispose();
-            }
-        } catch (IOException e) {
-            getInstance().logError(e.getMessage());
+        if (fServer != null) {
+            fServer.dispose();
         }
     }
 }
