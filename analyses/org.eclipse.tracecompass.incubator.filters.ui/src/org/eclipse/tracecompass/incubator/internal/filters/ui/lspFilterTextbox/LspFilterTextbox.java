@@ -12,11 +12,13 @@ package org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextViewer;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -55,9 +57,12 @@ public class LspFilterTextbox implements LspObserver {
     private final Color fDefaultFilterBackgroundColor;
     private final StyledText fFilterStyledText;
     private final TextViewer fTextViewer;
+    private final Document fDocument;
     private final CLabel fSearchButton;
     private final CLabel fCancelButton;
     private final RecentlyUsedFilters fRecentlyUsedFilters;
+    private final ContentAssistant fContentAssistant;
+    private final FilterBoxContentAssistProcessor fContentAssistProcessor;
     private String fLastTextUpdate;
     private final DefaultToolTip fToolTip;
 
@@ -107,9 +112,23 @@ public class LspFilterTextbox implements LspObserver {
             fIsValidString = true;
         }
         fDefaultFilterTextColor = fFilterStyledText.getForeground();
-        fRecentlyUsedFilters = new RecentlyUsedFilters(5, "GlobalFilterViewer"); //$NON-NLS-1$
+
+        fRecentlyUsedFilters = new RecentlyUsedFilters(5, "GlobalFilterViewer");
         // TODO: To combine with the completion items once available
         // List<String> filterStrings = fRecentlyUsedFilters.getRecently();
+
+        // Document
+        fDocument = new Document();
+        fTextViewer.setDocument(fDocument);
+
+        // Content Assistant
+        fContentAssistant = new ContentAssistant();
+        fContentAssistant.enableAutoActivation(true);
+        fContentAssistant.install(fTextViewer);
+
+        // Content Assist Processor
+        fContentAssistProcessor = new FilterBoxContentAssistProcessor();
+        fContentAssistant.setContentAssistProcessor(fContentAssistProcessor, IDocument.DEFAULT_CONTENT_TYPE);
 
         fToolTip = new DefaultToolTip(fFilterStyledText);
         styleToolTip();
@@ -130,7 +149,7 @@ public class LspFilterTextbox implements LspObserver {
      * @return the text
      */
     public String getText() {
-        return fFilterStyledText.getText();
+        return fDocument.get();
     }
 
     /**
@@ -140,7 +159,8 @@ public class LspFilterTextbox implements LspObserver {
      *            the value to set to
      */
     public void setText(String text) {
-        fFilterStyledText.setText(text);
+        fDocument.set(text);
+        fTextViewer.setDocument(fDocument);
     }
 
     /**
@@ -167,7 +187,7 @@ public class LspFilterTextbox implements LspObserver {
      * Method to notify listeners of valid string
      */
     private void notifyValid() {
-        fRecentlyUsedFilters.addFilter(fFilterStyledText.getText());
+        fRecentlyUsedFilters.addFilter(getText());
         if (fIsValidString) {
             for (FilterValidityListener validListener : fListeners) {
                 validListener.validFilter();
@@ -197,7 +217,7 @@ public class LspFilterTextbox implements LspObserver {
                 }
 
                 // Get the filterbox texte
-                String text = Objects.requireNonNull(fFilterStyledText.getText());
+                String text = getText();
 
                 // If text has not change since last update from autocompletion,
                 // do nothing
@@ -210,7 +230,7 @@ public class LspFilterTextbox implements LspObserver {
                     // If the autocompletion changed the string
                     if (!newText.equals(text)) {
                         // Update the filtertextbox
-                        fFilterStyledText.setText(newText);
+                        setText(newText);
                         fFilterStyledText.setCaretOffset(cursorPosition);
                         text = newText;
                     }
@@ -256,7 +276,7 @@ public class LspFilterTextbox implements LspObserver {
 
             @Override
             public void mouseUp(MouseEvent e) {
-                fFilterStyledText.setText(StringUtils.EMPTY);
+                setText(StringUtils.EMPTY);
                 resetView();
             }
 
@@ -305,14 +325,14 @@ public class LspFilterTextbox implements LspObserver {
             Display.getDefault().syncExec(new Runnable() {
                 @Override()
                 public void run() {
-                    // TODO: Needs to be implemented and linked with the dropdown
-                    /*List<CompletionItem> completions = completion.getLeft();
-                    for (int i = 0; i < completions.size(); i++) {
-                        TextEdit textEdit = completions.get(i).getTextEdit();
-                        String suggestion = textEdit.getNewText();
-                        // this need to be link with the dropdown
-                        System.out.println("Please do something with this variable " + suggestion);
-                    }*/
+                    List<CompletionItem> completions;
+                    if (completion.isLeft()) {
+                        completions = completion.getLeft();
+                    } else {
+                        completions = completion.getRight().getItems();
+                    }
+
+                    fContentAssistProcessor.setLspCompletions(completions);
                 }
             });
         }
@@ -382,7 +402,7 @@ public class LspFilterTextbox implements LspObserver {
      * Method to call when an update to the text is needed
      */
     private void updateView() {
-        for (int index = 0; index < fFilterStyledText.getText().length(); index++) {
+        for (int index = 0; index < getText().length(); index++) {
             Color foregroundColor = getColor(index);
             Boolean hasError = indexIsError(index);
             updateViewBetween(index, index + 1, foregroundColor, hasError);

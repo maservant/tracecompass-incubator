@@ -23,4 +23,5 @@ Export-Package: org.eclipse.tracecompass.incubator.internal.filters.ui;x-interna
 Automatic-Module-Name: org.eclipse.tracecompass.incubator.lsp.ui
 Import-Package: com.google.gson,
  org.apache.commons.lang,
- org.eclipse.jface.text
+ org.eclipse.jface.text,
+ org.eclipse.jface.text.contentassist
