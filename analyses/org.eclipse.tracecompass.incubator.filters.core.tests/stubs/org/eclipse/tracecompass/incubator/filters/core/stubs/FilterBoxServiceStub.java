@@ -42,19 +42,35 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 /**
- * FilterBoxService stub: Wrap around the actual textDocumentService
- * implementation. Use this class to store data coming from the LSPCLient bound
- * in the TestEnvironment. Store the data into the FilterBoxServiceMocukup
+ * Implements the fake FilterBoxService stub to probe/forward messages/signals
+ * from the real LSP client/server implementations.
+ *
+ * This class uses the TestConnector to forward signals/messages to the real
+ * implementations.
+ *
+ * Implements this class methods as needed to probe the messages/signals into
+ * the mockup.
+ *
+ * DON'T FORGET TO COUNT THE TRANSACTIONS SO THE TESTS CAN BE SYNCHRONIZE BASED
+ * ON THE NUMBER OF EXPECTED TRANSACTIONS THIS COUNT CAN BE FOUND/INSERTED
+ * WITHIN: @link LSPServerStub, this, LSPClientStub and FakeClientStub
+ *
+ * @see LSPServerStub, TestConnector
  *
  * @author Maxime Thibault
  *
  */
 public class FilterBoxServiceStub implements TextDocumentService {
 
+    // Mockup in wich store the probed messages/signals
     public FilterBoxServiceMockup fMockup = new FilterBoxServiceMockup();
-    private final Stub fStub;
 
-    public FilterBoxServiceStub(Stub stub) {
+    /**
+     * Reference to the TestConnector that create the LSPServerStub.
+     */
+    private final TestConnector fStub;
+
+    public FilterBoxServiceStub(TestConnector stub) {
         fStub = stub;
     }
 
@@ -63,9 +79,11 @@ public class FilterBoxServiceStub implements TextDocumentService {
         // Count the transaction
         fStub.count();
 
-        // Call the real implementation
+        // Forward call to the real server
         fMockup.fCursor = position.getPosition().getCharacter();
         fMockup.fCompletionsReceived = fStub.getProxyServer().getTextDocumentService().completion(position);
+
+        // Forward back the response to the real client
         return fMockup.fCompletionsReceived;
     }
 
@@ -155,8 +173,8 @@ public class FilterBoxServiceStub implements TextDocumentService {
 
     @Override
     public void didOpen(DidOpenTextDocumentParams params) {
-        // Not implemented
-        // Call the real implementation
+        // Forward call the real server (note: the server will reponse back
+        // through the LSPClientStub)
         fStub.getProxyServer().getTextDocumentService().didOpen(params);
         // Count this transaction
         fStub.count();
@@ -166,7 +184,8 @@ public class FilterBoxServiceStub implements TextDocumentService {
     public void didChange(DidChangeTextDocumentParams params) {
         // Store data in mockup
         fMockup.fInputReceived = params.getContentChanges().get(0).getText();
-        // Call the function on the real implementation
+        // Forward call the function on the real server (note: the server will
+        // reponse back through the LSPClientStub)
         fStub.getProxyServer().getTextDocumentService().didChange(params);
         // Count this transaction
         fStub.count();
@@ -187,8 +206,9 @@ public class FilterBoxServiceStub implements TextDocumentService {
         // Count transaction
         fStub.count();
 
-        // Call the real implementation
+        // Forward call the real implementation and wait for response
         fMockup.fColorsReceived = fStub.getProxyServer().getTextDocumentService().documentColor(params);
+        // Forward back the response to the real client implementation
         return fMockup.fColorsReceived;
 
     }

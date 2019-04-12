@@ -20,20 +20,31 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserv
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserver;
 
 /**
- * LanguageClient stub: Wrap around LanguageClientImpl Helps to store data about
- * the real implementation. Use the LSPClientMockup to store data from calls
+ *
+ * Implements a fake LanguageClient to handle the messages send by a real
+ * LanguageFilterServer. Use this class to probe/forward the messages.
+ *
+ * DON'T FORGET TO COUNT THE TRANSACTIONS SO THE TESTS CAN BE SYNCHRONIZE BASED
+ * ON THE NUMBER OF EXPECTED TRANSACTIONS THIS COUNT CAN BE FOUND/INSERTED
+ * WITHIN: @link this, FilterBoxServiceStub, LSPClientStub and FakeClientStub
+ *
+ * @link TestEnvironment
  *
  * @author Maxime Thibault
- * @author David-Alexandre Beaupre
  *
  */
 public class LSPClientStub implements LanguageClient, LspObservable {
 
+    // Mockup in wich store the probed messages/signals
     public LSPClientMockup fMockup = new LSPClientMockup();
-    private final Stub fStub;
+
+    // Reference to the TestConnector that create this LSPServerStub.
+    private final TestConnector fStub;
+
+    // Observer to send updates
     public LspObserver fObserver;
 
-    public LSPClientStub(Stub stub) {
+    public LSPClientStub(TestConnector stub) {
         fStub = stub;
     }
 
@@ -46,7 +57,7 @@ public class LSPClientStub implements LanguageClient, LspObservable {
     public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
         // Store data into mockup
         fMockup.fDiagnosticsReceived = diagnostics.getDiagnostics();
-        // Call the real Client implementation
+        // Forward the call to the real Client implementation
         fStub.getProxyClient().publishDiagnostics(diagnostics);
         // Count this transaction
         fStub.count();

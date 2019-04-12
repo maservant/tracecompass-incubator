@@ -17,21 +17,45 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import org.eclipse.tracecompass.incubator.internal.filters.core.server.FilterWorkspaceService;
 
 /**
- * LanguageServer stub: Wrap around an actual LanguageServerImpl Helps to store
- * data about the real implementation. Use the LSPServerMockup to store data
- * from calls
+ *
+ * Implements a fake LanguageServer to handle the messages passed by a real
+ * LanguageFilterClient. Use this class to probe/forward the messages.
+ *
+ * DON'T FORGET TO COUNT THE TRANSACTIONS SO THE TESTS CAN BE SYNCHRONIZE BASED
+ * ON THE NUMBER OF EXPECTED TRANSACTIONS THIS COUNT CAN BE FOUND/INSERTED
+ * WITHIN: @link this, FilterBoxServiceStub, LSPClientStub and FakeClientStub
+ *
+ * @link TestConnector, TestEnvironment
  *
  * @author Maxime Thibault
  *
  */
 public class LSPServerStub implements LanguageServer {
 
+    // Mockup in wich store the probed messages/signals
     public LSPServerMockup fMockup = new LSPServerMockup();
-    private final FilterBoxServiceStub fFilterBoxService;
-    private final WorkspaceService fFilterWorkspaceService;
-    private final Stub fStub;
 
     /**
+     * A fake FilterBoxServer
+     *
+     * @link FilterBoxService
+     */
+    private final FilterBoxServiceStub fFilterBoxService;
+
+    /**
+     * Don't do anything right now. Implement a fakeFilterWorkspaceServiceStub
+     * if necessary
+     */
+    private final WorkspaceService fFilterWorkspaceService;
+
+    // Reference to the TestConnector that create this LSPServerStub.
+    private final TestConnector fStub;
+
+    /**
+     *
+     * Create the serverStub. Also initialize the services stubs.
+     *
+     * @link FilterBoxServiceStub
      *
      * @param languageServer:
      *            The real LanguageServer implementation
@@ -39,7 +63,7 @@ public class LSPServerStub implements LanguageServer {
      *            use this semaphore to count the transactions and use it in the
      *            TestEnvironment
      */
-    LSPServerStub(Stub stub) {
+    LSPServerStub(TestConnector stub) {
         fStub = stub;
         fFilterBoxService = new FilterBoxServiceStub(stub);
         fFilterWorkspaceService = new FilterWorkspaceService();
@@ -54,18 +78,23 @@ public class LSPServerStub implements LanguageServer {
     public CompletableFuture<Object> shutdown() {
         Object returnVal = null;
         try {
+            // Get the value from the real server
             returnVal = fStub.getProxyServer().shutdown().get();
         } catch (InterruptedException | ExecutionException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        // Pass it back to the real client
         return CompletableFuture.completedFuture(returnVal);
     }
 
     @Override
     public void exit() {
+        // Ask the server to exits
         fStub.getProxyServer().exit();
-        // Count this transaction
+        // Count this transaction so that we can terminate the tests
+        // @see TestEnvironment.waitForTransactionToTerminate
+        // This is the last transaction we expect, but should not be considered
+        // in the testEnvironment transactionExpected value
         fStub.count();
     }
 

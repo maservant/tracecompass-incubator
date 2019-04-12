@@ -12,11 +12,20 @@ package org.eclipse.tracecompass.incubator.filters.core.tests.client;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.incubator.filters.core.environment.TestEnvironment;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.Timeout;
+
 
 public class LspClientTest {
+
+    /** Timeout the tests after 2 minutes */
+    @Rule
+    public TestRule timeoutRule = new Timeout(2, TimeUnit.MINUTES);
 
     /**
      * Simple hello world tests. LSPClient send 'hello' to LSPServer

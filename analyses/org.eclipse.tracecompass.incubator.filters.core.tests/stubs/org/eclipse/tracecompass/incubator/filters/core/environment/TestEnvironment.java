@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.incubator.filters.core.environment;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
-import org.eclipse.tracecompass.incubator.filters.core.stubs.Stub;
+import org.eclipse.tracecompass.incubator.filters.core.stubs.TestConnector;
 import org.eclipse.tracecompass.incubator.internal.filters.core.client.wrapper.LanguageFilterClientWrapper;
 import org.eclipse.tracecompass.incubator.internal.filters.core.server.LSPServer;
 
@@ -19,16 +19,40 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.server.LSPServer
  * Create a test environment for testing LSP implementations Use this object in
  * your test case to synchronize and probe transactions
  *
+ * This class contains everything to test the real LSP client implementation and
+ * the real LSP server implementation.
+ *
+ * Stubs will need to enhenced in order to support more tests see @link Stub for
+ * more information on how to use the Stub
+ *
+ * Access stubs and real implementations from this class methods.
+ *
+ * 1.Use Server/Client to call methods invoke real implementations
+ *
+ * 2.Use stubs to check if value passed between real implementations are
+ * correct.
+ *
  * @author Maxime Thibault
  *
  */
 public class TestEnvironment {
 
+    // The real LSP server implementation
     private LSPServer fServer = null;
-    private LanguageFilterClientWrapper fClient = null;
-    private Stub fStub;
 
+    // The real LSP client implementation
+    private LanguageFilterClientWrapper fClient = null;
+
+    // Stub that contains the fake server and the face client implementation
+    // see @link Stub for more information on how to use the Stub
+    private TestConnector fStub;
+
+    // The number of expected transactions between the server and the client
+    // The transactions are counted in the stubs
+    // see @link Stub for more information on how to use the Stub
     private int fExepectedTransaction;
+
+    // Semaphore to wait the end of expected transactions
     private Semaphore fTransactionsLock;
 
     /**
@@ -36,7 +60,6 @@ public class TestEnvironment {
      *
      * @param expectedTransaction
      *            The number of transaction expected during the test
-     *
      * @throws InterruptedException
      *             Exception thrown by environment initialization
      * @throws IOException
@@ -64,7 +87,10 @@ public class TestEnvironment {
      * Initialize the test environment
      *
      * @param expectedTransaction
-     *            The number of transaction expected before completion
+     *            The number of transaction expected before completion This
+     *            variable is use to create a semaphore that block until the
+     *            number of transactions between the LSP Implementations has
+     *            been observed. @see TestConnector.count()
      * @throws IOException
      *             Exception thrown by the streams
      * @throws InterruptedException
@@ -85,7 +111,7 @@ public class TestEnvironment {
         Stream serverStubStream = new Stream();
 
         // Init stub
-        fStub = new Stub(fTransactionsLock);
+        fStub = new TestConnector(fTransactionsLock);
 
         // Server read from client stub, write its own stream back to it
         fServer = new LSPServer(clientStubStream.read, serverStream.write);
@@ -110,6 +136,7 @@ public class TestEnvironment {
      * @throws IOException
      */
     public void waitForTransactionToTerminate() throws InterruptedException, IOException {
+        // @see TestConnector.count()
         fTransactionsLock.acquire(fExepectedTransaction);
         // Do one more for exit call -> This ensure that the last transaction
         // we've expected has finished
@@ -120,9 +147,11 @@ public class TestEnvironment {
     /**
      * Return the stub
      *
+     * Use this to check value passed between the real implementations
+     *
      * @return
      */
-    public Stub getStub() {
+    public TestConnector getStub() {
         return fStub;
     }
 

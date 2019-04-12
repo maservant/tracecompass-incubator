@@ -17,6 +17,8 @@ import org.eclipse.lsp4j.Diagnostic;
  * Use this class to save data from LSPClientStub Add attributes/functions if
  * necessary
  *
+ * @see LSPClientStub
+ *
  * @author Maxime Thibault
  *
  */

@@ -19,40 +19,61 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 
 /**
- * A complete stub to test LSP client/server communication
+ * Used in the TestEnvironment to handle communications between
+ * LanguageFilterServer and LanguageFilterClient.
+ *
+ * This class centralizes communications between these two classes. Doing so we
+ * can probe the values passed between them and check if they are valid and/or
+ * expected.
+ *
+ * To do so, we use a client stub and a server stub connected to the real
+ * implementations in which we forward back the signals to the other end.
+ *
+ * This class knows everything (stubs and real implementations) and can
+ * communicate with each end. We pass this class to the stubs so those can
+ * forward the signals to any end.
  *
  * @author Maxime Thibault
  *
  */
-public class Stub {
+public class TestConnector {
 
+    // The real server implementation
     private static LanguageServer fProxyServer;
+    // The real client implementation
     private static LanguageClient fProxyClient;
 
     private LSPClientStub fClientStub;
     private LSPServerStub fServerStub;
+
+    // Client stub, usually the far end of the client
     private final FakeClientStub fFakeClientStub;
 
+    // Passed by the TestEnvironment to count the transactions
     private final Semaphore fTransactionsLock;
 
     /**
-     * Create the stub environment. This environment contains the client and the
-     * server stub Both can access the server and client proxy.
+     * Setup the TestConnector. FIXME: Create a fake client with no purpose
+     * yet..
      *
      * @param transactionLock
      */
-    public Stub(Semaphore transactionLock) {
+    public TestConnector(Semaphore transactionLock) {
         fTransactionsLock = transactionLock;
         fFakeClientStub = new FakeClientStub();
     }
 
     /**
-     * Initialize the serverStub
+     * Initialize the serverStub from the TestEnvironment
+     *
+     * See the LSPServerStub to implements/modify signal probing/forwarding
+     *
+     * @link LSPServerStub
      *
      * @param streamFromClient
      *            Stream to read from client
      * @param streamToClient
-     *            Strean ti write to client
+     *            Stream to write to client
      */
     public void initServer(InputStream streamFromClient, OutputStream streamToClient) {
         // Start the stub server
@@ -64,7 +85,11 @@ public class Stub {
     }
 
     /**
-     * Initialize the clientStub
+     * Initialize the clientStub from the TestEnvironment
+     *
+     * See the LSPClientStub to implements/modify signal probing/forwarding
+     *
+     * @link LSPClientStub
      *
      * @param streamFromServer
      *            Stream to read from server
@@ -81,7 +106,9 @@ public class Stub {
     }
 
     /**
-     * Return the stub observer Not used yet
+     * Return the stub observer
+     *
+     * FIXME: Not used yet
      *
      * @return
      */
@@ -128,6 +155,11 @@ public class Stub {
     /**
      * Increment semaphore (used for synchronization based on the number of
      * expected transaction)
+     *
+     * Use this inside stubs to count the transactions
+     *
+     * @see LSPClientStub, LSPServerStub, FilterBoxServiceStub
+     *
      */
     public void count() {
         fTransactionsLock.release();
