@@ -43,8 +43,9 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserv
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserver;
 
 /**
- * LanguageClient to be used by 1 LSPFilterClient. This class implements the
- * LSP4J LanguageClient and update an LspObserver
+ * The LanguageFilterClient implementation for the FilterBox
+ *
+ * See LSP specifications for more informations.
  *
  * @author Maxime Thibault
  *
@@ -60,6 +61,9 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
     private Integer fCursor = 0;
     private ThreadPoolExecutor fThreadPoolExecutor;
 
+    /**
+     * Construct the LanguageFilterClient
+     */
     public LanguageFilterClient() {
         LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
         fThreadPoolExecutor = new ThreadPoolExecutor(
@@ -84,16 +88,17 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
         }
         TextDocumentIdentifier textDocumentIdentifier = new TextDocumentIdentifier(uri);
 
-        //Ask for completion update
+        // Ask for completion update
         fThreadPoolExecutor.execute(completionTask(uri, textDocumentIdentifier));
-        //Ask for syntax highlight update
+        // Ask for syntax highlight update
         fThreadPoolExecutor.execute(syntaxHighlightingTask(uri, textDocumentIdentifier));
     }
 
     /**
-     * Task that ask the server for completion and then update the observer
+     * Task to ask the server for autocompletion hints. Then update the dropdown sugestions
      *
-     * @param uri path to file
+     * @param uri
+     *            path to file
      * @param filterBoxId
      * @return
      */
@@ -117,7 +122,8 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
     }
 
     /**
-     * Task that ask the server for syntax color information and the update the observer
+     * Ask the server for color information about filterbox input tokens.
+     * Then uses this information to update the input color.
      *
      * @param uri
      * @param filterBoxId
@@ -166,7 +172,8 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
     }
 
     /**
-     * Tell the server that the document at uri has beed open
+     * Tell the server that the document at uri has been open
+     *
      * @param uri
      */
     public void tellDidOpen(String uri) {
@@ -179,8 +186,10 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
 
     /**
      * Tell the server that the document at uri as change.
+     *
      * @param uri
-     * @param input the changed (full string)
+     * @param input
+     *            the changed (full string)
      */
     public void tellDidChange(String uri, String input, int cursorPos) {
         fCursor = cursorPos;

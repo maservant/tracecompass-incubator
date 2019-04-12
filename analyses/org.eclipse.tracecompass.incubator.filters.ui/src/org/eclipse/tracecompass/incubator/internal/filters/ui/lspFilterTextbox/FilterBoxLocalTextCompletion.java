@@ -40,7 +40,7 @@ public class FilterBoxLocalTextCompletion {
 
     /**
      * Autocomplete the string based on the cursorPos. This function suppose
-     * that the last inserted character is at cursorPos-1
+     * that the last inserted character is at cursorPos-1 (behind the cursor)
      *
      * @param str
      *            The string to complete
@@ -81,6 +81,7 @@ public class FilterBoxLocalTextCompletion {
         if (str.length() > cursorPos) {
             String nextChar = String.valueOf(str.charAt(cursorPos));
 
+            // Check if the char at cursor is a left symbol
             boolean charAtCursorOk = charAtCursor.equals(LEFT_BRACKET) ||
                     charAtCursor.equals(LEFT_PARENTHESIS) ||
                     charAtCursor.equals(LEFT_SQUARE_BRACKET) ||
@@ -88,6 +89,7 @@ public class FilterBoxLocalTextCompletion {
                     charAtCursor.equals(SINGLE_QUOTE) ||
                     charAtCursor.equals(SPACE);
 
+            // Check if the char at cursor+1 is a right symbol
             boolean rightOK = nextChar.equals(RIGHT_BRACKET) ||
                     nextChar.equals(RIGHT_PARENTHESIS) ||
                     nextChar.equals(RIGHT_SQUARE_BRACKET) ||
@@ -95,6 +97,8 @@ public class FilterBoxLocalTextCompletion {
                     nextChar.equals(SINGLE_QUOTE) ||
                     nextChar.equals(SPACE);
 
+            // If the left char is a bracket, a parenthesis or a square bracket,
+            // the right char should not be a quote.
             if (charAtCursor.equals(LEFT_BRACKET) ||
                     charAtCursor.equals(LEFT_PARENTHESIS) ||
                     charAtCursor.equals(LEFT_SQUARE_BRACKET)) {
@@ -141,6 +145,7 @@ public class FilterBoxLocalTextCompletion {
             break;
         }
 
+        // Insert the char between the string at the cursor position
         return str.substring(0, cursorPos) + charToInsert + str.substring(cursorPos, str.length());
     }
 }
