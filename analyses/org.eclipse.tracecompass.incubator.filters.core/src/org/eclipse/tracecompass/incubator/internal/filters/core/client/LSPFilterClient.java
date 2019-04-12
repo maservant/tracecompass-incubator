@@ -19,87 +19,134 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
+import org.eclipse.tracecompass.incubator.internal.filters.core.Activator;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.Configuration;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserver;
 
 import com.google.common.annotations.VisibleForTesting;
 
 /**
- * LSP Client simplification that offers an API to its observer. The underlying
- * class is the LanguageClient implementation for the tracecompass FilterBox.
+ * This class intent is to be use by the LspFilterTextbox.java
+ *
+ * This class simplify the LanguageFilterClient used by the LspFilterTextbox
+ * reducing the number of call required to achieve an update in a document.
  *
  * @author Maxime Thibault
  *
  */
 public class LSPFilterClient {
 
-    private LanguageFilterClient fLanguageClient;
-    private Socket fSocket;
+    private LanguageFilterClient fLanguageClient = null;
+    private Socket fSocket = null;
 
     /**
-     * Create client: -Connect to server with socket from default hostname and
-     * port -Register an observer who can use client API and get notified when
-     * server responds
-     *
-     * @param observer
-     *            that uses this API and get notified
-     */
-    public LSPFilterClient(@NonNull LspObserver observer) throws UnknownHostException, IOException {
-        fSocket = new Socket(Configuration.HOSTNAME, Configuration.PORT);
-        initialize(fSocket.getInputStream(), fSocket.getOutputStream(), observer);
-    }
-
-    /**
-     * Create client: -Connect to server with socket from hostname and port
-     * -Register an observer who can use client API and get notified when server
-     * responds
+     * Connect the client to server that match the hostname and the port number
+     * Also register an observer which will use this class to update the server
+     * and to be updated by the server.
      *
      * @param hostname
-     *            address of server to connect to
+     *            server IP address
      * @param port
-     *            port of server
+     *            server port number
      * @param observer
-     *            that uses this API and get notified
+     *            to update and get update from
+     * @param documentUri
+     *            OPTIONAL document identifier on which the LSP should work. See
+     *            LSP specifications
      */
-    public LSPFilterClient(String hostname, Integer port, @NonNull LspObserver observer) throws UnknownHostException, IOException {
-        fSocket = new Socket(hostname, port);
-        initialize(fSocket.getInputStream(), fSocket.getOutputStream(), observer);
+    public LSPFilterClient(String hostname, Integer port, @NonNull LspObserver observer, String documentUri) {
+
+        // Start a thread that periodically try to connect to the server if not
+        // already connected
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // While we're not connected to the server
+                while (fSocket == null) {
+                    try {
+                        // Try to connect to the server
+                        fSocket = new Socket(hostname, port);
+
+                    } catch (Exception e) {
+                        // Thread sleep for 5 seconds if has not connected to
+                        // server
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e1) {
+                            Activator.getInstance().logError(e1.getMessage());
+                        }
+
+                    } finally {
+                        // Setup the client if fSocket is not null (because
+                        // we've successfully connected to server)
+                        try {
+                            if (fSocket != null) {
+                                initialize(fSocket.getInputStream(), fSocket.getOutputStream(), observer, documentUri);
+                            }
+                        } catch (IOException e) {
+                            Activator.getInstance().logError(e.getMessage());
+                        }
+                    }
+                }
+            }
+        }).start();
     }
 
     /**
-     * Use this class for testing only Create client: -Use InputStream and
-     * OutputStream instead of socket -Register an observer who can use client
-     * API and get notified when server responds
+     * Constructor that uses a default hostname and port number. See
+     * Configuration.java for more information.
+     *
+     * @param observer
+     *            to update and get update from
+     * @param documentUri
+     *            OPIONAL document identifier on which the LSP should work. See
+     *            LSP specifications
+     */
+    public LSPFilterClient(@NonNull LspObserver observer, String documentUri) throws UnknownHostException, IOException {
+        this(Configuration.HOSTNAME, Configuration.PORT, observer, documentUri);
+    }
+
+    /**
+     * **USE THIS FOR TESTING ONLY**
      *
      * @param in
-     *            input stream of a stream communication
+     *            where the data is coming form
      * @param out
-     *            output stream of a stream communication
+     *            where the data is going to
      * @param observer
-     *            that uses this API to get notified
+     *            to update and get update from
      */
     @VisibleForTesting
     public LSPFilterClient(InputStream in, OutputStream out, @NonNull LspObserver observer) {
-        initialize(in, out, observer);
+        initialize(in, out, observer, null);
     }
 
     /**
-     * Initialize the LanguageServer from LanguageClient implementation
+     * Initialize the LSPFilterClient.
+     *
+     * See LSP specification.
      *
      * @param in
      * @param out
      * @param observer
+     * @param documentUri
+     *            OPTIONAL
      */
-    private void initialize(InputStream in, OutputStream out, @NonNull LspObserver observer) {
+    private void initialize(InputStream in, OutputStream out, @NonNull LspObserver observer, String documentUri) {
         fLanguageClient = new LanguageFilterClient();
         Launcher<LanguageServer> launcher = LSPLauncher.createClientLauncher(fLanguageClient, in, out);
         fLanguageClient.setServer(launcher.getRemoteProxy());
         fLanguageClient.register(observer);
         launcher.startListening();
+
+        // If a documentUri is specified, tell the server about it
+        if (documentUri != null) {
+            fLanguageClient.tellDidOpen(documentUri);
+        }
     }
 
     /**
-     * Return language client used by this LSPClient
+     * See LSP specifications
      *
      * @return Language client
      */
@@ -108,27 +155,38 @@ public class LSPFilterClient {
     }
 
     /**
-     * PUBLIC API: Observers use this to tell the server that the file has
-     * change
+     * Observers use this to tell the server that the file has change
      *
-     * @param str
-     *            string to send
+     * @param Uri
+     *            the file uri on which there's a change
+     * @param input
+     *            new file content
+     * @param cursorPos
+     *            position of cursor when the document change
+     *
      */
     public void notify(String Uri, String input, int cursorPos) {
+
+        if (fLanguageClient == null) {
+            return;
+        }
         fLanguageClient.tellDidChange(Uri, input, cursorPos);
     }
 
     /**
-     * Close client-side socket connection
+     * Close client-side socket connection. Also tell the server to shutdown.
      *
      * @throws IOException
      */
     public void dispose() throws IOException {
+
         try {
-            //Tell server to shutdown
-            fLanguageClient.shutdown();
+            // Tell server to shutdown
+            if (fLanguageClient != null) {
+                fLanguageClient.shutdown();
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            Activator.getInstance().logError(e.getMessage());
         }
 
         // Close socket if exists
