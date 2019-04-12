@@ -11,14 +11,18 @@ package org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox;
 
 /**
  *
- * Client-side autocompletion for parenthesis/brackets/quotes FIXME: When
- * entering the first say '(' or '"', the text is completed correctly. But
- * sometimes the user will close the character himself to avoid having to use
- * the arrow to go after the closing character. If the user enters the closing
- * character, it should just move to the next one, ie remove the one that was
- * auto-added. For example, if I type '"', 'a', '"', I would expect the string
- * to be "a", now, it is "a""", with two trailing "". Same with parenthesis '(',
- * 'a', ')' should be (a), not (a)). See the behavior in Eclipse itself.
+ * Client-side autocompletion for parenthesis/brackets/quotes
+ *
+ * FIXME: When entering the first say '(' or '"', the text is completed
+ * correctly. But sometimes the user will close the character himself to avoid
+ * having to use the arrow to go after the closing character. If the user enters
+ * the closing character, it should just move to the next one, ie remove the one
+ * that was auto-added. For example, if I type '"', 'a', '"', I would expect the
+ * string to be "a", now, it is "a""", with two trailing "". Same with
+ * parenthesis '(', 'a', ')' should be (a), not (a)). See the behavior in
+ * Eclipse itself.
+ *
+ * TODO: move to core?
  *
  * @author Maxime Thibault
  */
@@ -66,7 +70,14 @@ public class FilterBoxLocalTextCompletion {
      */
     private static boolean canComplete(String str, Integer cursorPos) {
         boolean isValid = true;
-        String charAtCursor = String.valueOf(str.charAt(cursorPos - 1));
+
+        String charAtCursor = "";
+        // If cursorPos = 0, it means there's no char behind. Then left
+        // charAtCursor blank
+        if (cursorPos > 0) {
+            charAtCursor = String.valueOf(str.charAt(cursorPos - 1));
+        }
+
         if (str.length() > cursorPos) {
             String nextChar = String.valueOf(str.charAt(cursorPos));
 

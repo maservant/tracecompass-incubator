@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  *
+ *This tests the {@link FilterBoxLocalTextCompletion}
+ *
  * @author Maxime Thibault
  *
  */
