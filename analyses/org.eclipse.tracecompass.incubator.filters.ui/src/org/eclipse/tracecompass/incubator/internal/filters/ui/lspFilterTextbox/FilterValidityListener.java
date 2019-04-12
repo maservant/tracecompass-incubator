@@ -15,16 +15,16 @@ package org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox;
  * @author Jeremy Dube
  *
  */
-public interface ValidListener {
+public interface FilterValidityListener {
     /**
      * Called when the string is valid
      */
-    void valid();
+    void validFilter();
 
     /**
      * Called when the string is invalid
      */
-    default void invalid() {
+    default void invalidFilter() {
         // Do nothing
     }
 }

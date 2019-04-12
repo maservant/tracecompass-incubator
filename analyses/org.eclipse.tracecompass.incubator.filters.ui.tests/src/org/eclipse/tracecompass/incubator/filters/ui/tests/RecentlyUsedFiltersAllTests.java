@@ -17,6 +17,7 @@ import org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox.R
 import org.junit.jupiter.api.Test;
 
 /**
+ * This class tests the {@link RecentlyUsedFilters}
  *
  * @author Jeremy Dube
  *
@@ -30,7 +31,7 @@ public class RecentlyUsedFiltersAllTests {
         RecentlyUsedFilters recentlyUsedFilters = new RecentlyUsedFilters(5, "RecentlyUsedFiltersTest");
         recentlyUsedFilters.addFilter("filter1");
         // Get filters
-        List<String> filtersList = recentlyUsedFilters.getRecently();
+        List<String> filtersList = recentlyUsedFilters.getRecentlyFilters();
         assertEquals(1, filtersList.size());
         assertEquals("filter1", filtersList.get(0));
         // Clear filters for future tests
@@ -45,15 +46,16 @@ public class RecentlyUsedFiltersAllTests {
         RecentlyUsedFilters recentlyUsedFilters = new RecentlyUsedFilters(5, "RecentlyUsedFiltersTest2");
         recentlyUsedFilters.addFilter("filter1");
         // Get filters
-        List<String> filtersList = recentlyUsedFilters.getRecently();
+        List<String> filtersList = recentlyUsedFilters.getRecentlyFilters();
         assertEquals(1, filtersList.size());
         recentlyUsedFilters.clearFilters();
-        filtersList = recentlyUsedFilters.getRecently();
+        filtersList = recentlyUsedFilters.getRecentlyFilters();
         assertEquals(0, filtersList.size());
     }
 
     /**
-     * Creates two filters and check if they have the correct order, i.e. filter2 should be first
+     * Creates two filters and check if they have the correct order, i.e.
+     * filter2 should be first
      */
     @Test
     public void createTwoFilters() {
@@ -61,7 +63,7 @@ public class RecentlyUsedFiltersAllTests {
         recentlyUsedFilters.addFilter("filter1");
         recentlyUsedFilters.addFilter("filter2");
         // Get filters
-        List<String> filtersList = recentlyUsedFilters.getRecently();
+        List<String> filtersList = recentlyUsedFilters.getRecentlyFilters();
         assertEquals(2, filtersList.size());
         assertEquals("filter2", filtersList.get(0));
         assertEquals("filter1", filtersList.get(1));
