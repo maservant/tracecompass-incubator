@@ -22,6 +22,13 @@ import org.eclipse.tracecompass.incubator.filters.core.environment.TestEnvironme
 import org.eclipse.tracecompass.incubator.internal.filters.core.server.SyntaxHighlighting;
 import org.junit.Test;
 
+/**
+ * Tests the communication between the LSP Client and the LSP Server
+ *
+ * @author Maxime Thibault
+ * @author David-Alexandre Beaupre
+ *
+ */
 public class ServerTest {
 
     @Test
@@ -32,13 +39,12 @@ public class ServerTest {
         String uri = "Arriba";
 
         for (int i = 0; i < strArray.length; i++) {
+            // FIXME: Test the transactions type
             /**
-             * We expect 5 transactions:
-             * 1.DidOpen: client -> Server
-             * 2.DidChange: client -> server
-             * 3.publishDiagnostics: server -> client
-             * 4.syntaxHighlight: client <-> server
-             * 5.documentColor: client <->server
+             * We expect 5 transactions: 1.DidOpen: client -> Server
+             * 2.DidChange: client -> server 3.publishDiagnostics: server ->
+             * client 4.syntaxHighlight: client <-> server 5.documentColor:
+             * client <->server
              */
             TestEnvironment te = new TestEnvironment(5);
             te.getClient().getLanguageClient().tellDidOpen(uri);
@@ -55,7 +61,7 @@ public class ServerTest {
     @Test
     public void ColorHighlightReply() throws InterruptedException, IOException, ExecutionException {
         String input = "TID == 42 || PID != 12 && Poly matches Ericsson";
-        Color[] expectedColors = {SyntaxHighlighting.TEXT_COLOR,
+        Color[] expectedColors = { SyntaxHighlighting.TEXT_COLOR,
                 SyntaxHighlighting.OPERATION_COLOR,
                 SyntaxHighlighting.TEXT_COLOR,
                 SyntaxHighlighting.SEPARATOR_COLOR,
@@ -65,7 +71,7 @@ public class ServerTest {
                 SyntaxHighlighting.SEPARATOR_COLOR,
                 SyntaxHighlighting.TEXT_COLOR,
                 SyntaxHighlighting.OPERATION_COLOR,
-                SyntaxHighlighting.TEXT_COLOR};
+                SyntaxHighlighting.TEXT_COLOR };
 
         String uri = "Arriba";
 
@@ -85,8 +91,8 @@ public class ServerTest {
     @Test
     public void CompletionReply() throws InterruptedException, IOException, ExecutionException {
         String input = "(TID == 42 || PID != 12 && Poly matches Ericsson)";
-        int[] cursors = {5, 7, 23, input.length()};
-        int[] expectedLength = {9, 0, 2, 2};
+        int[] cursors = { 5, 7, 23, input.length() };
+        int[] expectedLength = { 9, 0, 2, 2 };
 
         String uri = "Arriba";
 

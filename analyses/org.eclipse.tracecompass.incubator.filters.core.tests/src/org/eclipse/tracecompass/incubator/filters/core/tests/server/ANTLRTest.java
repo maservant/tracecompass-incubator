@@ -25,12 +25,12 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.server.FilterVal
 import org.junit.Test;
 
 /**
+ * This class tests server-side class using antlr for syntax color, validation
+ * and autocompletion
  *
  * @author Maxime Thibault
  * @author David-Alexandre Beaupre
  *
- *         This class tests server-side class using antlr for syntax color,
- *         validation and autocompletion
  */
 public class ANTLRTest {
 
@@ -95,7 +95,7 @@ public class ANTLRTest {
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
         int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
 
-        // We expect antlr to see NoViableAltException at position 6 because
+        // We expect antlr to see NoViableAltException at position 6 because there is no value after the ==
         int lineExpected = 0;
         int startOffsetExpected = 0;
         int endOffsetExpected = str.length();

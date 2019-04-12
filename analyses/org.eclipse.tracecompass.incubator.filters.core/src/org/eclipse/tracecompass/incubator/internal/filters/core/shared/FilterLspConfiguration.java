@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.incubator.internal.filters.core.shared;
  * @author Maxime Thibault
  *
  */
-public interface Configuration {
+public interface FilterLspConfiguration {
     /**
      * IP address to run the server
      */
