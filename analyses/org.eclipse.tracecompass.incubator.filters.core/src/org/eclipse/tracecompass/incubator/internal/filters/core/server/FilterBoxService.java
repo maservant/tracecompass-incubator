@@ -105,9 +105,7 @@ public class FilterBoxService implements TextDocumentService {
                 item.setTextEdit(textEdit);
                 completions.add(item);
             }
-        } catch (RecognitionException error) {
-            Activator.getInstance().logError(error.getMessage());
-        } catch (IOException error) {
+        } catch (RecognitionException | IOException error) {
             Activator.getInstance().logError(error.getMessage());
         }
         return CompletableFuture.completedFuture(Either.forLeft(completions));
@@ -245,9 +243,7 @@ public class FilterBoxService implements TextDocumentService {
             if (client != null) {
                 client.publishDiagnostics(pd);
             }
-        } catch (RecognitionException error) {
-            Activator.getInstance().logError(error.getMessage());
-        } catch (IOException error) {
+        } catch (RecognitionException | IOException error) {
             Activator.getInstance().logError(error.getMessage());
         }
     }

@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.eclipse.tracecompass.incubator.internal.filters.core.Activator;
-import org.eclipse.tracecompass.incubator.internal.filters.core.shared.Configuration;
+import org.eclipse.tracecompass.incubator.internal.filters.core.shared.FilterLspConfiguration;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserver;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -104,7 +104,7 @@ public class LSPFilterClient {
      *            LSP specifications
      */
     public LSPFilterClient(@NonNull LspObserver observer, String documentUri) throws UnknownHostException, IOException {
-        this(Configuration.HOSTNAME, Configuration.PORT, observer, documentUri);
+        this(FilterLspConfiguration.HOSTNAME, FilterLspConfiguration.PORT, observer, documentUri);
     }
 
     /**

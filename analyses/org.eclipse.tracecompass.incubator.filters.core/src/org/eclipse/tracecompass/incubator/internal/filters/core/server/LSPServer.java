@@ -22,7 +22,7 @@ import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.tracecompass.incubator.internal.filters.core.Activator;
-import org.eclipse.tracecompass.incubator.internal.filters.core.shared.Configuration;
+import org.eclipse.tracecompass.incubator.internal.filters.core.shared.FilterLspConfiguration;
 
 /**
  * LSPServer wrapper
@@ -46,7 +46,7 @@ public class LSPServer {
      *             can be thrown by the socket
      */
     public LSPServer() throws IOException {
-        fServerSocket = new ServerSocket(Configuration.PORT);
+        fServerSocket = new ServerSocket(FilterLspConfiguration.PORT);
         new Thread(new ServerLoop()).start();
     }
 

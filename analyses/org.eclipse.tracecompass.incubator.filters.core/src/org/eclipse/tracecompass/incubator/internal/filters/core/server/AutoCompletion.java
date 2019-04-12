@@ -117,12 +117,12 @@ public class AutoCompletion {
 
             commonTokens = tokenStream.getTokens();
 
-            String suggestion = new String();
+            StringBuilder suggestion = new StringBuilder();
 
             for (int j = 0; j < commonTokens.size(); j++) {
-                suggestion = new String(suggestion + commonTokens.get(j).getText() + " "); //$NON-NLS-1$
+                suggestion.append(commonTokens.get(j).getText() + " "); //$NON-NLS-1$
             }
-            suggestions.set(i, suggestion);
+            suggestions.set(i, suggestion.toString());
         }
 
         return suggestions;
