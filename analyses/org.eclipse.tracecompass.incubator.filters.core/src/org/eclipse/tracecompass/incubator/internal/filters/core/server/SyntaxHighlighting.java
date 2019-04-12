@@ -32,8 +32,17 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
  */
 public class SyntaxHighlighting {
 
+    /**
+     * RGB color for the operators (float values)
+     */
     public static final Color OPERATION_COLOR = new Color(0.3, 0.3, 1, 1);
+    /**
+     * RGB color for the text (float values)
+     */
     public static final Color TEXT_COLOR = new Color(0, 0, 0, 1);
+    /**
+     * RGB color for the separators (float values)
+     */
     public static final Color SEPARATOR_COLOR = new Color(0.9, 0.5, 0.1, 1);
 
     /**

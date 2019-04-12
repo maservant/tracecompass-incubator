@@ -39,6 +39,7 @@ public class LSPServer {
      * requests
      *
      * @throws IOException
+     *             can be thrown by the socket
      */
     public LSPServer() throws IOException {
         fServerSocket = new ServerSocket(Configuration.PORT);
@@ -49,7 +50,7 @@ public class LSPServer {
      * Create server from InputStream and OutputStream FIXME: This class is used
      * by the tests case only. This needs to be fixed.
      *
-     * @param in:
+     * @param in
      *            InputStream (data in)
      * @param out
      *            OutputStream (data out)
@@ -118,7 +119,7 @@ public class LSPServer {
     /**
      * Close client-end and server socket
      *
-     * @throws IOException
+     * @throws IOException from the socket
      */
     public void dispose() throws IOException {
         fServerSocket.close();

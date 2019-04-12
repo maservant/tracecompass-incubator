@@ -19,8 +19,8 @@ import org.eclipse.jdt.annotation.NonNull;
  */
 public interface LspObservable {
     /**
-     * Method to register an observer
-     * which will be notified when the lsp server sends a change
+     * Method to register an observer which will be notified when the lsp server
+     * sends a change
      *
      * @param observer
      *            the observer to be registered

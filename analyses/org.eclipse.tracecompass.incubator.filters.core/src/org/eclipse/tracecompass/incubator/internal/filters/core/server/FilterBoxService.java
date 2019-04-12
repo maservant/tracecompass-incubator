@@ -149,6 +149,13 @@ public class FilterBoxService implements TextDocumentService {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Gives colors to each token in the user input
+     *
+     * @param params
+     *            is the for the document (i.e. the input)
+     * @return List of colors for each token as a CompletableFuture
+     */
     @Override
     public CompletableFuture<List<ColorInformation>> documentColor(DocumentColorParams params) {
         try {
@@ -226,12 +233,12 @@ public class FilterBoxService implements TextDocumentService {
         String uri = params.getTextDocument().getUri();
         TextDocumentContentChangeEvent contentChange = params.getContentChanges().get(0);
         if (contentChange == null) {
-            throw new NullPointerException("Event change param cannot be null");
+            throw new NullPointerException("Event change param cannot be null"); //$NON-NLS-1$
         }
         String input = params.getContentChanges().get(0).getText();
         fFiltersInputs.put(uri, input);
         try {
-            List<Diagnostic> diagnostics = Validation.validate(input);
+            List<Diagnostic> diagnostics = FilterValidation.validate(input);
             PublishDiagnosticsParams pd = new PublishDiagnosticsParams(uri, diagnostics);
             pd.setDiagnostics(diagnostics);
             LanguageClient client = fLSPServer.getClient();

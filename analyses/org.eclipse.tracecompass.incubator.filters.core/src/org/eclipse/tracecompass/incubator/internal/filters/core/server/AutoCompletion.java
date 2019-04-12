@@ -33,8 +33,8 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 public class AutoCompletion {
 
     // theree seems to be no way of getting those directly from the grammar
-    static private String[] OPERATORS = { "==", "!=", "<", ">", "matches", "contains", "present" };
-    static private String[] SEPARATORS = { "&&", "||" };
+    static private String[] OPERATORS = { "==", "!=", "<", ">", "matches", "contains", "present" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+    static private String[] SEPARATORS = { "&&", "||" }; //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
      * Proposes suggestions based on the cursor position
@@ -43,8 +43,11 @@ public class AutoCompletion {
      *            is the content of the filter box
      * @param cursor
      *            is the current position in the string
+     * @return List of suggestions as string
      * @throws IOException
+     *             can be thrown by ByteArrayInputStream
      * @throws RecognitionException
+     *             can be thrown by the ANTLR parser and lexer
      */
     @SuppressWarnings("restriction") // Suppress restriction on ANTLR
                                      // FilterParser*
