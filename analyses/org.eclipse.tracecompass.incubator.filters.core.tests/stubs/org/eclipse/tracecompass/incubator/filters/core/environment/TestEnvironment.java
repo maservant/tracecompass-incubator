@@ -13,7 +13,7 @@ import java.util.concurrent.Semaphore;
 
 import org.eclipse.tracecompass.incubator.filters.core.stubs.Stub;
 import org.eclipse.tracecompass.incubator.internal.filters.core.client.wrapper.LanguageFilterClientWrapper;
-import org.eclipse.tracecompass.incubator.internal.filters.core.server.LSPServer;
+import org.eclipse.tracecompass.incubator.internal.filters.core.server.FilterServerFactory;
 
 /**
  * Create a test environment for testing LSP implementations Use this object in
@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.server.LSPServer
  */
 public class TestEnvironment {
 
-    private LSPServer fServer = null;
+    private FilterServerFactory fServer = null;
     private LanguageFilterClientWrapper fClient = null;
     private Stub fStub;
 
@@ -88,7 +88,7 @@ public class TestEnvironment {
         fStub = new Stub(fTransactionsLock);
 
         // Server read from client stub, write its own stream back to it
-        fServer = new LSPServer(clientStubStream.read, serverStream.write);
+        fServer = new FilterServerFactory(clientStubStream.read, serverStream.write);
 
         // Init clientStub: stub read from server and write its own stream back
         // to it
@@ -140,7 +140,7 @@ public class TestEnvironment {
      *
      * @return
      */
-    public LSPServer getServer() {
+    public FilterServerFactory getServer() {
         return fServer;
     }
 }

@@ -25,12 +25,13 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.Activator;
 import org.eclipse.tracecompass.incubator.internal.filters.core.shared.FilterLspConfiguration;
 
 /**
- * LSPServer wrapper
+ * It's the class responsible for listening on the server socket and instanciate
+ * a language server instance to associate with a client
  *
  * @author Maxime Thibault
  *
  */
-public class LSPServer {
+public class FilterServerFactory {
 
     private LanguageFilterServer fLSPServer;
     private ServerSocket fServerSocket;
@@ -46,7 +47,7 @@ public class LSPServer {
      * @throws IOException
      *             can be thrown by the socket
      */
-    public LSPServer() throws IOException {
+    public FilterServerFactory() throws IOException {
         fServerSocket = new ServerSocket(FilterLspConfiguration.PORT);
         fMainThread = new Thread(new ServerLoop());
         fMainThread.start();
@@ -62,7 +63,7 @@ public class LSPServer {
      *            OutputStream (data out)
      */
     @VisibleForTesting
-    public LSPServer(InputStream in, OutputStream out) {
+    public FilterServerFactory(InputStream in, OutputStream out) {
         fLSPServer = new LanguageFilterServer();
         Launcher<LanguageClient> launcher = LSPLauncher.createServerLauncher(fLSPServer, in, out);
         fLSPServer.connect(launcher.getRemoteProxy());
@@ -114,7 +115,7 @@ public class LSPServer {
             while (fCanRun) {
                 try {
                     Socket clientSocket = fServerSocket.accept();
-                    Thread thread =  new Thread(new ConnectionInitializer(clientSocket));
+                    Thread thread = new Thread(new ConnectionInitializer(clientSocket));
                     fClientThreads.add(thread);
                     thread.start();
                 } catch (IOException e) {
