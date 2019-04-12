@@ -21,7 +21,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.tracecompass.incubator.internal.filters.core.server.AutoCompletion;
 import org.eclipse.tracecompass.incubator.internal.filters.core.server.SyntaxHighlighting;
-import org.eclipse.tracecompass.incubator.internal.filters.core.server.Validation;
+import org.eclipse.tracecompass.incubator.internal.filters.core.server.FilterValidation;
 import org.junit.Test;
 
 /**
@@ -62,7 +62,7 @@ public class ANTLRTest {
     @Test
     public void validationMismatchedTokenException() throws IOException, RecognitionException {
 
-        List<Diagnostic> diagnostics = Validation.validate("TID = 123");
+        List<Diagnostic> diagnostics = FilterValidation.validate("TID = 123");
         int lineStart = diagnostics.get(0).getRange().getStart().getLine();
         int offsetStart = diagnostics.get(0).getRange().getStart().getCharacter();
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
@@ -89,7 +89,7 @@ public class ANTLRTest {
 
         String str = "TID == ";
 
-        List<Diagnostic> diagnostics = Validation.validate(str);
+        List<Diagnostic> diagnostics = FilterValidation.validate(str);
         int lineStart = diagnostics.get(0).getRange().getStart().getLine();
         int offsetStart = diagnostics.get(0).getRange().getStart().getCharacter();
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
@@ -111,14 +111,14 @@ public class ANTLRTest {
     @Test
     public void validationSimpleStringNoErrors() throws IOException, RecognitionException {
         String str = "PID == 42";
-        List<Diagnostic> diagnostics = Validation.validate(str);
+        List<Diagnostic> diagnostics = FilterValidation.validate(str);
         assertEquals(diagnostics.size(), 0);
     }
 
     @Test
     public void validationComplexStringNoErrors() throws IOException, RecognitionException {
         String str = "TID < 12 && (PID == 42 && (Ericsson > 1 || Poly matches 2))";
-        List<Diagnostic> diagnostics = Validation.validate(str);
+        List<Diagnostic> diagnostics = FilterValidation.validate(str);
         assertEquals(diagnostics.size(), 0);
     }
 
@@ -126,7 +126,7 @@ public class ANTLRTest {
     public void validationMissingClosingParentheseOneChar() throws IOException, RecognitionException {
         String str = "(TID == 1";
 
-        List<Diagnostic> diagnostics = Validation.validate(str);
+        List<Diagnostic> diagnostics = FilterValidation.validate(str);
         int lineStart = diagnostics.get(0).getRange().getStart().getLine();
         int offsetStart = diagnostics.get(0).getRange().getStart().getCharacter();
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
@@ -150,7 +150,7 @@ public class ANTLRTest {
     public void validationMissingClosingParentheseMultipleChars() throws IOException, RecognitionException {
         String str = "(TID == 123456789";
 
-        List<Diagnostic> diagnostics = Validation.validate(str);
+        List<Diagnostic> diagnostics = FilterValidation.validate(str);
         int lineStart = diagnostics.get(0).getRange().getStart().getLine();
         int offsetStart = diagnostics.get(0).getRange().getStart().getCharacter();
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();

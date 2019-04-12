@@ -12,7 +12,9 @@ package org.eclipse.tracecompass.incubator.internal.filters.core.server;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import org.antlr.runtime.ANTLRInputStream;
@@ -42,25 +44,32 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_retur
  * @author Remi Croteau
  *
  */
-public class Validation {
+public class FilterValidation {
 
     /**
-     * Get the simplest expression at current cursor position
+     * Get the range of the error for the smallest expression possible
      *
      * @param tree
-     * @param cursor
+     *            is the representation of full expression entered by the user
+     * @param startIndex
+     *            is whether we want the start or the end of the simple
+     *            expression
      * @return
      */
     static private int getErrorStartEndIndex(CommonTree tree, boolean startIndex) {
         Stack<CommonTree> treeStack = new Stack<>();
         treeStack.push(tree);
         CommonTree currentTree = null;
+        // Depth first search of the tree of the full expression to find the
+        // smallest expression with the error
         while (!treeStack.isEmpty()) {
             currentTree = treeStack.pop();
             int childCount = currentTree.getChildCount();
+            // push all children of the current tree node
             for (int i = childCount - 1; i >= 0; i--) {
                 treeStack.push((CommonTree) currentTree.getChild(i));
             }
+            // we are only interested in error nodes to find their position
             if (currentTree instanceof CommonErrorNode) {
                 if (startIndex) {
                     int start = ((CommonErrorNode) currentTree).start.getCharPositionInLine();
@@ -82,7 +91,9 @@ public class Validation {
      * @return diagnostics is a list containing all the errors found by the
      *         parser and lexer
      * @throws IOException
+     *             from the InputStream
      * @throws RecognitionException
+     *             from the ANTLR parser or lexer
      */
     @SuppressWarnings("restriction")
     public static List<Diagnostic> validate(String str) throws IOException, RecognitionException {
@@ -194,16 +205,13 @@ public class Validation {
      * @param diagnostics
      */
     private static List<Diagnostic> preprocessDiagnostics(List<Diagnostic> diagnostics) {
+        List<Diagnostic> newDiagnostics = new ArrayList<>();
+        Set<Diagnostic> uniqueDiagnostics = new HashSet<>();
 
-        for (int i = 0; i < diagnostics.size(); i++) {
-            for (int j = i + 1; j < diagnostics.size(); j++) {
-                if (diagnostics.get(i).equals(diagnostics.get(j))) {
-                    diagnostics.remove(j);
-                }
-            }
-        }
+        uniqueDiagnostics.addAll(diagnostics);
+        newDiagnostics.addAll(uniqueDiagnostics);
 
-        return diagnostics;
+        return newDiagnostics;
     }
 
 }

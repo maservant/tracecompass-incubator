@@ -310,6 +310,7 @@ public class LspFilterTextbox implements LspObserver {
                     for (int i = 0; i < completions.size(); i++) {
                         TextEdit textEdit = completions.get(i).getTextEdit();
                         String suggestion = textEdit.getNewText();
+                        // this need to be link with the dropdown
                         System.out.println("Please do something with this variable " + suggestion);
                     }
                 }

@@ -16,6 +16,12 @@ package org.eclipse.tracecompass.incubator.internal.filters.core.shared;
  *
  */
 public interface Configuration {
-    public static final String HOSTNAME = "127.0.0.1";
-    public static final Integer PORT = 9090;
+    /**
+     * IP address to run the server
+     */
+    String HOSTNAME = "127.0.0.1"; //$NON-NLS-1$
+    /**
+     * Default port for the server
+     */
+    Integer PORT = 9090;
 }
