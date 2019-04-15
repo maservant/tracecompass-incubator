@@ -115,7 +115,8 @@ public class GlobalFilterViewer extends Composite {
                     return;
                 }
                 fEnabledFilters.add(text);
-                fSavedArea.setItems(fDisabledFilters.toArray(new String[fDisabledFilters.size()]));
+                fSavedArea.removeAll();
+                fDisabledFilters.forEach(string -> fSavedArea.add(string));
                 filtersUpdated();
             }
 

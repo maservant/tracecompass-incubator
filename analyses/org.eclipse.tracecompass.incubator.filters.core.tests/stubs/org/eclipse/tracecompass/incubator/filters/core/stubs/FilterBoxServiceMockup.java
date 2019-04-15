@@ -20,7 +20,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
  * Use this class to store data from FilterBoxServiceStub Add
  * attributes/functions if necessary
  *
- * @see FilterBoxServiceStub
+ * {@link FilterBoxServiceStub}
  *
  * @author Maxime Thibault
  *

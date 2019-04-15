@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.server.FilterWor
  *
  * DON'T FORGET TO COUNT THE TRANSACTIONS SO THE TESTS CAN BE SYNCHRONIZE BASED
  * ON THE NUMBER OF EXPECTED TRANSACTIONS THIS COUNT CAN BE FOUND/INSERTED
- * WITHIN: @link this, FilterBoxServiceStub, LSPClientStub and FakeClientStub
+ * WITHIN: this, {@link FilterBoxServiceStub}, {@link LSPClientStub} and {@link FakeClientStub}
  *
  * @see TestConnector
  * @see TestEnvironment
@@ -40,7 +40,7 @@ public class LSPServerStub implements LanguageServer {
     /**
      * A fake FilterBoxServer
      *
-     * @link FilterBoxService
+     * {@link FilterBoxService}
      */
     private final FilterBoxServiceStub fFilterBoxService;
 
@@ -57,7 +57,7 @@ public class LSPServerStub implements LanguageServer {
      *
      * Create the serverStub. Also initialize the services stubs.
      *
-     * @link FilterBoxServiceStub
+     * {@link FilterBoxServiceStub}
      *
      * @param languageServer:
      *            The real LanguageServer implementation

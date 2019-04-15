@@ -53,9 +53,9 @@ import org.eclipse.lsp4j.services.TextDocumentService;
  *
  * DON'T FORGET TO COUNT THE TRANSACTIONS SO THE TESTS CAN BE SYNCHRONIZE BASED
  * ON THE NUMBER OF EXPECTED TRANSACTIONS THIS COUNT CAN BE FOUND/INSERTED
- * WITHIN: @link LSPServerStub, this, LSPClientStub and FakeClientStub
+ * WITHIN: {@link LSPServerStub}, this, {@link LSPClientStub} and {@link FakeClientStub}
  *
- * @see LSPServerStub, TestConnector
+ * {@link LSPServerStub}, {@link TestConnector}
  *
  * @author Maxime Thibault
  *
