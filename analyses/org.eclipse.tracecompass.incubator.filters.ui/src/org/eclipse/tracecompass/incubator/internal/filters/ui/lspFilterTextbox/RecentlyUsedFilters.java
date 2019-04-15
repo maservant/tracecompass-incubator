@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.incubator.internal.filters.ui.lspFilterTextbox;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -17,7 +18,6 @@ import java.util.prefs.Preferences;
  * Class to save and get the recently used filters
  *
  * @author Jeremy Dube
- *
  */
 public class RecentlyUsedFilters {
 
@@ -57,14 +57,14 @@ public class RecentlyUsedFilters {
     /**
      * Get the recently used filters
      *
-     * @return an array starting with the latest used filter at first index
+     * @return a list starting with the latest used filter at first index
      */
     public List<String> getRecentlyFilters() {
         List<String> filters = new ArrayList<>(fSize);
         for (int i = fFilters.size() - 1; i >= 0; i--) {
             filters.add(fFilters.get(i));
         }
-        return filters;
+        return Collections.unmodifiableList(filters);
     }
 
     /**
