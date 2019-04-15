@@ -26,7 +26,7 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserv
  *
  * DON'T FORGET TO COUNT THE TRANSACTIONS SO THE TESTS CAN BE SYNCHRONIZED BASED
  * ON THE NUMBER OF EXPECTED TRANSACTIONS THIS COUNT CAN BE FOUND/INSERTED
- * WITHIN: @link this, FilterBoxServiceStub, LSPClientStub and FakeClientStub
+ * WITHIN: this, {@link FilterBoxServiceStub}, {@link LSPClientStub} and {@link FakeClientStub}
  *
  * {@link TestEnvironment}
  *

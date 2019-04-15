@@ -17,10 +17,9 @@ import org.eclipse.lsp4j.Diagnostic;
  * Use this class to save data from LSPClientStub Add attributes/functions if
  * necessary
  *
- * @see LSPClientStub
+ * {@link LSPClientStub}
  *
  * @author Maxime Thibault
- *
  */
 public class LSPClientMockup {
     public String fInputReceived = null;

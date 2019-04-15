@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.incubator.filters.core.stubs;
  * Use this class to save data from LSPServerStub Add attributes/functions if
  * necessary
  *
- * @see LSPServerStub
+ * {@link LSPServerStub}
  *
  * @author Maxime Thibault
  *

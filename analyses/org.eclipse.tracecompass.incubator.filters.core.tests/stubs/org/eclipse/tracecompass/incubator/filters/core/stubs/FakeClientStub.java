@@ -32,19 +32,18 @@ public class FakeClientStub implements LspObserver {
 
     @Override
     public void diagnostic(String uri, List<Diagnostic> diagnostics) {
-        // TODO Auto-generated method stub
-
+        // Nothing to do
     }
 
     @Override
     public void completion(String uri, Either<List<CompletionItem>, CompletionList> completion) {
-        // TODO Auto-generated method stub
+        // Nothing to do
 
     }
 
     @Override
     public void syntaxHighlighting(String uri, List<ColorInformation> colors) {
-        // TODO Auto-generated method stub
+        // Nothing to do
 
     }
 }
