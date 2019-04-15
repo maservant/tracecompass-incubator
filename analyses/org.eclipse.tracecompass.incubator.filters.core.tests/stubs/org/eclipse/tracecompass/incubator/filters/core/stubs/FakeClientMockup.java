@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.incubator.filters.core.stubs;
  * Add attributes/functions if necessary
  *
  * @author Maxime Thibault
- *
  */
 public class FakeClientMockup {
     public String fReceived = null;

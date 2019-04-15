@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.server.FilterSer
  * correct.
  *
  * @author Maxime Thibault
+ *
  */
 public class TestEnvironment {
 
