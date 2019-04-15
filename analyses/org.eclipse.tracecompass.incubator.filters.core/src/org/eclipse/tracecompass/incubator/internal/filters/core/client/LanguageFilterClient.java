@@ -94,10 +94,17 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
     }
 
     /**
-     * Task to ask the server for autocompletion hints. Then update the dropdown sugestions
+     * Task to ask the server for autocompletion hints. Then update the dropdown
+     * sugestions
      *
      * @param uri
-     *            path to file
+     *            For a text document this would be a path to the file. In order
+     *            to allow a single client to have support for multiple filter
+     *            boxes in different views, which may be handy in the future, we
+     *            use this document identifier when sending and receiving
+     *            requests. For the global filter viewer, the URI used is the
+     *            component name. See initialization of fLspFilterTextBox in the
+     *            GlobalFilterViewer constructor.
      * @param filterBoxId
      * @return
      */
@@ -121,8 +128,8 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
     }
 
     /**
-     * Ask the server for color information about filterbox input tokens.
-     * Then uses this information to update the input color.
+     * Ask the server for color information about filterbox input tokens. Then
+     * uses this information to update the input color.
      *
      * @param uri
      * @param filterBoxId
@@ -189,7 +196,8 @@ public class LanguageFilterClient implements LanguageClient, LspObservable {
      * @param uri
      * @param input
      *            the changed (full string)
-     * @param cursorPos The current position of the cursor
+     * @param cursorPos
+     *            The current position of the cursor
      */
     public void tellDidChange(String uri, String input, int cursorPos) {
         fCursor = cursorPos;

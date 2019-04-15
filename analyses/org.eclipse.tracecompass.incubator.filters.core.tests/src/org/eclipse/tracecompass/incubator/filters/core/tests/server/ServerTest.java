@@ -31,8 +31,13 @@ import org.junit.Test;
  */
 public class ServerTest {
 
+    /**
+     * Client sends a request to the server to check if the input is valid or
+     * not according to ANTLR. Checks the client-server communication for
+     * didChange request.
+     */
     @Test
-    public void ValidityReply() throws InterruptedException, IOException {
+    public void validityReply() throws InterruptedException, IOException {
         String[] strArray = { "TID", "TID==", "TID==28" };
         int[] validity = { 0, 1, 0 };
 
@@ -62,8 +67,13 @@ public class ServerTest {
         }
     }
 
+    /**
+     * Client sends a request to the server to check if the token coloration is
+     * valid. Checks the client-server communication for the documentColor
+     * request.
+     */
     @Test
-    public void ColorHighlightReply() throws InterruptedException, IOException, ExecutionException {
+    public void colorHighlightReply() throws InterruptedException, IOException, ExecutionException {
         String input = "TID == 42 || PID != 12 && Poly matches Ericsson";
         Color[] expectedColors = { SyntaxHighlighting.TEXT_COLOR,
                 SyntaxHighlighting.OPERATION_COLOR,
@@ -92,8 +102,13 @@ public class ServerTest {
         }
     }
 
+    /**
+     * Client sends a request to the server to check for completions to the
+     * input string. Checks the client-server communication for the completion
+     * request.
+     */
     @Test
-    public void CompletionReply() throws InterruptedException, IOException, ExecutionException {
+    public void completionReply() throws InterruptedException, IOException, ExecutionException {
         String input = "(TID == 42 || PID != 12 && Poly matches Ericsson)";
         int[] cursors = { 5, 7, 23, input.length() };
         int[] expectedLength = { 9, 0, 2, 2 };

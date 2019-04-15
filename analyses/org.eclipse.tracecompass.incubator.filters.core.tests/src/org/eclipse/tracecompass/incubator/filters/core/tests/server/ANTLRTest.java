@@ -33,6 +33,10 @@ import org.junit.Test;
  */
 public class ANTLRTest {
 
+    /**
+     * Checks if color information list returned by syntax highlighting module
+     * has the right colors for the appropriate ranges
+     */
     @Test
     public void syntaxColorTests() throws IOException {
         String text = "TID";
@@ -58,6 +62,11 @@ public class ANTLRTest {
 
     }
 
+    /**
+     * Checks the MismatchTokemException by making sure the parser finds this
+     * error when the user enters an invalid operator. Also checks the range of
+     * the error
+     */
     @Test
     public void validationMismatchedTokenException() throws IOException, RecognitionException {
 
@@ -83,6 +92,10 @@ public class ANTLRTest {
 
     }
 
+    /**
+     * This is to verify that an incomplete filter entry, in this case lacking a
+     * ending value, generates a error. Also checks the range of the error.
+     */
     @Test
     public void validationNoViableAltException() throws IOException, RecognitionException {
 
@@ -94,7 +107,8 @@ public class ANTLRTest {
         int lineEnd = diagnostics.get(0).getRange().getEnd().getLine();
         int offsetEnd = diagnostics.get(0).getRange().getEnd().getCharacter();
 
-        // We expect antlr to see NoViableAltException at position 6 because there is no value after the ==
+        // We expect antlr to see NoViableAltException at position 6 because
+        // there is no value after the ==
         int lineExpected = 0;
         int startOffsetExpected = 0;
         int endOffsetExpected = str.length();
@@ -107,6 +121,10 @@ public class ANTLRTest {
 
     }
 
+    /**
+     * Ensures that a simple valid filter expression of the form TEXT OP TEXT
+     * triggers no error.
+     */
     @Test
     public void validationSimpleStringNoErrors() throws IOException, RecognitionException {
         String str = "PID == 42";
@@ -114,6 +132,10 @@ public class ANTLRTest {
         assertEquals(diagnostics.size(), 0);
     }
 
+    /**
+     * Also verifies that a valid filter expression triggers no error. This time
+     * with a more complex entry.
+     */
     @Test
     public void validationComplexStringNoErrors() throws IOException, RecognitionException {
         String str = "TID < 12 && (PID == 42 && (Ericsson > 1 || Poly matches 2))";
@@ -121,6 +143,10 @@ public class ANTLRTest {
         assertEquals(diagnostics.size(), 0);
     }
 
+    /**
+     * Verifies that an entry with unbalanced parentheses triggers an error.
+     * Also checks the range of the error.
+     */
     @Test
     public void validationMissingClosingParentheseOneChar() throws IOException, RecognitionException {
         String str = "(TID == 1";
@@ -145,6 +171,10 @@ public class ANTLRTest {
 
     }
 
+    /**
+     * Also checks for the error triggered when the parentheses are not
+     * balanced. This time with a multiple-character value.
+     */
     @Test
     public void validationMissingClosingParentheseMultipleChars() throws IOException, RecognitionException {
         String str = "(TID == 123456789";
@@ -169,6 +199,10 @@ public class ANTLRTest {
 
     }
 
+    /**
+     * Verifies that when the entry is TEXT, there is a list of suggestions of
+     * size 9 with operators and separators proposed by the completion module.
+     */
     @Test
     public void completionOperatorsSeparators() throws IOException, RecognitionException {
         String str = "TID";
@@ -179,6 +213,10 @@ public class ANTLRTest {
         assertEquals(sizeExpected, suggestions.size());
     }
 
+    /**
+     * Verifies that after a closing parenthesis, the completion module proposes
+     * only separators (size 2).
+     */
     @Test
     public void completionSeparatorsAfterParentheses() throws IOException, RecognitionException {
         String str = "(TID == 42)";
@@ -189,6 +227,10 @@ public class ANTLRTest {
         assertEquals(sizeExpected, suggestions.size());
     }
 
+    /**
+     * Verifies that operators and separators are suggested but with a more
+     * complex entry.
+     */
     @Test
     public void completionLongInputOperatorsSeparators() throws IOException, RecognitionException {
         String str = "(TID == 42 && PID != 12) || Poly";
@@ -199,6 +241,11 @@ public class ANTLRTest {
         assertEquals(sizeExpected, suggestions.size());
     }
 
+    /**
+     * Verifies that operators and separators are suggested but with a more
+     * complex entry. This time the cursor is not at the end of the entry but
+     * after TID.
+     */
     @Test
     public void completionLongInputOperatorsSeparatorsCursorMiddle() throws IOException, RecognitionException {
         String str = "(TID == 42 && PID != 12) || Poly";
@@ -209,6 +256,10 @@ public class ANTLRTest {
         assertEquals(sizeExpected, suggestions.size());
     }
 
+    /**
+     * Verifies that no operators and separators are suggested because the
+     * cursor is right after an operator (==).
+     */
     @Test
     public void completionLongInputOperatorsSeparatorsCursorMiddleNoSuggestions() throws IOException, RecognitionException {
         String str = "(TID == 42 && PID != 12) || Poly";
@@ -219,6 +270,10 @@ public class ANTLRTest {
         assertEquals(sizeExpected, suggestions.size());
     }
 
+    /**
+     * Verifies that only separators are suggested when the cursor is after a
+     * complete simple expression (another operator would make no sens here).
+     */
     @Test
     public void completionSeparatorsOnly() throws IOException, RecognitionException {
         String str = "TID == 42";
