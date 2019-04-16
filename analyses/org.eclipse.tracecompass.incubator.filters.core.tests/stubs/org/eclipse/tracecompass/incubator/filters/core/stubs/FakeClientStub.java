@@ -23,8 +23,6 @@ import org.eclipse.tracecompass.incubator.internal.filters.core.shared.LspObserv
  * FakeClientMockup
  *
  * @author Maxime Thibault
- *
- *
  */
 public class FakeClientStub implements LspObserver {
 
